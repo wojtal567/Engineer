@@ -20,21 +20,18 @@
 |MISO|D19|
 
 
-#### IlI9341 TFT TOUCH DISPLAY
-
-|||
+|IlI9341 TFT TOUCH DISPLAY||
 |---|--:|
 |VCC|3.3 V|
 |GND|GND|
 |CS|D5|
 |LED|3.3 V|
-|||
-|*TOUCH*||
+
+|TOUCH||
+|---|--:|
 |CS|D14|
 
-#### SD CARD MODULE
-
-|||
+|SD CARD||
 |---|--:|
 |VCC|3.3 V|
 |GND|GND|
