@@ -19,8 +19,8 @@ TFT_eSPI tft = TFT_eSPI();
 SHT3X sht30(0x45);
 
 int temp, humi;
-const char* ssid = "czwartasciana";
-const char* password = "Z768JPLG";
+const char* ssid = "";
+const char* password = "";
 
 char *pmType[] = { "PM0.3", "PM0.5",  "PM1.0",  "PM2.5",  "PM5.0",  "PM10.0"};
 
