@@ -1,10 +1,18 @@
 #include <WiFi.h>
 #include <SPI.h>
 #include <TFT_eSPI.h>
+#include <SD.h>
+#include <NTPClient.h>
 #include <WEMOS_SHT3X.h> 
+//#include "TFT_eSPI/Fonts/Font16.h"
 
-#define dataRectWidth 80
-#define dataRectHeight 18
+#define dataValueRectWidth 50
+#define dataValueRectHeight 30
+
+#define menuRectTop 14
+#define menuRectBottom 225
+#define menuRectLeft 14
+#define menuRectRight 305
 
 struct pms5003data {
   uint16_t framelen;
@@ -19,22 +27,33 @@ TFT_eSPI tft = TFT_eSPI();
 SHT3X sht30(0x45);
 
 int temp, humi;
-const char* ssid = "ssid";
-const char* password = "password";
+const char* ssid = "czwartasciana";
+const char* password = "Z768JPLG";
 
-char *pmType[] = { "PM0.3", "PM0.5",  "PM1.0",  "PM2.5",  "PM5.0",  "PM10.0"};
+char *titles[] = { "PM2.5     ug/m3", "TEMP",  "RH",  "PM1.0   ug/m3",  "PM10.0    ug/m3",  "PM10  PARTICLES", "Air quality:"};
 
-int dataPositionXY[6][2] =
-              {{20, 54},
-              {20, 116},
-              {20, 175},
-              {120, 54},
-              {120, 116},
-              {120, 175}};
+uint8_t titlesPositionXY[7][2] =
+              {{20, 20},
+              {212, 22},
+              {212, 90},
+              {20, 150},
+              {110, 150},
+              {210, 150},
+              {21, 209}};
+
+uint8_t dataPositionXY[7][2] =
+              {{90, 70},
+              {240, 50},
+              {240, 112},
+              {50, 167},
+              {140, 167},
+              {244, 167},
+              {21, 208}};
 
 struct pms5003data data;
 
 void setup(){
+//  tft.loadFont();
   uint8_t wifiAttempts = 10;
   Serial.begin(115200);
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
@@ -54,17 +73,10 @@ void loop(){
   sht30.get(); 
   temp = sht30.cTemp;
   humi = sht30.humidity;
-  tft.setCursor(213, 54);
-  tft.print(temp);
-  tft.setCursor(213, 116);
-  tft.print(humi);
-  
   if(readPMSdata(&Serial2)){
     tftClearData();
     tftDisplayData();
   }
-  Serial.print(sht30.cTemp);
-  Serial.print(sht30.humidity);
   delay(3000);
 }
 
@@ -79,47 +91,50 @@ void tftMenuInit(){
   tft.begin();
   tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
-  tft.setTextSize(2);
   tft.setTextColor(TFT_WHITE); 
-  tft.setCursor(213, 22);
-  tft.print("Temp");
-  tft.setCursor(213, 84);
-  tft.print("RH");
-  tft.drawLine(105, 14, 105, 203, TFT_WHITE);
-  tft.drawLine(205, 14, 205, 203, TFT_WHITE);
-  for(uint8_t i=0;i<6;i++){
-    tft.setCursor(dataPositionXY[i][0], dataPositionXY[i][1]-32);
-    tft.print(pmType[i]);
-  }
-  tft.drawRect(14, 14, 292, 190, TFT_WHITE);
-  for(uint8_t i=0;i<96;i++){
-    if(i<64)
-      tft.drawLine(210+i, 215, 210+i, 224, RGB16b(31, 0+i, 0));
-    else
-      tft.drawLine(210+i, 215, 210+i, 224, RGB16b(31-(i-32)%32, 63, 0));
+  tft.drawLine(103, 146, 103, 200, TFT_WHITE);
+  tft.drawLine(203, 14, 203, 200, TFT_WHITE);
+  tft.drawLine(14, 145, 305, 145, TFT_WHITE);
+  tft.drawLine(14, 200, 305, 200, TFT_WHITE);
+  tft.drawRect(14, 14, 292, 212, TFT_WHITE);
+  tft.setTextSize(2);
+  for(uint8_t i=0;i<7;i++){
+    tft.setCursor(titlesPositionXY[i][0], titlesPositionXY[i][1]);
+    if(i>2)
+       tft.setTextSize(1);
+    tft.print(titles[i]);
   }
   
-  tft.drawRect(210, 215, 96, 10, TFT_WHITE);
+  for(uint8_t i=0;i<96;i++){
+    if(i<64)
+      tft.drawLine(202+i, 208, 202+i, 217, RGB16b(31, 0+i, 0));
+    else
+      tft.drawLine(202+i, 208, 202+i, 217, RGB16b(31-(i-32)%32, 63, 0));
+  }
+  tft.drawRect(202, 208, 96, 10, TFT_WHITE);
 }
 
 void tftClearData(){
-  for(uint8_t i = 0;i<6;i++)
-    tft.fillRect(dataPositionXY[i][0], dataPositionXY[i][1], dataRectWidth, dataRectHeight, TFT_BLACK);
+  tft.fillRect(dataPositionXY[0][0], dataPositionXY[0][1], 80, 75, TFT_BLACK);
+  for(uint8_t i = 1;i<6;i++)
+    tft.fillRect(dataPositionXY[i][0], dataPositionXY[i][1], dataValueRectWidth, dataValueRectHeight, TFT_BLACK);
+  
 }
 
 void tftDisplayData(){
-  tft.setTextSize(2);
+  tft.setTextSize(7);
   tft.setTextColor(TFT_WHITE);
   tft.setCursor(dataPositionXY[0][0],dataPositionXY[0][1]);
-  tft.print(data.particles_03um);
+  tft.print(data.pm10_standard);
+  tft.setTextSize(3);
   tft.setCursor(dataPositionXY[1][0],dataPositionXY[1][1]);
-  tft.print(data.particles_05um);
+  tft.print(temp);
   tft.setCursor(dataPositionXY[2][0],dataPositionXY[2][1]);
-  tft.print(data.particles_10um);
+  tft.print(humi);
   tft.setCursor(dataPositionXY[3][0],dataPositionXY[3][1]);
-  tft.print(data.particles_25um);
+  tft.print(data.pm25_standard);
   tft.setCursor(dataPositionXY[4][0],dataPositionXY[4][1]);
-  tft.print(data.particles_50um);
+  tft.print(data.pm100_standard);
   tft.setCursor(dataPositionXY[5][0],dataPositionXY[5][1]);
   tft.print(data.particles_100um);
 }
