@@ -38,8 +38,8 @@ TFT_eSPI tft = TFT_eSPI();
 SHT3X sht30(0x45);
 
 int temp, humi;
-const char* ssid = "Kamil";
-const char* password = "qetuo13579";
+const char* ssid = "millofthedam";
+const char* password = "penis123";
 const char* ntpServer = "0.pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
@@ -197,8 +197,7 @@ void save_card(){
   }
 }
 
-void tftMenuInit(){
-  double col_hex =  0xF800;
+void tftMenuInit() {
   tft.begin();
   tft.setRotation(3);
   tft.fillScreen(TFT_BLACK);
@@ -381,7 +380,7 @@ void loop(){
   humi = sht30.humidity;
   RtcDateTime now = Rtc.GetDateTime();
   printDateTime(now);
-  if((now.Minute()%5==0)||first_measure)
+  if((now.Minute()%5==0)|| first_measure )
     if(readPMSdata(&Serial2)){
       tftClearData();
       tftDisplayData();
