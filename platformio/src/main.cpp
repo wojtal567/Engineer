@@ -379,7 +379,7 @@ void loop(){
   humi = sht30.humidity;
   RtcDateTime now = Rtc.GetDateTime();
   printDateTime(now);
-  if((now.Minute()%5==0)||first_measure)
+  if(((now.Minute()%5==0)&&(now.Second()==0))||first_measure)
   {
     first_measure=false;
     if(readPMSdata(&Serial2)){
