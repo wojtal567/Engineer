@@ -44,6 +44,7 @@ const char* ntpServer = "0.pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
 
+bool first_measure = true;
 
 char *titles[] = { "PM2.5     ug/m3", "TEMP",  "RH",  "PM1.0   ug/m3",  "PM10.0    ug/m3",  "PM10  PARTICLES", "Air quality:"};
 
@@ -371,25 +372,21 @@ void setup(){
     tft.setTextSize(1);
     tft.setCursor(0, 230);
     tft.print("No WiFi connection");
-  }
-   
-  
+  }  
 }
 
 void loop(){
-  
   sht30.get(); 
   temp = sht30.cTemp;
   humi = sht30.humidity;
-  if(readPMSdata(&Serial2)){
-    tftClearData();
-    tftDisplayData();
-    save_card();   
-    RtcDateTime now = Rtc.GetDateTime();
-    printDateTime(now);   
-  }
-
-delay(3000);
+  RtcDateTime now = Rtc.GetDateTime();
+  printDateTime(now);
+  if((now.Minute()%5==0)||first_measure)
+    if(readPMSdata(&Serial2)){
+      tftClearData();
+      tftDisplayData();
+      save_card();      
+    }
 }
  
   
