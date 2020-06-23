@@ -380,12 +380,20 @@ void loop(){
   humi = sht30.humidity;
   RtcDateTime now = Rtc.GetDateTime();
   printDateTime(now);
+<<<<<<< HEAD
   if((now.Minute()%5==0)|| first_measure )
+=======
+  if((now.Minute()%5==0)||first_measure)
+  {
+    first_measure=false;
+>>>>>>> a930225189355be4264cd7f82beed0225bb640c9
     if(readPMSdata(&Serial2)){
       tftClearData();
       tftDisplayData();
       save_card();      
     }
+  }
+    
 }
  
   
