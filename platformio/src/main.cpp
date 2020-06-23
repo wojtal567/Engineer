@@ -382,11 +382,15 @@ void loop(){
   RtcDateTime now = Rtc.GetDateTime();
   printDateTime(now);
   if((now.Minute()%5==0)||first_measure)
+  {
+    first_measure=false;
     if(readPMSdata(&Serial2)){
       tftClearData();
       tftDisplayData();
       save_card();      
     }
+  }
+    
 }
  
   
