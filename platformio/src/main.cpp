@@ -10,6 +10,7 @@ RtcDS1307<TwoWire> Rtc(Wire);
 //#include <NTPClient.h>
 #include <WEMOS_SHT3X.h> 
 //#include "TFT_eSPI/Fonts/Font16.h"
+#include <HTTPClient.h>
 
 #define dataValueRectWidth 50
 #define dataValueRectHeight 30
@@ -78,6 +79,7 @@ uint16_t  RGB16b(uint8_t red, uint8_t green, uint8_t blue){
 int db_open() {
   if (db != NULL)
     sqlite3_close(db);
+
   int rc = sqlite3_open(db_file_name, &db);
   return rc;
 }
@@ -85,14 +87,15 @@ int db_open() {
 
 void db_createtable()
 {
-  if (db == NULL) {
+  if (db == NULL) 
     Serial.println("No database open");
-  }
+  
   String sql = "CREATE table if not exists samples (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)";
   int rc = sqlite3_exec(db, sql.c_str(), 0, (void*)data1, &zErrMsg);
-  if (rc != SQLITE_OK) {
+
+  if (rc != SQLITE_OK)
     sqlite3_free(zErrMsg);
-  }
+  
 }
 
 boolean start_SD()
@@ -113,46 +116,38 @@ boolean start_SD()
 String timestamp(){
   RtcDateTime timestamp = Rtc.GetDateTime();
   String time = (String)timestamp.Year()+"-";
+
   if(timestamp.Month()<10)
-  {
     time+="0"+(String)timestamp.Month()+"-";
-  }else
-  {
+  else
     time+=(String)timestamp.Month()+"-";
-  } 
-  if(timestamp.Day()<10){
+
+  if(timestamp.Day()<10)
     time+="0"+(String)timestamp.Day()+" ";
-  }else
-  {
+  else
     time+=(String)timestamp.Day()+" ";
-  }
+  
   if(timestamp.Hour()<10)
-  {
     time+="0"+(String)timestamp.Hour()+":";
-  }else
-  {
+  else
     time+=(String)timestamp.Hour()+":";
-  }
+  
   if(timestamp.Minute()<10)
-  {
     time+="0"+(String)timestamp.Minute()+":";
-  }else
-  {
+  else
     time+=(String)timestamp.Minute()+":";
-  }
-  if(timestamp.Second()<10){
+  
+  if(timestamp.Second()<10)
     time+="0"+(String)timestamp.Second();
-  }else
-  {
+  else
     time+=(String)timestamp.Second();
-  }
+
   return time;
 }
 
 int db_save(int temp, int humi) {
-  if (db == NULL) {
-    return 0;
-  }
+  if (db == NULL) return 0;
+  
   String sql = "insert into samples (temperature, humidity, pm10, pm25, pm100, timestamp) values ("+(String)temp+", "+(String)humi+", "+(String)data.pm10_standard+", "+(String)data.pm25_standard+", "+(String)data.pm100_standard+", "+"'"+timestamp()+"')";
   int rc = sqlite3_exec(db, sql.c_str(), 0, (void*)data1, &zErrMsg);
   if (rc != SQLITE_OK) {
@@ -221,12 +216,12 @@ void tftMenuInit() {
     tft.print(titles[i]);
   }
   
-  for(uint8_t i=0;i<96;i++){
+  for(uint8_t i=0;i<96;i++)
     if(i<64)
       tft.drawLine(202+i, 208, 202+i, 217, RGB16b(31, 0+i, 0));
     else
       tft.drawLine(202+i, 208, 202+i, 217, RGB16b(31-(i-32)%32, 63, 0));
-  }
+  
   tft.drawRect(202, 208, 96, 10, TFT_WHITE);
 }
 
@@ -257,9 +252,9 @@ void tftDisplayData(){
 
 boolean readPMSdata(Stream *s) {
   
-  if (! Serial2.available()) {
+  if (! Serial2.available()) 
     return false;
-  }
+  
   
   // Read a byte at a time until we get to the special '0x42' start-byte
   if (s->peek() != 0x42) {
@@ -268,23 +263,25 @@ boolean readPMSdata(Stream *s) {
   }
 
   // Now read all 32 bytes
-  if (s->available() < 32) {
+  if (s->available() < 32) 
     return false;
-  }
+  
     
   uint8_t buffer[32];    
   uint16_t sum = 0;
   s->readBytes(buffer, 32);
 
   // get checksum ready
-  for (uint8_t i=0; i<30; i++) {
+  for (uint8_t i=0; i<30; i++)
     sum += buffer[i];
+  
+
+  
+  for (auto j=2; j<32; j++){
+    Serial.print("0x"); Serial.print(buffer[j], HEX); Serial.print(", ");
   }
 
   
-  for (uint8_t i=2; i<32; i++) {
-    Serial.print("0x"); Serial.print(buffer[i], HEX); Serial.print(", ");
-  }
   Serial.println();
   
   
@@ -355,7 +352,8 @@ void setup(){
     Serial.print(".");
     delay(500);
     wifiAttempts--;
-  } 
+  }
+
   if(WiFi.status()==WL_CONNECTED)
   {
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -365,13 +363,14 @@ void setup(){
     tft.setCursor(0, 230); 
     Serial.println(WiFi.localIP());
     tft.print("IP address: "+ WiFi.localIP().toString());
-  }
+  } 
   else
   {
     tft.setTextSize(1);
     tft.setCursor(0, 230);
     tft.print("No WiFi connection");
   }  
+
 }
 
 void loop(){
@@ -380,17 +379,28 @@ void loop(){
   humi = sht30.humidity;
   RtcDateTime now = Rtc.GetDateTime();
   printDateTime(now);
-<<<<<<< HEAD
-  if((now.Minute()%5==0)|| first_measure )
-=======
   if((now.Minute()%5==0)||first_measure)
   {
     first_measure=false;
->>>>>>> a930225189355be4264cd7f82beed0225bb640c9
     if(readPMSdata(&Serial2)){
       tftClearData();
       tftDisplayData();
-      save_card();      
+      save_card();
+      HTTPClient client;
+      client.begin("http://192.168.1.130:3434/submit");
+      int httpResponseCode = client.POST("CHUJ CI W DUPE");
+      if(httpResponseCode > 0) 
+      {
+        String response = client.getString();
+        Serial.println(httpResponseCode);
+        Serial.println(response);
+      } 
+      else 
+      {
+        Serial.print("ERROR ON POST");
+        Serial.print(httpResponseCode);
+      }
+      client.end();
     }
   }
     
