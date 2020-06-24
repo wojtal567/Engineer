@@ -53,8 +53,8 @@ RtcDS1307<TwoWire> Rtc(Wire);
 
 sqlite3 *db = NULL;
 char db_file_name[100] = "\0";
-char *zErrMsg = 0;//jakos to trza wyrzucic
-const char* data1 = "Output:";//tez
+char *zErrMsg = 0; //jakos to trza wyrzucic
+const char* data1 = "Output:"; //tez
 
 struct pms5003data {
   uint16_t framelen;
