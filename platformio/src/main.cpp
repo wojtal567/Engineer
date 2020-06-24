@@ -1,3 +1,32 @@
+//TODO PRZECZYTA CELE I ZAKRESY PROJEKTOW(XD)
+//TODO diagnostyka
+//TODO nie ip a antenka
+//TODO konfigurator do sieci
+//TODO zmiena formatu daty
+//TODO on to chce za tydzien wzionc
+//TODO blokowanie dotyku przy uzyciu guzika(albo po czasie)(albo to i to)(a jednak xD)
+//TODO informacja o zablokowanym dotyku
+//TODO Kamil- SSID/haslo Michal - gui Czarek - blokowanie
+//TODO networkmanager (przez web ustawienia sieci)
+//TODO za tydzien ladne kolorky(nie lubi czarnych(kolorow ofc)), temp i wilgotnosc pokazac tam gdzie air quality
+//TODO air quality w prawo blizej skali
+//TODO stopnie i procenty
+//TODO pm10 to nie prawda
+//TODO pomyslec nad tym gui
+//TODO GUI ZROBIC
+//TODO wygladzone czcionki
+//TODO jednostki chyba nie potrzebne
+//TODO mozna slupki graficzne(zgaduje że kolorowe maja byc)(czerwone)
+//TODO szata graficzna ma byc kolorowa(kurwa kolorky)
+//TODO JEDNAK BEZ PRZYCISKU (to sie kurwa wyklucza)
+//TODO chce zaznaczac obszar i z tego wykres
+//TODO wykresy i dokonczenie parsowania danych
+//TODO zmiana bazy i upchniecie do wyswietlacza
+//TODO zakresy na osiach lub automatyczne skalowanie bo pewnie biblioteka ma 
+//TODO przedzial czasowy
+//TODO konfigurowalne (kurwa kolorky)
+//TODO jednak nie laczyc urzadzenia z aplikacja bo nie chce(a moze jednak?)
+//TODO zapisywanie problemow na kartce(bo kartka)
 #include <WiFi.h>
 #include <Wire.h>
 #include <SPI.h>
