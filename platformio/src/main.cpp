@@ -27,6 +27,7 @@
 //TODO konfigurowalne (kurwa kolorky)
 //TODO jednak nie laczyc urzadzenia z aplikacja bo nie chce(a moze jednak?)
 //TODO zapisywanie problemow na kartce(bo kartka)
+//TODO SPRAWDŹCIE SOBIE DODATEK GITLENS//////////////////////////////
 #include <WiFi.h>
 #include <Wire.h>
 #include <SPI.h>
