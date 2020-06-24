@@ -4,6 +4,9 @@
 #include <cstring>
 #include <Stream.h>
 
+//TODO zrobić tak, żeby można było zmienić nazwę tabeli czyli dodać zmienną klasową
+//TODO oprogramować metodę zapisywania do bazy
+
 class SQLiteDb
 {
     private:

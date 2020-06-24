@@ -1,3 +1,4 @@
+//TODO STWORZYĆ KLASY ZWIĄZANE Z ZAPISYWANIEM NA SD I INNYMI PIERDOŁAMI
 //TODO PRZECZYTA CELE I ZAKRESY PROJEKTOW(XD)
 //TODO diagnostyka
 //TODO nie ip a antenka
@@ -6,7 +7,7 @@
 //TODO on to chce za tydzien wzionc
 //TODO blokowanie dotyku przy uzyciu guzika(albo po czasie)(albo to i to)(a jednak xD)
 //TODO informacja o zablokowanym dotyku
-//TODO Kamil- SSID/haslo Michal - gui Czarek - blokowanie
+//TODO Kamil- SSID/haslo Michal - guji Czarek - blokowanie
 //TODO networkmanager (przez web ustawienia sieci)
 //TODO za tydzien ladne kolorky(nie lubi czarnych(kolorow ofc)), temp i wilgotnosc pokazac tam gdzie air quality
 //TODO air quality w prawo blizej skali
