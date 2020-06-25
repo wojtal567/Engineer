@@ -32,4 +32,5 @@ class PMS5003
     public:
         PMS5003();
         bool readData(Stream *reader, Stream *debugger);
+        std::map<std::string, uint16_t> returnData();
 };

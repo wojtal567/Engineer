@@ -1,8 +1,10 @@
 #include <SQLiteDb.hpp>
 
-SQLiteDb::SQLiteDb()
+SQLiteDb::SQLiteDb(String localPath, String tableName)
 {
     sqlite3_initialize();
+    _localPath = localPath;
+    _tableName = tableName;
 }
 
 int SQLiteDb::open(const char name[100])
@@ -23,9 +25,10 @@ void SQLiteDb::createTable(Stream *serial)
     if(object == NULL)
         serial->print("No database open");
 
+    String sql = "CREATE table if not exists " + _tableName + " (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)";
     int rc = sqlite3_exec(
         object,
-        "CREATE table if not exists samples (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)",
+        sql.c_str(),
         0,
         (void*)"Output:",
         &zErrorMessage
@@ -33,4 +36,26 @@ void SQLiteDb::createTable(Stream *serial)
 
     if(rc != SQLITE_OK)
         sqlite3_free(zErrorMessage);
+}
+
+int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
+{
+    if(object == NULL)
+        return 0;
+    
+    String sql = "insert into " + _tableName + " (temperature, humidity, pm10, pm25, pm100, timestamp) values (" +
+                  ", " + (String)temperature + ", " + (String)humidity + ", " + (String)data["pm10"] + ", " +
+                  ", " + (String)data["pm25"] + ", " + (String)data["pm100"] + ", " +"'"+timestamp+"')";
+
+    int rc = sqlite3_exec(object, sql.c_str(), 0, (void*)"Output:", &zErrorMessage);         
+
+    if (rc != SQLITE_OK) {
+        debugger->print(F("SQL error: "));
+        debugger->print(sqlite3_extended_errcode(object));
+        debugger->print(" ");
+        debugger->println(zErrorMessage);
+        sqlite3_free(zErrorMessage);
+    }
+    
+    return rc;
 }

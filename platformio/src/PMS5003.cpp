@@ -46,3 +46,8 @@ bool PMS5003::readData(Stream *reader, Stream *debugger)
 
     return true;
 }
+
+std::map<std::string, uint16_t> PMS5003::returnData()
+{
+    return data;
+}
