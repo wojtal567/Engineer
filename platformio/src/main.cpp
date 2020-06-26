@@ -1,9 +1,10 @@
-//TODO STWORZYĆ KLASY ZWIĄZANE Z ZAPISYWANIEM NA SD I INNYMI PIERDOŁAMI
+//TODO przetestować kupę
+//TODO STWORZYĆ KLASY ZWIĄZANE Z ZAPISYWANIEM NA SD I INNYMI PIERDOŁAMI <- done
 //TODO PRZECZYTA CELE I ZAKRESY PROJEKTOW(XD)
 //TODO diagnostyka
 //TODO nie ip a antenka
 //TODO konfigurator do sieci
-//TODO zmiena formatu daty
+//TODO zmiena formatu daty <- done
 //TODO on to chce za tydzien wzionc
 //TODO blokowanie dotyku przy uzyciu guzika(albo po czasie)(albo to i to)(a jednak xD)
 //TODO informacja o zablokowanym dotyku

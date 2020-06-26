@@ -5,9 +5,6 @@
 #include <Stream.h>
 #include <PMS5003.hpp>
 
-//TODO zrobić tak, żeby można było zmienić nazwę tabeli czyli dodać zmienną klasową
-//TODO oprogramować metodę zapisywania do bazy
-
 class SQLiteDb
 {
     private:
@@ -19,8 +16,11 @@ class SQLiteDb
         bool isOpened;
     public:
         SQLiteDb(String localPath, String tableName);
-        int open(const char name[100]);
+        void init();
+        void kill();
+        int open();
         void close();
         void createTable(Stream *serial);
         int save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger);
+        String getLocalPath();
 };

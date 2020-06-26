@@ -2,14 +2,23 @@
 
 SQLiteDb::SQLiteDb(String localPath, String tableName)
 {
-    sqlite3_initialize();
     _localPath = localPath;
     _tableName = tableName;
 }
 
-int SQLiteDb::open(const char name[100])
+void SQLiteDb::init()
 {
-    strncpy(fileName, name, 100);
+    sqlite3_initialize();
+}
+
+void SQLiteDb::kill()
+{
+    sqlite3_shutdown();
+}
+
+int SQLiteDb::open()
+{
+    strncpy(fileName, _localPath.c_str(), 100);
     if (object != NULL)
         sqlite3_close(object);
     return sqlite3_open(fileName, &object);
@@ -58,4 +67,9 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
     }
     
     return rc;
+}
+
+String SQLiteDb::getLocalPath()
+{
+    return _localPath;
 }
