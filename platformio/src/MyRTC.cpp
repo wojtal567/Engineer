@@ -1,6 +1,6 @@
-#include <RTC.hpp>
+#include <MyRTC.hpp>
 
-RTC::RTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer)
+RTC::MyRTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer)
 {
     _gmtOffestInSeconds = gmtOffestInSeconds;
     _daylightOffsetInSeconds = daylightOffsetInSeconds;
@@ -28,7 +28,7 @@ RTC::RTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer)
     object->SetDateTime(dateTime);
 }
 
-String RTC::getTimestamp()
+String MyRTC::getTimestamp()
 {
     RtcDateTime now = object->GetDateTime();
     char buffer[20];

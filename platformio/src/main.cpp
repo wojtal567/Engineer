@@ -2,15 +2,19 @@
 #include <Wire.h>
 #include <lvgl.h>
 #include <TFT_eSPI.h>
-#include <RtcDS1307.h>
-#include <WiFi.h>
+#include <MyWiFi.hpp>
+#include <MyRTC.hpp>
 #include <WEMOS_SHT3X.h> 
 #include <PMS5003.hpp>
 #define LVGL_TICK_PERIOD 60
+#define GMT_OFFSET_IN_SEC = 3600;
+#define DAYLIGHT_OFFSET_IN_SEC = 3600;
+#define NTP_SERVER = "0.pool.ntp.org";
 
 PMS5003 *pmsSensor;
+MyWiFi *myWiFi;
+MyRTC myRTC(3600, 3600, "0.pool.ntp.org");
 
-RtcDS1307<TwoWire> Rtc(Wire);
 SHT3X sht30(0x45);
 //Ticker tick; /* timer for interrupt handler */
 TFT_eSPI tft = TFT_eSPI(); /* TFT instance */
@@ -55,11 +59,6 @@ bool date_synchronized = false;
 
 int screenWidth = 320;
 int screenHeight = 240;
-const char* ssid = "";
-const char* password = "";
-const char* ntpServer = "0.pool.ntp.org";
-const long gmtOffset_sec = 3600;
-const int daylightOffset_sec = 3600;
 
 
 

@@ -1,6 +1,6 @@
 #include <RtcDS1307.h>
 #include <Wire.h>
-class RTC
+class MyRTC
 {
     private:
         RtcDS1307<TwoWire> *object;
