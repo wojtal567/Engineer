@@ -1,6 +1,6 @@
 #include <MyRTC.hpp>
 
-RTC::MyRTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer)
+MyRTC::MyRTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer)
 {
     _gmtOffestInSeconds = gmtOffestInSeconds;
     _daylightOffsetInSeconds = daylightOffsetInSeconds;
@@ -9,23 +9,7 @@ RTC::MyRTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer
     configTime(gmtOffestInSeconds, daylightOffsetInSeconds, ntpServer);
 
     object = new RtcDS1307<TwoWire>(Wire);
-    object->Begin();
-    time_t rawtime;
-    struct tm *timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    char year[5], month[5];
-    strftime(year, sizeof(year), "%Y", timeinfo);
-    strftime(month, sizeof(month), "%m", timeinfo);
-    RtcDateTime dateTime = RtcDateTime(
-        atoi(year),
-        atoi(month),
-        timeinfo->tm_mday,
-        timeinfo->tm_hour, 
-        timeinfo->tm_min, 
-        timeinfo->tm_sec
-    );
-    object->SetDateTime(dateTime);
+    config(true);
 }
 
 String MyRTC::getTimestamp()
@@ -44,4 +28,22 @@ String MyRTC::getTimestamp()
         now.Second() 
     );
     return (String)buffer;
+}
+
+void MyRTC::config(bool synchronized)
+{
+    if(synchronized)
+    {
+        object->Begin();
+        time_t rawtime;
+        struct tm* timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        char year[5];
+        char month[5];
+        strftime (year, sizeof(year), "%Y",timeinfo);
+        strftime (month, sizeof(month), "%m", timeinfo);
+        RtcDateTime date = RtcDateTime(atoi(year), atoi(month), timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+        object->SetDateTime(date);
+    }
 }

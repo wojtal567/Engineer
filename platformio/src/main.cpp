@@ -64,24 +64,6 @@ int screenHeight = 240;
 
 int temp, humi;
 
-void config_time(lv_task_t * task)
-{
-  if(date_synchronized)
-  {
-    Rtc.Begin();
-    time_t rawtime;
-    struct tm* timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    char year[5];
-    char month[5];
-    strftime (year, sizeof(year), "%Y",timeinfo);
-    strftime (month, sizeof(month), "%m", timeinfo);
-    RtcDateTime date = RtcDateTime(atoi(year), atoi(month), timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
-    Rtc.SetDateTime(date);
-  }  
-}
-
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
 {
   uint16_t c;
@@ -160,7 +142,7 @@ static void btn_connect(lv_obj_t * obj, lv_event_t event){
   if(event==LV_EVENT_RELEASED)
   {
     uint8_t wifiAttempts=10;
-    ssid=lv_textarea_get_text(ssid_ta);
+    char ssid=lv_textarea_get_text(ssid_ta);
     Serial.println(ssid);
     password=lv_textarea_get_text(pwd_ta);
     Serial.println(password);
@@ -227,19 +209,13 @@ void turnFanOnFunc(lv_task_t * task)
 
 void date_time(lv_task_t * task)
 {
-  RtcDateTime dt = Rtc.GetDateTime();
-  char datestring[20];
-  snprintf_P(datestring, 
-            20,
-            PSTR("%02u.%02u.%04u %02u:%02u:%02u"),
-            dt.Day(),
-            dt.Month(),
-            dt.Year(),
-            dt.Hour(),
-            dt.Minute(),
-            dt.Second() );
   if(WiFi.status()==WL_CONNECTED)
-    lv_label_set_text(dateAndTimeAtBar, datestring);
+    lv_label_set_text(dateAndTimeAtBar, myRTC.getTimestamp().c_str());
+}
+
+void config_time(lv_task_t * task)
+{
+  myRTC.config(date_synchronized);
 }
 
 void main_screen()
@@ -383,7 +359,7 @@ void setup() {
 
   lv_task_t * date = lv_task_create(date_time, 1000, LV_TASK_PRIO_MID, NULL);
   syn_rtc = lv_task_create_basic();
-  lv_task_set_cb(syn_rtc, config_time);
+  lv_task_set_cb(syn_rtc, config_time());
   lv_task_set_period(syn_rtc, 3600000);
   getSample = lv_task_create(getSampleFunc, 300000, LV_TASK_PRIO_HIGH, NULL);
   turnFanOn = lv_task_create(turnFanOnFunc, 240000, LV_TASK_PRIO_HIGH, NULL);

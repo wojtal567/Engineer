@@ -1,5 +1,6 @@
 #include <RtcDS1307.h>
 #include <Wire.h>
+#include <lvgl.h>
 class MyRTC
 {
     private:
@@ -9,6 +10,7 @@ class MyRTC
         char* _ntpServer;
 
     public:
-        RTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer);
+        MyRTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer);
         String getTimestamp();
+        void config(bool synchronized);
 };
