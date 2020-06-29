@@ -1,9 +1,10 @@
 #include <stdint.h>
-#include <Stream.h>
+#include <HardwareSerial.h>
 #include <map>
 #include <string>
 #include <iterator>
 #include <vector>
+#include <Arduino.h>
 
 #define BUFFERSIZE 32
 #define VALUES 15
@@ -11,6 +12,7 @@
 class PMS5003
 {
     private:
+        HardwareSerial *_reader, *_debugger;
         std::map<std::string, uint16_t> data;
         const char* labels[15] = { 
             "framelen",
@@ -30,7 +32,8 @@ class PMS5003
             "checksum"
         }; 
     public:
-        PMS5003();
-        bool readData(Stream *reader, Stream *debugger);
+        PMS5003(HardwareSerial *reader, HardwareSerial *debugger);
+        bool readData();
         std::map<std::string, uint16_t> returnData();
+        void dumpSamples();
 };
