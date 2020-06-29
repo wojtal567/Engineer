@@ -1,35 +1,4 @@
-//TODO przetestować kupę
-//TODO STWORZYĆ KLASY ZWIĄZANE Z ZAPISYWANIEM NA SD I INNYMI PIERDOŁAMI <- done
-//TODO PRZECZYTA CELE I ZAKRESY PROJEKTOW(XD)
-//TODO diagnostyka
-//TODO nie ip a antenka
-//TODO konfigurator do sieci
-//TODO zmiena formatu daty <- done
-//TODO on to chce za tydzien wzionc
-//TODO blokowanie dotyku przy uzyciu guzika(albo po czasie)(albo to i to)(a jednak xD)
-//TODO informacja o zablokowanym dotyku
-//TODO Kamil- SSID/haslo Michal - guji Czarek - blokowanie
-//TODO networkmanager (przez web ustawienia sieci)
-//TODO za tydzien ladne kolorky(nie lubi czarnych(kolorow ofc)), temp i wilgotnosc pokazac tam gdzie air quality
-//TODO air quality w prawo blizej skali
-//TODO stopnie i procenty
-//TODO pm10 to nie prawda
-//TODO pomyslec nad tym gui
-//TODO GUI ZROBIC
-//TODO wygladzone czcionki
-//TODO jednostki chyba nie potrzebne
-//TODO mozna slupki graficzne(zgaduje że kolorowe maja byc)(czerwone)
-//TODO szata graficzna ma byc kolorowa(kurwa kolorky)
-//TODO JEDNAK BEZ PRZYCISKU (to sie kurwa wyklucza)
-//TODO chce zaznaczac obszar i z tego wykres
-//TODO wykresy i dokonczenie parsowania danych
-//TODO zmiana bazy i upchniecie do wyswietlacza
-//TODO zakresy na osiach lub automatyczne skalowanie bo pewnie biblioteka ma 
-//TODO przedzial czasowy
-//TODO konfigurowalne (kurwa kolorky)
-//TODO jednak nie laczyc urzadzenia z aplikacja bo nie chce(a moze jednak?)
-//TODO zapisywanie problemow na kartce(bo kartka)
-//TODO SPRAWDŹCIE SOBIE DODATEK GITLENS//////////////////////////////
+//syf jak ja nie moge
 #include <WiFi.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -38,6 +7,7 @@
 #include <sqlite3.h>
 #include <RtcDS1307.h>
 #include <time.h>
+#include <lvgl.h>
 RtcDS1307<TwoWire> Rtc(Wire);
 //#include <NTPClient.h>
 #include <WEMOS_SHT3X.h> 
@@ -55,8 +25,8 @@ RtcDS1307<TwoWire> Rtc(Wire);
 
 sqlite3 *db = NULL;
 char db_file_name[100] = "\0";
-char *zErrMsg = 0; //jakos to trza wyrzucic
-const char* data1 = "Output:"; //tez
+char *zErrMsg = 0;//jakos to trza wyrzucic
+const char* data1 = "Output:";//tez
 
 struct pms5003data {
   uint16_t framelen;
@@ -100,7 +70,6 @@ uint8_t dataPositionXY[7][2] =
               {21, 208}};
 
 struct pms5003data data;
-
 
 uint16_t  RGB16b(uint8_t red, uint8_t green, uint8_t blue){  
   if(red>31 or green>63 or blue>31)
@@ -334,7 +303,7 @@ boolean readPMSdata(Stream *s) {
   // success!
   return true;
 }
-
+uint8_t wifiAttempts = 10;
 void printDateTime(const RtcDateTime& dt)
 {
     char datestring[20];
@@ -370,23 +339,240 @@ void config_time()
   Rtc.SetDateTime(date);
 }
 
+static lv_disp_buf_t disp_buf;
+static lv_color_t buf[LV_HOR_RES_MAX * 10];
+
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
+{
+    uint32_t w = (area->x2 - area->x1 + 1);
+    uint32_t h = (area->y2 - area->y1 + 1);
+
+    tft.startWrite();
+    tft.setAddrWindow(area->x1, area->y1, w, h);
+    tft.pushColors(&color_p->full, w * h, true);
+    tft.endWrite();
+
+    lv_disp_flush_ready(disp);
+}
+
+/* Reading input device (simulated encoder here) */
+bool read_encoder(lv_indev_drv_t * indev, lv_indev_data_t * data)
+{
+    static int32_t last_diff = 0;
+    int32_t diff = 0; /* Dummy - no movement */
+    int btn_state = LV_INDEV_STATE_REL; /* Dummy - no press */
+
+    data->enc_diff = diff - last_diff;;
+    data->state = btn_state;
+
+    last_diff = diff;
+
+    return false;
+}
+
+
+static void keyboard_event_cb(lv_obj_t * keyboard, lv_event_t event){
+  lv_keyboard_def_event_cb(keyboard, event);
+  if(event == LV_EVENT_APPLY){
+    //printf("LV_EVENT_APPLY\n");
+  }else if(event == LV_EVENT_CANCEL){
+	  //keyboard = NULL;
+  }
+}
+
+lv_obj_t * keyboard;
+lv_obj_t * ssid_ta;
+lv_obj_t * pwd_ta;
+int screenWidth = 320;
+int screenHeight = 240;
+bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
+{
+    uint16_t touchX, touchY;
+
+    bool touched = tft.getTouch(&touchX, &touchY, 600);
+
+    if(!touched)
+    {
+      return false;
+    }
+
+    if(touchX>screenWidth || touchY > screenHeight)
+    {
+     // Serial.println("Y or y outside of expected parameters..");
+      //Serial.print("y:");
+     // Serial.print(touchX);
+     // Serial.print(" x:");
+     // Serial.print(touchY);
+    }
+    else
+    {
+
+      data->state = touched ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL; 
+  
+      /*Save the state and save the pressed coordinate*/
+      //if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
+     
+      /*Set the coordinates (if released use the last pressed coordinates)*/
+      data->point.x = touchX;
+      data->point.y = touchY;
+  
+     // Serial.print("Data x");
+     // Serial.println(touchX);
+      
+    //  Serial.print("Data y");
+    //  Serial.println(touchY);
+
+    }
+
+    return false; /*Return `false` because we are not buffering and no more data to read*/
+}
+
+static void ta_event_cb(lv_obj_t * ta, lv_event_t event)
+{
+    if(event == LV_EVENT_CLICKED) {
+        
+       
+        if(keyboard==NULL)
+        {
+          keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+          lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES/2);
+          lv_obj_set_event_cb(keyboard, keyboard_event_cb);
+          lv_keyboard_set_textarea(keyboard, ta);
+        }
+         if(keyboard != NULL)
+            lv_keyboard_set_textarea(keyboard, ta);
+    }
+
+    else if(event == LV_EVENT_INSERT) {
+        //const char * str = lv_event_get_data();
+        //if(str[0] == '\n') {
+      //      printf("Ready\n");
+        //}
+    }
+}
+
+
+void btn_cancel(){
+  //TODO powrot do glownego gui
+}
+
+static void btn_connect(lv_obj_t * obj, lv_event_t event){
+  if(event==LV_EVENT_RELEASED)
+  {
+    wifiAttempts=10;
+    ssid=lv_textarea_get_text(ssid_ta);
+    Serial.println(ssid);
+    password=lv_textarea_get_text(pwd_ta);
+    Serial.println(password);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED and wifiAttempts>0){
+      Serial.print(".");
+      delay(500);
+      wifiAttempts--;
+    }
+  }
+}
+
+static void btn_lock(lv_obj_t * obj, lv_event_t event){
+  if(event == LV_EVENT_CLICKED)
+  {
+    lv_obj_t *lockScreen = lv_obj_create(NULL, NULL);
+    lv_scr_load(lockScreen);
+    lv_obj_t *padContainer = lv_cont_create(lockScreen, NULL);
+    //lv_obj_set_width_fit(padContainer, LV_FIT_PARENT);
+    //lv_obj_set_height_fit(padContainer, LV_FIT_TIGHT);
+    lv_obj_align(padContainer, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+
+    lv_obj_t *unlockbutton = lv_btn_create(padContainer, NULL);
+    lv_label_set_text(lv_label_create(unlockbutton, NULL), "U");
+    lv_obj_set_width(unlockbutton, 30);
+    lv_obj_align(unlockbutton, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
+  }
+}
+
 void setup(){
 //  tft.loadFont();
-  uint8_t wifiAttempts = 10;
+  
   Serial.begin(115200);
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
+  lv_init();
   tft.init();
-  tft.setRotation(1);
-  tft.fillScreen(TFT_BLACK);
-  tftMenuInit();  
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED and wifiAttempts>0){
-    Serial.print(".");
-    delay(500);
-    wifiAttempts--;
-  }
+  tft.setRotation(3);
+  uint16_t calData[5] = {299, 3588, 348, 3474, 1};
+  tft.setTouch(calData);
+  lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
+  /*Initialize the display*/
+  lv_disp_drv_t disp_drv;
+  lv_disp_drv_init(&disp_drv);
+  disp_drv.hor_res = 320;
+  disp_drv.ver_res = 240;
+  disp_drv.flush_cb = my_disp_flush;
+  disp_drv.buffer = &disp_buf;
+  lv_disp_drv_register(&disp_drv);
+    //dotyk
+  lv_indev_drv_t indev_drv;
+  lv_indev_drv_init(&indev_drv);             /*Descriptor of a input device driver*/
+  indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
+  indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
+  lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-  if(WiFi.status()==WL_CONNECTED)
+
+
+  lv_obj_t * ssid_label = lv_label_create(lv_scr_act(), NULL);
+  lv_label_set_text(ssid_label, "SSID: ");
+  lv_obj_set_pos(ssid_label, 5, 28);
+
+  ssid_ta = lv_textarea_create(lv_scr_act(), NULL);
+  lv_textarea_set_text(ssid_ta, "");
+  lv_textarea_set_pwd_mode(ssid_ta, false);
+  lv_textarea_set_one_line(ssid_ta, true);
+  lv_obj_set_event_cb(ssid_ta, ta_event_cb);
+  lv_textarea_set_cursor_hidden(ssid_ta, true);
+  lv_obj_set_width(ssid_ta, LV_HOR_RES/2 -20);
+  lv_obj_set_pos(ssid_ta, 100, 20);
+
+  lv_obj_t * pwd_label = lv_label_create(lv_scr_act(), NULL);
+  lv_label_set_text(pwd_label, "Password: ");
+  lv_obj_set_pos(pwd_label, 5, 68);
+  pwd_ta = lv_textarea_create(lv_scr_act(), NULL);
+  lv_textarea_set_text(pwd_ta, "");
+  lv_textarea_set_pwd_mode(pwd_ta, true);
+  lv_textarea_set_one_line(pwd_ta, true);
+  lv_obj_set_event_cb(pwd_ta, ta_event_cb);
+  lv_textarea_set_cursor_hidden(pwd_ta, true);
+  lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
+  lv_obj_set_pos(pwd_ta, 100, 60);
+
+  lv_obj_t * apply_btn = lv_btn_create(lv_scr_act(), NULL);
+  lv_obj_t * apply_label = lv_label_create(apply_btn, NULL);
+  lv_label_set_text(apply_label, "Connect");
+  lv_obj_set_event_cb(apply_btn, btn_connect);
+  lv_obj_set_width(apply_btn, 75);
+  lv_obj_set_pos(apply_btn, 243, 13);
+
+  lv_obj_t * cancel_btn = lv_btn_create(lv_scr_act(), NULL);
+  lv_obj_t * cancel_label = lv_label_create(cancel_btn, NULL);
+  lv_label_set_text(cancel_label, "Cancel");
+  lv_obj_set_width(cancel_btn, 75);
+  lv_obj_set_pos(cancel_btn, 243, 60);
+
+  lv_obj_t *lockbutton = lv_btn_create(lv_scr_act(), NULL);
+  lv_label_set_text(lv_label_create(lockbutton, NULL), "L");
+  lv_obj_set_width(lockbutton, 30);
+  lv_obj_set_pos(lockbutton, 280, 200);
+  lv_obj_set_event_cb(lockbutton, btn_lock);
+
+
+  //tft.fillScreen(TFT_BLACK);
+  //tftMenuInit();  
+ // WiFi.begin(ssid, password);
+  //while (WiFi.status() != WL_CONNECTED and wifiAttempts>0){
+   // Serial.print(".");
+    //delay(500);
+  //  wifiAttempts--;
+  //}
+
+  /*if(WiFi.status()==WL_CONNECTED)
   {
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     delay(500);
@@ -402,11 +588,12 @@ void setup(){
     tft.setCursor(0, 230);
     tft.print("No WiFi connection");
   }  
-
+*/
 }
 
+
 void loop(){
-  sht30.get(); 
+  /*sht30.get(); 
   temp = sht30.cTemp;
   humi = sht30.humidity;
   RtcDateTime now = Rtc.GetDateTime();
@@ -434,7 +621,8 @@ void loop(){
       }
       client.end();
     }
-  }
+  }*/
+  lv_task_handler(); /* let the GUI do its work */
     
 }
  
