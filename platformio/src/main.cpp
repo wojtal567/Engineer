@@ -211,7 +211,7 @@ int db_save(int temp, int humi) {
   if (db == NULL) return 0;
   String sql;
   if(Rtc.GetMemory(1)==1)
-    sql = "INSERT INTO samples ('id', 'temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ('1', '', '', '', '', '', '', '', '', '2020-06-30 12:19:42');";
+    sql = "INSERT INTO samples ('temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ("+(String)temp+", "+(String)humi+", "+(String)data.pm10_standard+", "+(String)data.pm25_standard+", "+(String)data.pm100_standard+", "+(String)data.particles_10um+", "+(String)data.particles_25um+", "+(String)data.particles_100um+", '"+timestamp()+"')";
   else
     sql = "insert into 'samples' (temperature, humidity, pm10, pm25, pm100, particles1, particles25, particles10) values ("+(String)temp+", "+(String)humi+", "+(String)data.pm10_standard+", "+(String)data.pm25_standard+", "+(String)data.pm100_standard+", "+(String)data.particles_10um+", "+(String)data.particles_25um+", "+(String)data.particles_100um+")";
   int rc = sqlite3_exec(db, sql.c_str(), 0, (void*)data1, &zErrMsg);
