@@ -193,7 +193,7 @@ void db_createtable()
   if (db == NULL) 
     Serial.println("No database open");
   
-  String sql = "CREATE table if not exists samples (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)";
+  String sql = "CREATE table if not exists samples (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, particles1 INTEGER, particles25 INTEGER, particles10 INTEGER, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)";
   int rc = sqlite3_exec(db, sql.c_str(), 0, (void*)data1, &zErrMsg);
 
   if (rc != SQLITE_OK) {
