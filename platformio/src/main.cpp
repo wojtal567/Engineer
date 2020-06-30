@@ -70,7 +70,8 @@ lv_obj_t * labelLockButton1;
 lv_obj_t * lockButton1;
 lv_obj_t * labelDateLock;
 lv_obj_t * labelTimeLock;
-lv_obj_t * wifiLabelAtLock;
+lv_obj_t * wifiStatusAtLock;
+lv_obj_t * sdStatusAtLock;
  
 lv_task_t * turnFanOn;
 lv_task_t * getSample;
@@ -487,16 +488,24 @@ void date_time(lv_task_t * task)
     lv_label_set_text(dateAndTimeAtBar, datetimestring);
     lv_label_set_text(labelTimeLock, timestring);
     lv_label_set_text(labelDateLock, datestring);
-    lv_label_set_text(wifiLabelAtLock, LV_SYMBOL_WIFI);
+    lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
     lv_label_set_text(wifiStatus, LV_SYMBOL_WIFI);
+  } 
+  else
+  {
+    lv_label_set_text(wifiStatusAtLock, "");
+    lv_label_set_text(wifiStatus, "");
   }
   if(start_SD())
   {
     lv_label_set_text(sdStatus, LV_SYMBOL_SD_CARD);
-    
+    lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
   }    
   else
+  {
     lv_label_set_text(sdStatus, "");
+    lv_label_set_text(sdStatusAtLock, "");
+  }
 }
  
 void main_screen()
@@ -527,9 +536,9 @@ void main_screen()
   lv_obj_set_style_local_border_opa(setButton, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
   lv_obj_set_style_local_border_opa(setButton, LV_BTN_PART_MAIN, LV_BTN_STATE_PRESSED, LV_OPA_TRANSP);
   wifiStatus = lv_label_create(contBar, NULL);
-  sdStatus = lv_label_create(contBar, NULL);
-  dateAndTimeAtBar = lv_label_create(contBar, NULL);  
   lv_label_set_text(wifiStatus, "");
+  dateAndTimeAtBar = lv_label_create(contBar, NULL);  
+  sdStatus = lv_label_create(contBar, NULL);
   lv_label_set_text(sdStatus, "");
   lv_label_set_text(dateAndTimeAtBar, "Hello!");
  
@@ -670,14 +679,17 @@ void lock_screen()
   lv_obj_align(labelTimeLock, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
   lv_obj_set_size(labelTimeLock, 300, 200);
 
-
   labelDateLock = lv_label_create(contDateTimeLock, NULL);
   lv_label_set_text(labelDateLock, "to wifi");
   lv_obj_align(labelTimeLock, NULL, LV_ALIGN_CENTER, 0, 0);
 
-  wifiLabelAtLock = lv_label_create(contDateTimeLock, NULL);
-  lv_obj_align(wifiLabelAtLock, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
-  lv_label_set_text(wifiLabelAtLock, "");
+  wifiStatusAtLock = lv_label_create(contDateTimeLock, NULL);
+  lv_obj_align(wifiStatusAtLock, NULL, LV_ALIGN_IN_BOTTOM_MID, 10, 0);
+  lv_label_set_text(wifiStatusAtLock, "");
+
+  sdStatusAtLock = lv_label_create(contDateTimeLock, NULL);
+  lv_obj_align(sdStatusAtLock, NULL, LV_ALIGN_IN_BOTTOM_MID, -10, 0);
+  lv_label_set_text(sdStatusAtLock, "");
 }
  
 void setup() {
