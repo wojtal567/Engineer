@@ -25,7 +25,9 @@ int measure_period = 10000;
   lv_obj_t * contTemp;
   lv_obj_t * contHumi;
   lv_obj_t * labelSetButton;
+  lv_obj_t * labelLockButton;
   lv_obj_t * setButton;
+  lv_obj_t * lockButton;
   lv_obj_t * labelPMTitle[3];
   lv_obj_t * labelPMData[3];
   lv_obj_t * labelParticles;
@@ -53,6 +55,16 @@ lv_obj_t * apply_btn;
 lv_obj_t * apply_label;
 lv_obj_t * cancel_btn;
 lv_obj_t * cancel_label;
+
+
+//lockscreen gui
+lv_obj_t * lock_scr;
+lv_obj_t * contDateTimeLock;
+lv_obj_t * labelLockButton1;
+lv_obj_t * lockButton1;
+lv_obj_t * labelDateLock;
+lv_obj_t * labelTimeLock;
+lv_obj_t * wifiLabelAtLock;
 
 
 lv_task_t * turnFanOn;
@@ -269,6 +281,16 @@ static void setButton_task(lv_obj_t * obj, lv_event_t event)
   lv_disp_load_scr(wifi_scr);
 }
 
+static void lockButton_task(lv_obj_t * obj, lv_event_t event)
+{
+  lv_disp_load_scr(lock_scr);
+}
+
+static void lockButton_task1(lv_obj_t * obj, lv_event_t event)
+{
+  lv_disp_load_scr(main_scr);
+}
+
 static void btn_cancel(lv_obj_t * obj, lv_event_t event)
 {
   lv_disp_load_scr(main_scr);
@@ -278,12 +300,11 @@ static void btn_cancel(lv_obj_t * obj, lv_event_t event)
 
 void getSampleFunc(lv_task_t * task)
 {
+  sht30.get();
   temp = sht30.cTemp;
   humi = sht30.humidity;
-  
-  char buffer[7];
-  
   //TODO wrzucenie na lcd 
+  char buffer[10];
   if(readPMSdata(&Serial2))
   {
     itoa(data.pm10_standard, buffer, 10);
@@ -302,10 +323,10 @@ void getSampleFunc(lv_task_t * task)
     lv_label_set_text(labelPMParticle[2], buffer);
     lv_bar_set_value(barPMParticle[2], data.particles_100um, LV_ANIM_ON);
   }
-  itoa(temp, buffer, 10);
-  lv_label_set_text(labelTempValue, buffer); //TODO DODAC KURDE BELA "°C"
-  itoa(humi, buffer, 10);
-  lv_label_set_text(labelHumiValue, buffer); //TODO DODAC KURDE BELA "%" 
+  String temporary = (String)temp + "°C";
+  lv_label_set_text(labelTempValue, temporary.c_str()); //TODO DODAC KURDE BELA "°C"
+  temporary = (String)humi + "%";
+  lv_label_set_text(labelHumiValue, temporary.c_str()); //TODO DODAC KURDE BELA "%" 
   lv_task_reset(turnFanOn);
   digitalWrite(33, LOW);
 }
@@ -319,8 +340,10 @@ void date_time(lv_task_t * task)
 {
   RtcDateTime dt = Rtc.GetDateTime();
   char datestring[20];
-  snprintf_P(datestring, 
-            20,
+  char timestring[20];
+  char datetimestring[40];
+  snprintf_P(datetimestring, 
+            40,
             PSTR("%02u.%02u.%04u %02u:%02u:%02u"),
             dt.Day(),
             dt.Month(),
@@ -328,10 +351,26 @@ void date_time(lv_task_t * task)
             dt.Hour(),
             dt.Minute(),
             dt.Second() );
+  snprintf_P(datestring, 
+            20,
+            PSTR("%02u.%02u.%04u"),
+            dt.Day(),
+            dt.Month(),
+            dt.Year());
+
+  snprintf_P(timestring, 
+            20,
+            PSTR("%02u:%02u:%02u"),
+            dt.Hour(),
+            dt.Minute(),
+            dt.Second() );
   if(WiFi.status()==WL_CONNECTED){
   //TODO Rozbic datestring na date i czas oddzielnie, zeby nie zmienialy rozmiaru non stop lub cos z align ustawic
-    lv_label_set_text(dateAndTimeAtBar, datestring);
+    lv_label_set_text(dateAndTimeAtBar, datetimestring);
+    lv_label_set_text(labelTimeLock, timestring);
+    lv_label_set_text(labelDateLock, datestring);
     lv_label_set_text(statusAtBar, LV_SYMBOL_WIFI);
+    lv_label_set_text(wifiLabelAtLock, LV_SYMBOL_WIFI);
   }
 }
 
@@ -352,6 +391,16 @@ void main_screen()
   lv_obj_set_style_local_bg_opa(setButton, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
   lv_obj_set_style_local_border_opa(setButton, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
   lv_obj_set_style_local_border_opa(setButton, LV_BTN_PART_MAIN, LV_BTN_STATE_PRESSED, LV_OPA_TRANSP);
+
+  lockButton = lv_btn_create(main_scr, NULL);
+  labelLockButton = lv_label_create(lockButton, NULL);
+  lv_obj_align(lockButton, NULL, LV_ALIGN_IN_BOTTOM_LEFT, -43, 0);
+  lv_label_set_text(labelLockButton, LV_SYMBOL_POWER);
+  lv_btn_set_fit(lockButton,  LV_FIT_TIGHT);
+  lv_obj_set_event_cb(lockButton, lockButton_task);
+  lv_obj_set_style_local_bg_opa(lockButton, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_obj_set_style_local_border_opa(lockButton, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_obj_set_style_local_border_opa(lockButton, LV_BTN_PART_MAIN, LV_BTN_STATE_PRESSED, LV_OPA_TRANSP);
 
   statusAtBar = lv_label_create(contBar, NULL);
   dateAndTimeAtBar = lv_label_create(contBar, NULL);
@@ -473,6 +522,40 @@ void wifi_screen()
 
 }
 
+void lock_screen()
+{
+  contDateTimeLock = lv_cont_create(lock_scr, NULL);
+  lv_obj_set_auto_realign(contDateTimeLock, true);                    /*Auto realign when the size changes*/
+  lv_obj_align(contDateTimeLock, NULL, LV_ALIGN_CENTER, 0, -40);  /*This parametrs will be sued when realigned*/
+  //lv_cont_set_fit4(contDateTimeLock,   LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+  lv_cont_set_fit(contDateTimeLock, LV_FIT_TIGHT);
+  lv_cont_set_layout(contDateTimeLock, LV_LAYOUT_PRETTY_MID);
+
+  lockButton1 = lv_btn_create(lock_scr, NULL);
+  labelLockButton1 = lv_label_create(lockButton1, NULL);
+  lv_obj_align(lockButton1, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+  lv_label_set_text(labelLockButton1, LV_SYMBOL_POWER);
+  lv_btn_set_fit(lockButton1,  LV_FIT_TIGHT);
+  lv_obj_set_event_cb(lockButton1, lockButton_task1);
+  lv_obj_set_style_local_bg_opa(lockButton1, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_obj_set_style_local_border_opa(lockButton1, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_obj_set_style_local_border_opa(lockButton1, LV_BTN_PART_MAIN, LV_BTN_STATE_PRESSED, LV_OPA_TRANSP);
+
+  labelTimeLock = lv_label_create(contDateTimeLock, NULL);
+  lv_label_set_text(labelTimeLock, "Connect");
+  lv_obj_align(labelTimeLock, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+  lv_obj_set_size(labelTimeLock, 300, 200);
+
+
+  labelDateLock = lv_label_create(contDateTimeLock, NULL);
+  lv_label_set_text(labelDateLock, "to wifi");
+  lv_obj_align(labelTimeLock, NULL, LV_ALIGN_CENTER, 0, 0);
+
+  wifiLabelAtLock = lv_label_create(contDateTimeLock, NULL);
+  lv_obj_align(wifiLabelAtLock, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+  lv_label_set_text(wifiLabelAtLock, "");
+}
+
 void setup() {
   pinMode(33, OUTPUT);
   digitalWrite(33, LOW);
@@ -510,8 +593,10 @@ void setup() {
 
   main_scr = lv_cont_create(NULL, NULL);
   wifi_scr = lv_cont_create(NULL, NULL);
+  lock_scr = lv_cont_create(NULL, NULL);
   main_screen();
   wifi_screen();
+  lock_screen();
   lv_disp_load_scr(main_scr);
 
 
