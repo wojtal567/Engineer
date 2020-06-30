@@ -383,7 +383,6 @@ static void btn_connect(lv_obj_t * obj, lv_event_t event){
     {
       configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
       lv_task_ready(syn_rtc);
-      lv_label_set_text(wifiStatus, LV_SYMBOL_WIFI);
     }
     lv_disp_load_scr(main_scr);
     lv_textarea_set_text(ssid_ta, "");
@@ -488,6 +487,9 @@ void date_time(lv_task_t * task)
     lv_label_set_text(dateAndTimeAtBar, datetimestring);
     lv_label_set_text(labelTimeLock, timestring);
     lv_label_set_text(labelDateLock, datestring);
+  }
+  if(WiFi.status()==WL_CONNECTED)
+  {
     lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
     lv_label_set_text(wifiStatus, LV_SYMBOL_WIFI);
   } 
@@ -537,9 +539,9 @@ void main_screen()
   lv_obj_set_style_local_border_opa(setButton, LV_BTN_PART_MAIN, LV_BTN_STATE_PRESSED, LV_OPA_TRANSP);
   wifiStatus = lv_label_create(contBar, NULL);
   lv_label_set_text(wifiStatus, "");
-  dateAndTimeAtBar = lv_label_create(contBar, NULL);  
   sdStatus = lv_label_create(contBar, NULL);
   lv_label_set_text(sdStatus, "");
+  dateAndTimeAtBar = lv_label_create(contBar, NULL);  
   lv_label_set_text(dateAndTimeAtBar, "Hello!");
  
   for (int i = 0; i < 3; i++) {
