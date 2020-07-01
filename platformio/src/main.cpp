@@ -48,7 +48,6 @@ char db_file_name[100] = "\0";
   lv_obj_t * led[3];
   lv_obj_t * sdStatus;
  
- 
 //wifi gui
 lv_obj_t * contBarWiFi;
 lv_obj_t * wifiLabelAtBar;
@@ -748,3 +747,11 @@ void loop() {
   lv_task_handler(); /* let the GUI do its work */
   delay(5);
 }
+
+//TODO zrobić chowanie klawiatury
+//TODO zapisywanie ssid i hasła
+//TODO naprawić ntp
+//TODO komunikacja z apką
+//TODO ŁADNE GUI
+//TODO dodać dark theme (przełącznik w zębatce?)
+//TODO Zbierać wszystkie dane i wyświetlać na przesuwanych ekranach? 
