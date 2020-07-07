@@ -17,7 +17,7 @@ String MyRTC::getTimestamp()
     RtcDateTime now = object->GetDateTime();
     char buffer[20];
     snprintf_P(
-        buffer, 
+        buffer,
         20,
         PSTR("%02u.%02u.%04u %02u:%02u:%02u"),
         now.Day(),
@@ -25,14 +25,14 @@ String MyRTC::getTimestamp()
         now.Year(),
         now.Hour(),
         now.Minute(),
-        now.Second() 
+        now.Second()
     );
     return (String)buffer;
 }
 
 void MyRTC::config(bool synchronized)
 {
-    if(synchronized)
+    if(!synchronized)
     {
         object->Begin();
         time_t rawtime;

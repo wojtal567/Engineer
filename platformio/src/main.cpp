@@ -7,11 +7,15 @@
 #include <WEMOS_SHT3X.h>
 #include <SD.h>
 #include <sqlite3.h>
+#include <PMS5003.hpp>
+#include <rtc.hpp>
+
 #define LVGL_TICK_PERIOD 60
+
 RtcDS1307<TwoWire> Rtc(Wire);
 SHT3X sht30(0x45);
-//Ticker tick; /* timer for interrupt handler */
-TFT_eSPI tft = TFT_eSPI(); /* TFT instance */
+
+TFT_eSPI tft = TFT_eSPI();
 static lv_disp_buf_t disp_buf;
 static lv_color_t buf[LV_HOR_RES_MAX * 10];
 int measure_period = 300000;
@@ -22,8 +26,8 @@ char *zErrMsg = 0;
 char db_file_name[100] = "\0";
 
 //main gui
-  char *pm[] = {  "PM 1,0", "PM 2,5",  "PM 10,0"};
-  char *pmParticle[] = {  ">1,0 um", ">2,5 um",  ">10,0 um"};
+  char *pm[] = {"PM 1,0", "PM 2,5",  "PM 10,0"};
+  char *pmParticle[] = {">1,0 um", ">2,5 um",  ">10,0 um"};
   lv_obj_t * main_scr;
   lv_obj_t * wifiStatus;
   lv_obj_t * dateAndTimeAtBar;
@@ -83,109 +87,12 @@ int screenWidth = 320;
 int screenHeight = 240;
 String ssid = "";
 String password = "";
-const char* ntpServer = "0.pool.ntp.org";
+const char* ntpServer = "50.pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
  
 int temp, humi;
-struct pms5003data {
-  uint16_t framelen;
-  uint16_t pm10_standard, pm25_standard, pm100_standard;
-  uint16_t pm10_env, pm25_env, pm100_env;
-  uint16_t particles_03um, particles_05um, particles_10um, particles_25um, particles_50um, particles_100um;
-  uint16_t unused;
-  uint16_t checksum;
-};
- 
-struct pms5003data data;
- 
-boolean readPMSdata(Stream *s) {
- 
-  if (! Serial2.available())
-  {
-    return false;
-  }
-   
- 
- 
-  // Read a byte at a time until we get to the special '0x42' start-byte
-  if (s->peek() != 0x42) {
-    s->read();
-    return false;
-  }
- 
-  // Now read all 32 bytes
-  if (s->available() < 32)
-    return false;
- 
-   
-  uint8_t buffer[32];    
-  uint16_t sum = 0;
-  s->readBytes(buffer, 32);
- 
-  // get checksum ready
-  for (uint8_t i=0; i<30; i++)
-    sum += buffer[i];
- 
- 
- 
-  for (auto j=2; j<32; j++){
-    Serial.print("0x"); Serial.print(buffer[j], HEX); Serial.print(", ");
-  }
- 
- 
-  Serial.println();
- 
- 
-  // The data comes in endian'd, this solves it so it works on all platforms
-  uint16_t buffer_u16[15];
-  for (uint8_t i=0; i<15; i++) {
-    buffer_u16[i] = buffer[2 + i*2 + 1];
-    buffer_u16[i] += (buffer[2 + i*2] << 8);
-  }
- 
-  // put it into a nice struct :)
-  memcpy((void *)&data, (void *)buffer_u16, 30);
- 
-  if (sum != data.checksum) {
-    Serial.println("Checksum failure");
-    return false;
-  }
-  // success!
-  return true;
-}
-
-String timestamp(){
-  RtcDateTime timestamp = Rtc.GetDateTime();
-  String time = (String)timestamp.Year()+"-";
-
-  if(timestamp.Month()<10)
-    time+="0"+(String)timestamp.Month()+"-";
-  else
-    time+=(String)timestamp.Month()+"-";
-
-  if(timestamp.Day()<10)
-    time+="0"+(String)timestamp.Day()+" ";
-  else
-    time+=(String)timestamp.Day()+" ";
-  
-  if(timestamp.Hour()<10)
-    time+="0"+(String)timestamp.Hour()+":";
-  else
-    time+=(String)timestamp.Hour()+":";
-  
-  if(timestamp.Minute()<10)
-    time+="0"+(String)timestamp.Minute()+":";
-  else
-    time+=(String)timestamp.Minute()+":";
-  
-  if(timestamp.Second()<10)
-    time+="0"+(String)timestamp.Second();
-  else
-    time+=(String)timestamp.Second();
-
-  return time;
-}
+PMS5003 *pmsSensor;
 
 
 int db_open() {
@@ -219,10 +126,14 @@ void db_createtable()
 int db_save(int temp, int humi) {
   if (db == NULL) return 0;
   String sql;
+  std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
   if(Rtc.GetMemory(1)==1)
-    sql = "INSERT INTO samples ('temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ("+(String)temp+", "+(String)humi+", "+(String)data.pm10_standard+", "+(String)data.pm25_standard+", "+(String)data.pm100_standard+", "+(String)data.particles_10um+", "+(String)data.particles_25um+", "+(String)data.particles_100um+", '"+timestamp()+"')";
+    sql = "INSERT INTO samples ('temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ("+
+          (String)temp+", "+(String)humi+", "+(String)tmpData["pm10_standard"]+", "+(String)tmpData["pm25_standard"]+", "+(String)tmpData["pm100_standard"]+", "+(String)tmpData["particles_10um"]+", "
+          +(String)tmpData["particles_25um"]+", "+(String)tmpData["particles_100um"]+", '"+getMainTimestamp(Rtc)+"')";
   else
-    sql = "insert into 'samples' (temperature, humidity, pm10, pm25, pm100, particles1, particles25, particles10) values ("+(String)temp+", "+(String)humi+", "+(String)data.pm10_standard+", "+(String)data.pm25_standard+", "+(String)data.pm100_standard+", "+(String)data.particles_10um+", "+(String)data.particles_25um+", "+(String)data.particles_100um+")";
+    sql = "insert into 'samples' (temperature, humidity, pm10, pm25, pm100, particles1, particles25, particles10) values ("+(String)temp+", "+(String)humi+", "+(String)tmpData["pm10_standard"]+", "+(String)tmpData["pm25_standard"]+", "+(String)tmpData["pm100_standard"]+", "+(String)tmpData["particles_10um"]+", "
+          +(String)tmpData["particles_25um"]+", "+(String)tmpData["particles_100um"]+")";
   int rc = sqlite3_exec(db, sql.c_str(), 0, (void*)data1, &zErrMsg);
   if (rc != SQLITE_OK) {
     Serial.print(F("SQL error: "));
@@ -275,18 +186,7 @@ void config_time(lv_task_t * task)
 {
   if(WiFi.status()==WL_CONNECTED)
   {
-    Rtc.Begin();
-    time_t rawtime;
-    struct tm* timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    char year[5];
-    char month[5];
-    strftime (year, sizeof(year), "%Y",timeinfo);
-    strftime (month, sizeof(month), "%m", timeinfo);
-    RtcDateTime date = RtcDateTime(atoi(year), atoi(month), timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
-    Rtc.SetDateTime(date);
-    Rtc.SetMemory(1, 1);
+    configTime(Rtc);
   }  
 }
  
@@ -364,37 +264,31 @@ static void ta_event_cb(lv_obj_t * ta, lv_event_t event)
     }
 }
  
-static void btn_connect(lv_obj_t * obj, lv_event_t event){
-  if(event==LV_EVENT_RELEASED and (lv_textarea_get_text(ssid_ta)!="" or lv_textarea_get_text(pwd_ta)!=""))
+static void btn_connect(lv_obj_t * obj, lv_event_t event)
+{
+  if (event == LV_EVENT_RELEASED 
+    and (
+      (lv_textarea_get_text(ssid_ta) != NULL and lv_textarea_get_text(ssid_ta) != '\0')
+         or (lv_textarea_get_text(pwd_ta) != NULL and lv_textarea_get_text(pwd_ta) != '\0')
+    )
+  )
   {
     uint8_t wifiAttempts=10;
-    char _ssid[24] = "-----------------------";
-    char _password[24] = "-----------------------";
-	Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid));
-	Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password));
 
     ssid = lv_textarea_get_text(ssid_ta);
     Serial.println(ssid);
     password = lv_textarea_get_text(pwd_ta);
-    for(int i = 0; i < 24; i++)
-    {
-      _ssid[i] = ssid[i];
-      _password[i] = password[i];
-    }
 
-	Rtc.SetMemory(53, 1);
-    Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid)-1);
-    Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password)-1);
-	
-
-    Serial.println(password);
+    saveWiFiToRtcMemory(Rtc, ssid, password);
     WiFi.begin(ssid.c_str(), password.c_str());
-    while (WiFi.status() != WL_CONNECTED and wifiAttempts>0){
+    while (WiFi.status() != WL_CONNECTED and wifiAttempts > 0)
+    {
       Serial.print(".");
       delay(500);
       wifiAttempts--;
     }
-    if(WiFi.status()==WL_CONNECTED)
+
+    if(WiFi.status() == WL_CONNECTED)
     {
       configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
       lv_task_ready(syn_rtc);
@@ -404,25 +298,11 @@ static void btn_connect(lv_obj_t * obj, lv_event_t event){
     lv_textarea_set_text(pwd_ta, "");
   }
 }
-
-String getCharArrrayFromRTC(int address)
-{
-  uint8_t buff[24];
-  uint8_t gotten = Rtc.GetMemory(address, buff, sizeof(buff));
-  String result = "";
-  for (uint8_t ch = 0; ch < gotten; ch++)
-  {
-	  if((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && isAlphaNumeric((char)buff[ch]))
-    	result.concat((char)buff[ch]);
-  }
-  Serial.println(result.c_str());
-  return result;
-}
  
 static void setButton_task(lv_obj_t * obj, lv_event_t event)
 {
   lv_disp_load_scr(wifi_scr);
-  String result = getCharArrrayFromRTC(3);
+  String result = getCharArrrayFromRTC(Rtc, 3);
 }
 
 static void lockButton_task(lv_obj_t * obj, lv_event_t event)
@@ -451,23 +331,35 @@ void getSampleFunc(lv_task_t * task)
   Serial.println(humi);
   char buffer[7];
 
-  if(readPMSdata(&Serial2))
+  if(pmsSensor->readData())
   {
-    itoa(data.pm10_standard, buffer, 10);
+	  std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
+    pmsSensor->dumpSamples();
+
+    itoa(tmpData["pm10_standard"], buffer, 10);
     lv_label_set_text(labelPMData[0], buffer);
-    itoa(data.pm25_standard, buffer, 10);
+
+    itoa(tmpData["pm25_standard"], buffer, 10);
     lv_label_set_text(labelPMData[1], buffer);
-    itoa(data.pm100_standard, buffer, 10);
+
+    itoa(tmpData["pm100_standard"], buffer, 10);
     lv_label_set_text(labelPMData[2], buffer);
-    itoa(data.particles_10um, buffer, 10);
+
+    itoa(tmpData["particles_10um"], buffer, 10);
     lv_label_set_text(labelPMParticle[0], buffer);
-    lv_bar_set_value(barPMParticle[0], data.particles_10um, LV_ANIM_ON);
-    itoa(data.particles_25um, buffer, 10);
+
+    lv_bar_set_value(barPMParticle[0], tmpData["particles_10um"], LV_ANIM_ON);
+
+    itoa(tmpData["particles_25um"], buffer, 10);
     lv_label_set_text(labelPMParticle[1], buffer);
-    lv_bar_set_value(barPMParticle[1], data.particles_25um, LV_ANIM_ON);
-    itoa(data.particles_100um, buffer, 10);
+
+    lv_bar_set_value(barPMParticle[1], tmpData["particles_25um"], LV_ANIM_ON);
+
+    itoa(tmpData["particles_100um"], buffer, 10);
     lv_label_set_text(labelPMParticle[2], buffer);
-    lv_bar_set_value(barPMParticle[2], data.particles_100um, LV_ANIM_ON);
+
+    lv_bar_set_value(barPMParticle[2], tmpData["particles_100um"], LV_ANIM_ON);
+
     save_card();
   }
   itoa(temp, buffer, 10);
@@ -485,38 +377,12 @@ void turnFanOnFunc(lv_task_t * task)
  
 void date_time(lv_task_t * task)
 {
-   RtcDateTime dt = Rtc.GetDateTime();
-  char datestring[20];
-  char timestring[20];
-  char datetimestring[40];
-  snprintf_P(datetimestring, 
-            40,
-            PSTR("%02u.%02u.%04u %02u:%02u:%02u"),
-            dt.Day(),
-            dt.Month(),
-            dt.Year(),
-            dt.Hour(),
-            dt.Minute(),
-            dt.Second() );
-  snprintf_P(datestring, 
-            20,
-            PSTR("%02u.%02u.%04u"),
-            dt.Day(),
-            dt.Month(),
-            dt.Year());
-
-  snprintf_P(timestring, 
-            20,
-            PSTR("%02u:%02u:%02u"),
-            dt.Hour(),
-            dt.Minute(),
-            dt.Second() );
-  if(Rtc.GetMemory(1)==1){
+  if(Rtc.GetMemory(1) == 1){
   //TODO Rozbic datestring na date i czas oddzielnie, zeby nie zmienialy rozmiaru non stop lub cos z align ustawic
-    lv_label_set_text(dateAndTimeAtBar, datestring);
-    lv_label_set_text(dateAndTimeAtBar, datetimestring);
-    lv_label_set_text(labelTimeLock, timestring);
-    lv_label_set_text(labelDateLock, datestring);
+
+    //lv_label_set_text(dateAndTimeAtBar, dateTime);
+    lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
+    lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
   }
   if(WiFi.status()==WL_CONNECTED)
   {
@@ -573,6 +439,7 @@ void main_screen()
   lv_label_set_text(sdStatus, "");
   dateAndTimeAtBar = lv_label_create(contBar, NULL);  
   lv_label_set_text(dateAndTimeAtBar, "Hello!");
+  lv_obj_align(dateAndTimeAtBar, NULL, LV_LABEL_ALIGN_RIGHT, 0, 0);
  
   for (int i = 0; i < 3; i++) {
     led[i]  = lv_led_create(main_scr, NULL);
@@ -626,7 +493,7 @@ void main_screen()
   lv_label_set_align(labelTempValue, LV_LABEL_ALIGN_CENTER);
   lv_label_set_align(labelHumiValue, LV_LABEL_ALIGN_CENTER);
   lv_label_set_text(labelTemp, "Temp");
-  lv_label_set_text(labelHumi, "RH");
+  lv_label_set_text(labelHumi, "Humi");
   lv_label_set_text(labelTempValue, "-");
   lv_label_set_text(labelHumiValue, "-");
  
@@ -730,6 +597,9 @@ void setup() {
   sqlite3_initialize();
   Serial.begin(115200); /* prepare for possible serial debug */
   Serial2.begin(9600, SERIAL_8N1, 16, 17);
+
+  pmsSensor = new PMS5003(&Serial2, &Serial);
+
   lv_init();
  
   tft.begin(); /* TFT init */
@@ -777,8 +647,8 @@ void setup() {
 
   if(Rtc.GetMemory(53) == 1)
   {
-	  ssid = getCharArrrayFromRTC(3);
-	  password = getCharArrrayFromRTC(28);
+	  ssid = getCharArrrayFromRTC(Rtc, 3);
+	  password = getCharArrrayFromRTC(Rtc, 28);
 	  WiFi.begin(ssid.c_str(), password.c_str());
 	  if(WiFi.status() == WL_CONNECTED)
 	  {
@@ -794,7 +664,6 @@ void loop() {
 }
 
 //TODO zrobić chowanie klawiatury
-//TODO zapisywanie ssid i hasła
 //TODO naprawić ntp
 //TODO komunikacja z apką
 //TODO ŁADNE GUI
