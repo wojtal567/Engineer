@@ -81,8 +81,8 @@ bool date_synchronized = false;
  
 int screenWidth = 320;
 int screenHeight = 240;
-const char* ssid = "";
-const char* password = "";
+String ssid = "";
+String password = "";
 const char* ntpServer = "0.pool.ntp.org";
 const long gmtOffset_sec = 3600;
 const int daylightOffset_sec = 3600;
@@ -193,7 +193,7 @@ int db_open() {
     sqlite3_close(db);
 
   int rc = sqlite3_open(db_file_name, &db);
-  Serial.println(rc);
+  //Serial.println(rc);
   return rc;
 }
 
@@ -320,11 +320,11 @@ bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
  
   if (touchX > screenWidth || touchY > screenHeight)
   {
-    Serial.println("Y or y outside of expected parameters..");
-    Serial.print("y:");
-    Serial.print(touchX);
-    Serial.print(" x:");
-    Serial.print(touchY);
+    //Serial.println("Y or y outside of expected parameters..");
+    //Serial.print("y:");
+    //Serial.print(touchX);
+    //Serial.print(" x:");
+    //Serial.print(touchY);
   }
   else
   {
@@ -338,11 +338,11 @@ bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
     data->point.x = touchX;
     data->point.y = touchY;
  
-    Serial.print("Data x");
-    Serial.println(touchX);
- 
-    Serial.print("Data y");
-    Serial.println(touchY);
+    //Serial.print("Data x");
+    //Serial.println(touchX);
+ //
+    //Serial.print("Data y");
+    //Serial.println(touchY);
  
   }
  
@@ -368,11 +368,27 @@ static void btn_connect(lv_obj_t * obj, lv_event_t event){
   if(event==LV_EVENT_RELEASED and (lv_textarea_get_text(ssid_ta)!="" or lv_textarea_get_text(pwd_ta)!=""))
   {
     uint8_t wifiAttempts=10;
-    ssid=lv_textarea_get_text(ssid_ta);
+    char _ssid[24] = "-----------------------";
+    char _password[24] = "-----------------------";
+	Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid));
+	Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password));
+
+    ssid = lv_textarea_get_text(ssid_ta);
     Serial.println(ssid);
-    password=lv_textarea_get_text(pwd_ta);
+    password = lv_textarea_get_text(pwd_ta);
+    for(int i = 0; i < 24; i++)
+    {
+      _ssid[i] = ssid[i];
+      _password[i] = password[i];
+    }
+
+	Rtc.SetMemory(53, 1);
+    Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid)-1);
+    Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password)-1);
+	
+
     Serial.println(password);
-    WiFi.begin(ssid, password);
+    WiFi.begin(ssid.c_str(), password.c_str());
     while (WiFi.status() != WL_CONNECTED and wifiAttempts>0){
       Serial.print(".");
       delay(500);
@@ -388,10 +404,25 @@ static void btn_connect(lv_obj_t * obj, lv_event_t event){
     lv_textarea_set_text(pwd_ta, "");
   }
 }
+
+String getCharArrrayFromRTC(int address)
+{
+  uint8_t buff[24];
+  uint8_t gotten = Rtc.GetMemory(address, buff, sizeof(buff));
+  String result = "";
+  for (uint8_t ch = 0; ch < gotten; ch++)
+  {
+	  if((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && isAlphaNumeric((char)buff[ch]))
+    	result.concat((char)buff[ch]);
+  }
+  Serial.println(result.c_str());
+  return result;
+}
  
 static void setButton_task(lv_obj_t * obj, lv_event_t event)
 {
   lv_disp_load_scr(wifi_scr);
+  String result = getCharArrrayFromRTC(3);
 }
 
 static void lockButton_task(lv_obj_t * obj, lv_event_t event)
@@ -743,6 +774,18 @@ void setup() {
   lv_task_set_period(syn_rtc, 3600000);
   getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
   turnFanOn = lv_task_create(turnFanOnFunc, 240000, LV_TASK_PRIO_HIGH, NULL);
+
+  if(Rtc.GetMemory(53) == 1)
+  {
+	  ssid = getCharArrrayFromRTC(3);
+	  password = getCharArrrayFromRTC(28);
+	  WiFi.begin(ssid.c_str(), password.c_str());
+	  if(WiFi.status() == WL_CONNECTED)
+	  {
+		configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+      	lv_task_ready(syn_rtc);
+	  }
+  }
 }
  
 void loop() {
