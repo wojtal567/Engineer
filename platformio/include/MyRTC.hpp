@@ -12,8 +12,5 @@ class MyRTC
     public:
         MyRTC(long gmtOffestInSeconds, int daylightOffsetInSeconds, char* ntpServer);
         String getTimestamp();
-        String getDate();
-        String getTime();
         void config(bool synchronized);
-        void setMemory(int address, int value);
 };

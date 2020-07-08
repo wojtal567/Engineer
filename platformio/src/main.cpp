@@ -9,11 +9,19 @@
 #include <sqlite3.h>
 #include <PMS5003.hpp>
 #include <rtc.hpp>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 
 #define LVGL_TICK_PERIOD 60
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+#define GMT_OFFSET_SEC 7200
 
 RtcDS1307<TwoWire> Rtc(Wire);
-SHT3X sht30(0x45);
+static const char ntpServerName[] = "europe.pool.ntp.org";
+WiFiUDP ntpUDP;
+NTPClient dateTimeClient(ntpUDP, ntpServerName, 7200);
+
 
 TFT_eSPI tft = TFT_eSPI();
 static lv_disp_buf_t disp_buf;
@@ -25,34 +33,43 @@ const char* data1 = "Output:";
 char *zErrMsg = 0;
 char db_file_name[100] = "\0";
 
-//main gui
-  char *pm[] = {"PM 1,0", "PM 2,5",  "PM 10,0"};
-  char *pmParticle[] = {">1,0 um", ">2,5 um",  ">10,0 um"};
-  lv_obj_t * main_scr;
-  lv_obj_t * wifiStatus;
-  lv_obj_t * dateAndTimeAtBar;
-  lv_obj_t * contBar;
-  lv_obj_t * contTemp;
-  lv_obj_t * contStat;
-  lv_obj_t * contHumi;
-  lv_obj_t * labelLockButton;
-  lv_obj_t * lockButton;
-  lv_obj_t * labelSetButton;
-  lv_obj_t * setButton;
-  lv_obj_t * labelPMTitle[3];
-  lv_obj_t * labelPMData[3];
-  lv_obj_t * labelParticles;
-  lv_obj_t * labelPMTitleParticle[3];
-  lv_obj_t * labelPMParticle[3];
-  lv_obj_t * barPMParticle[3];
-  lv_obj_t * labelTemp;
-  lv_obj_t * labelHumi;
-  lv_obj_t * labelTempValue;
-  lv_obj_t * labelHumiValue;
-  lv_obj_t * led[3];
-  lv_obj_t * sdStatus;
+bool date_synchronized = false;
+
+String ssid = "";
+String password = "";
+
  
-//wifi gui
+int temp, humi;
+PMS5003 *pmsSensor;
+SHT3X sht30(0x45);
+
+//--------------------------------------------------main gui
+char *pm[] = {"PM 1,0", "PM 2,5",  "PM 10,0"};
+char *pmParticle[] = {">1,0 um", ">2,5 um",  ">10,0 um"};
+lv_obj_t * main_scr;
+lv_obj_t * wifiStatus;
+lv_obj_t * dateAndTimeAtBar;
+lv_obj_t * contBar;
+lv_obj_t * contTemp;
+lv_obj_t * contStat;
+lv_obj_t * contHumi;
+lv_obj_t * labelLockButton;
+lv_obj_t * lockButton;
+lv_obj_t * labelSetButton;
+lv_obj_t * setButton;
+lv_obj_t * labelPMTitle[3];
+lv_obj_t * labelPMData[3];
+lv_obj_t * labelParticles;
+lv_obj_t * labelPMTitleParticle[3];
+lv_obj_t * labelPMParticle[3];
+lv_obj_t * barPMParticle[3];
+lv_obj_t * labelTemp;
+lv_obj_t * labelHumi;
+lv_obj_t * labelTempValue;
+lv_obj_t * labelHumiValue;
+lv_obj_t * led[3];
+lv_obj_t * sdStatus;
+//--------------------------------------------------wifi gui
 lv_obj_t * contBarWiFi;
 lv_obj_t * wifiLabelAtBar;
 lv_obj_t * wifi_scr;
@@ -65,8 +82,7 @@ lv_obj_t * apply_btn;
 lv_obj_t * apply_label;
 lv_obj_t * cancel_btn;
 lv_obj_t * cancel_label;
-
-//lockscreen gui
+//--------------------------------------------------lockscreen gui
 lv_obj_t * lock_scr;
 lv_obj_t * contDateTimeLock;
 lv_obj_t * labelLockButton1;
@@ -75,25 +91,10 @@ lv_obj_t * labelDateLock;
 lv_obj_t * labelTimeLock;
 lv_obj_t * wifiStatusAtLock;
 lv_obj_t * sdStatusAtLock;
- 
+//--------------------------------------------------tasks 
 lv_task_t * turnFanOn;
 lv_task_t * getSample;
- 
-//synchronizacja rtc
 lv_task_t * syn_rtc;
-bool date_synchronized = false;
- 
-int screenWidth = 320;
-int screenHeight = 240;
-String ssid = "";
-String password = "";
-const char* ntpServer = "50.pool.ntp.org";
-const long gmtOffset_sec = 3600;
-const int daylightOffset_sec = 3600;
- 
-int temp, humi;
-PMS5003 *pmsSensor;
-
 
 int db_open() {
   if (db != NULL)
@@ -161,7 +162,7 @@ boolean start_SD()
 }
 
 void save_card(){
-  if(SD.begin(27))   
+  if (SD.begin(27))   
   {
     if(SD.exists("/database.db"))
     {
@@ -184,10 +185,13 @@ void save_card(){
 
 void config_time(lv_task_t * task)
 {
-  if(WiFi.status()==WL_CONNECTED)
+  if(WiFi.status() == WL_CONNECTED)
   {
-    configTime(Rtc);
-  }  
+    for(int i = 0; i < 3; i++)
+      dateTimeClient.update();
+    configTime(Rtc, dateTimeClient);
+  }
+
 }
  
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -218,7 +222,7 @@ bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
     return false;
   }
  
-  if (touchX > screenWidth || touchY > screenHeight)
+  if (touchX > SCREEN_WIDTH || touchY > SCREEN_HEIGHT)
   {
     //Serial.println("Y or y outside of expected parameters..");
     //Serial.print("y:");
@@ -290,7 +294,9 @@ static void btn_connect(lv_obj_t * obj, lv_event_t event)
 
     if(WiFi.status() == WL_CONNECTED)
     {
-      configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+      dateTimeClient.begin();
+      for(int i = 0; i < 3; i++)
+        dateTimeClient.update();
       lv_task_ready(syn_rtc);
     }
     lv_disp_load_scr(main_scr);
@@ -612,8 +618,8 @@ void setup() {
   /*Initialize the display*/
   lv_disp_drv_t disp_drv;
   lv_disp_drv_init(&disp_drv);
-  disp_drv.hor_res = screenWidth;
-  disp_drv.ver_res = screenHeight;
+  disp_drv.hor_res = SCREEN_WIDTH;
+  disp_drv.ver_res = SCREEN_HEIGHT;
   disp_drv.flush_cb = my_disp_flush;
   disp_drv.buffer = &disp_buf;
   lv_disp_drv_register(&disp_drv);
@@ -652,8 +658,10 @@ void setup() {
 	  WiFi.begin(ssid.c_str(), password.c_str());
 	  if(WiFi.status() == WL_CONNECTED)
 	  {
-		configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-      	lv_task_ready(syn_rtc);
+      dateTimeClient.begin();
+      for(int i = 0; i < 3; i++)
+        dateTimeClient.update();
+      lv_task_ready(syn_rtc);
 	  }
   }
 }

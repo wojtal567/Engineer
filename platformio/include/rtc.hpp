@@ -1,12 +1,37 @@
 #include <RtcDS1307.h>
 #include <Wire.h>
+#include <NTPClient.h>
+
+void configTime(RtcDS1307<TwoWire> &Rtc, NTPClient &ntp)
+{
+    Rtc.Begin();
+    time_t rawtime = ntp.getEpochTime();
+    struct tm * ti;
+    ti = localtime (&rawtime);
+
+    uint16_t year = ti->tm_year + 1900;
+
+    uint8_t month = ti->tm_mon + 1;
+
+    uint8_t day = ti->tm_mday;
+
+    uint8_t hours = ti->tm_hour;
+
+    uint8_t minutes = ti->tm_min;
+
+    uint8_t seconds = ti->tm_sec;
+
+    RtcDateTime date = RtcDateTime(year, month, day, hours, minutes, seconds);
+    Rtc.SetDateTime(date);
+    Rtc.SetMemory(1, 1);
+}
 
 void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password)
 {
     char _ssid[24] = "-----------------------";
     char _password[24] = "-----------------------";
-	Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid));
-	Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password));
+	  Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid));
+	  Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password));
 
     for(int i = 0; i < 24; i++)
     {
@@ -14,7 +39,7 @@ void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password)
       _password[i] = password[i];
     }
 
-	Rtc.SetMemory(53, 1);
+	  Rtc.SetMemory(53, 1);
     Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid)-1);
     Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password)-1);
 }
@@ -65,22 +90,6 @@ String getMainTimestamp(RtcDS1307<TwoWire> &Rtc)
   return time;
 }
 
-void configTime(RtcDS1307<TwoWire> &Rtc)
-{
-    Rtc.Begin();
-    time_t rawtime;
-    struct tm* timeinfo;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    char year[5];
-    char month[5];
-    strftime (year, sizeof(year), "%Y",timeinfo);
-    strftime (month, sizeof(month), "%m", timeinfo);
-    RtcDateTime date = RtcDateTime(atoi(year), atoi(month), timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
-    Rtc.SetDateTime(date);
-    Rtc.SetMemory(1, 1);
-}
-
 String getDate(RtcDS1307<TwoWire> &Rtc)
 {
     RtcDateTime dt = Rtc.GetDateTime();
@@ -107,3 +116,4 @@ String getTime(RtcDS1307<TwoWire> &Rtc)
     );
     return String(timestring);
 }
+
