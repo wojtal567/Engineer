@@ -256,15 +256,21 @@ bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 static void ta_event_cb(lv_obj_t * ta, lv_event_t event)
 {
     if(event == LV_EVENT_CLICKED) {
-        if(keyboard==NULL)
+        if(keyboard == NULL)
         {
           keyboard = lv_keyboard_create(lv_scr_act(), NULL);
           lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES/2);
           lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
           lv_keyboard_set_textarea(keyboard, ta);
         }
-         if(keyboard != NULL)
-            lv_keyboard_set_textarea(keyboard, ta);
+        else
+        {
+          keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+          lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES/2);
+          lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+          lv_keyboard_set_textarea(keyboard, ta);
+        }
+        
     }
 }
  
@@ -383,13 +389,13 @@ void turnFanOnFunc(lv_task_t * task)
  
 void date_time(lv_task_t * task)
 {
-  if(Rtc.GetMemory(1) == 1){
-  //TODO Rozbic datestring na date i czas oddzielnie, zeby nie zmienialy rozmiaru non stop lub cos z align ustawic
-
-    //lv_label_set_text(dateAndTimeAtBar, dateTime);
+  if(Rtc.GetMemory(1) == 1)
+  {
+    lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
     lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
     lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
   }
+
   if(WiFi.status()==WL_CONNECTED)
   {
     lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
@@ -400,6 +406,7 @@ void date_time(lv_task_t * task)
     lv_label_set_text(wifiStatusAtLock, "");
     lv_label_set_text(wifiStatus, "");
   }
+  
   if(start_SD())
   {
     lv_label_set_text(sdStatus, LV_SYMBOL_SD_CARD);
@@ -418,7 +425,7 @@ void main_screen()
   lv_obj_set_auto_realign(contBar, true);                    /*Auto realign when the size changes*/
   lv_obj_align(contBar, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);  /*This parametrs will be sued when realigned*/
   lv_cont_set_fit4(contBar,   LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-  lv_cont_set_layout(contBar, LV_LAYOUT_PRETTY_MID);
+  //lv_cont_set_layout(contBar, LV_LAYOUT_PRETTY_MID); - this causes elements to move on seconds tick
  
   lockButton = lv_btn_create(main_scr, NULL);
   labelLockButton = lv_label_create(lockButton, NULL);
@@ -441,11 +448,13 @@ void main_screen()
   lv_obj_set_style_local_border_opa(setButton, LV_BTN_PART_MAIN, LV_BTN_STATE_PRESSED, LV_OPA_TRANSP);
   wifiStatus = lv_label_create(contBar, NULL);
   lv_label_set_text(wifiStatus, "");
+  lv_obj_align(wifiStatus, NULL, LV_ALIGN_IN_LEFT_MID, 10, 0);
   sdStatus = lv_label_create(contBar, NULL);
   lv_label_set_text(sdStatus, "");
+  lv_obj_align(sdStatus, NULL, LV_ALIGN_IN_LEFT_MID, 45, 0);
   dateAndTimeAtBar = lv_label_create(contBar, NULL);  
   lv_label_set_text(dateAndTimeAtBar, "Hello!");
-  lv_obj_align(dateAndTimeAtBar, NULL, LV_LABEL_ALIGN_RIGHT, 0, 0);
+  lv_obj_align(dateAndTimeAtBar, NULL, LV_ALIGN_IN_RIGHT_MID, -120, 0);
  
   for (int i = 0; i < 3; i++) {
     led[i]  = lv_led_create(main_scr, NULL);
