@@ -672,7 +672,6 @@ void loop() {
 }
 
 //TODO zrobić chowanie klawiatury
-//TODO naprawić ntp
 //TODO komunikacja z apką
 //TODO ŁADNE GUI
 //TODO dodać dark theme (przełącznik w zębatce?)
