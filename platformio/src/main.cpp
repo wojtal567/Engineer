@@ -5,12 +5,11 @@
 #include <RtcDS1307.h>
 #include <WiFi.h>
 #include <WEMOS_SHT3X.h>
-#include <SD.h>
-#include <sqlite3.h>
 #include <PMS5003.hpp>
 #include <rtc.hpp>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
+#include <MySD.hpp>
 
 #define LVGL_TICK_PERIOD 60
 #define SCREEN_WIDTH 320
@@ -28,16 +27,13 @@ static lv_disp_buf_t disp_buf;
 static lv_color_t buf[LV_HOR_RES_MAX * 10];
 int measure_period = 300000;
 
-sqlite3 *db = NULL;
-const char* data1 = "Output:";
-char *zErrMsg = 0;
-char db_file_name[100] = "\0";
+MySD mySDCard(27);
+SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
 bool date_synchronized = false;
 
 String ssid = "";
 String password = "";
-
  
 int temp, humi;
 PMS5003 *pmsSensor;
@@ -95,93 +91,6 @@ lv_obj_t * sdStatusAtLock;
 lv_task_t * turnFanOn;
 lv_task_t * getSample;
 lv_task_t * syn_rtc;
-
-int db_open() {
-  if (db != NULL)
-    sqlite3_close(db);
-
-  int rc = sqlite3_open(db_file_name, &db);
-  //Serial.println(rc);
-  return rc;
-}
-
-void db_createtable()
-{
-  if (db == NULL) 
-    Serial.println("No database open");
-  
-  String sql = "CREATE table if not exists samples (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, particles1 INTEGER, particles25 INTEGER, particles10 INTEGER, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)";
-  int rc = sqlite3_exec(db, sql.c_str(), 0, (void*)data1, &zErrMsg);
-
-  if (rc != SQLITE_OK) {
-    Serial.print(F("SQL error: "));
-    Serial.print(sqlite3_extended_errcode(db));
-    Serial.print(" ");
-    Serial.println(zErrMsg);
-    sqlite3_free(zErrMsg);
-  }
-  
-}
-
-
-int db_save(int temp, int humi) {
-  if (db == NULL) return 0;
-  String sql;
-  std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
-  if(Rtc.GetMemory(1)==1)
-    sql = "INSERT INTO samples ('temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ("+
-          (String)temp+", "+(String)humi+", "+(String)tmpData["pm10_standard"]+", "+(String)tmpData["pm25_standard"]+", "+(String)tmpData["pm100_standard"]+", "+(String)tmpData["particles_10um"]+", "
-          +(String)tmpData["particles_25um"]+", "+(String)tmpData["particles_100um"]+", '"+getMainTimestamp(Rtc)+"')";
-  else
-    sql = "insert into 'samples' (temperature, humidity, pm10, pm25, pm100, particles1, particles25, particles10) values ("+(String)temp+", "+(String)humi+", "+(String)tmpData["pm10_standard"]+", "+(String)tmpData["pm25_standard"]+", "+(String)tmpData["pm100_standard"]+", "+(String)tmpData["particles_10um"]+", "
-          +(String)tmpData["particles_25um"]+", "+(String)tmpData["particles_100um"]+")";
-  int rc = sqlite3_exec(db, sql.c_str(), 0, (void*)data1, &zErrMsg);
-  if (rc != SQLITE_OK) {
-    Serial.print(F("SQL error: "));
-    Serial.print(sqlite3_extended_errcode(db));
-    Serial.print(" ");
-    Serial.println(zErrMsg);
-    sqlite3_free(zErrMsg);
-  }
-  return rc;
-}
-
-boolean start_SD()
-{
-  bool result = SD.begin(27);
-  if(result)
-  {
-    sqlite3_initialize();
-    strncpy(db_file_name,"/sd/database.db", 100);
-    db_open();
-    db_createtable();
-    sqlite3_close(db);
-    SD.end();
-  }
-  return result; 
-}
-
-void save_card(){
-  if (SD.begin(27))   
-  {
-    if(SD.exists("/database.db"))
-    {
-      db_open();
-      db_createtable();
-      db_save(temp, humi);
-      sqlite3_close(db);
-    }
-    else
-    {
-      strncpy(db_file_name,"/sd/database.db", 100);
-      db_open();
-      db_createtable();
-      db_save(temp, humi);
-      sqlite3_close(db);
-    }    
-    SD.end();
-  }
-}
 
 void config_time(lv_task_t * task)
 {
@@ -372,7 +281,7 @@ void getSampleFunc(lv_task_t * task)
 
     lv_bar_set_value(barPMParticle[2], tmpData["particles_100um"], LV_ANIM_ON);
 
-    save_card();
+    mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
   }
   itoa(temp, buffer, 10);
   lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
@@ -406,8 +315,8 @@ void date_time(lv_task_t * task)
     lv_label_set_text(wifiStatusAtLock, "");
     lv_label_set_text(wifiStatus, "");
   }
-  
-  if(start_SD())
+
+  if(mySDCard.start(&sampleDB, &Serial2))
   {
     lv_label_set_text(sdStatus, LV_SYMBOL_SD_CARD);
     lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
@@ -651,7 +560,6 @@ void setup() {
   wifi_screen();
   lock_screen();
   lv_disp_load_scr(main_scr);
- 
  
   lv_task_t * date = lv_task_create(date_time, 1000, LV_TASK_PRIO_MID, NULL);
   syn_rtc = lv_task_create_basic();

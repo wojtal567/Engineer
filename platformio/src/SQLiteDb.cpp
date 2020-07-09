@@ -1,8 +1,9 @@
 #include <SQLiteDb.hpp>
 
-SQLiteDb::SQLiteDb(String localPath, String tableName)
+SQLiteDb::SQLiteDb(String localPath, String relativePath, String tableName)
 {
     _localPath = localPath;
+    _relativePath = relativePath;
     _tableName = tableName;
 }
 
@@ -32,9 +33,9 @@ void SQLiteDb::close()
 void SQLiteDb::createTable(Stream *serial)
 {
     if(object == NULL)
-        serial->print("No database open");
+        serial->println("No database open");
 
-    String sql = "CREATE table if not exists " + _tableName + " (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)";
+    String sql = "CREATE table if not exists " + _tableName + " (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, temperature float, humidity FLOAT, pm10 FLOAT, pm25 FLOAT, pm100 float, particles1 INTEGER, particles25 INTEGER, particles10 INTEGER, timestamp datetime NOT NULL default CURRENT_TIMESTAMP)";
     int rc = sqlite3_exec(
         object,
         sql.c_str(),
@@ -44,54 +45,50 @@ void SQLiteDb::createTable(Stream *serial)
     );
 
     if(rc != SQLITE_OK)
-        sqlite3_free(zErrorMessage);
+    {
+      serial->print(F("SQL error: "));
+      serial->print(sqlite3_extended_errcode(object));
+      serial->print(" ");
+      serial->println(zErrorMessage);
+      sqlite3_free(zErrorMessage);
+    }
+
 }
 
 int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
 {
     if(object == NULL)
-        return 0;
-    
-    String sql = "insert into " + _tableName + " (temperature, humidity, pm10, pm25, pm100, timestamp) values (" +
-                  ", " + (String)temperature + ", " + (String)humidity + ", " + (String)data["pm10"] + ", " +
-                  ", " + (String)data["pm25"] + ", " + (String)data["pm100"] + ", " +"'"+timestamp+"')";
+    {
+      debugger->println("Database does not exist. NULL");
+      return 0;
+    }
 
-    int rc = sqlite3_exec(object, sql.c_str(), 0, (void*)"Output:", &zErrorMessage);         
+
+    String sql = "INSERT INTO samples ('temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ("+
+          (String)temperature+", "+(String)humidity+", "+(String)data["pm10_standard"]+", "+(String)data["pm25_standard"]+", "+(String)data["pm100_standard"]+", "+(String)data["particles_10um"]+", "
+          +(String)data["particles_25um"]+", "+(String)data["particles_100um"]+", '"+timestamp+"')";
+
+    debugger->println("Executing: " + sql);
+
+    int rc = sqlite3_exec(object, sql.c_str(), 0, (void*)"Output:", &zErrorMessage);
 
     if (rc != SQLITE_OK) {
-        debugger->print(F("SQL error: "));
-        debugger->print(sqlite3_extended_errcode(object));
+        debugger->println(F("SQL error: "));
+        debugger->println(sqlite3_extended_errcode(object));
         debugger->print(" ");
         debugger->println(zErrorMessage);
         sqlite3_free(zErrorMessage);
     }
-    
-    return rc;
-}
 
-int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int humidity, Stream *debugger)
-{
-    if(object == NULL)
-        return 0;
-    
-    String sql = "insert into " + _tableName + " (temperature, humidity, pm10, pm25, pm100, timestamp) values (" +
-                  ", " + (String)temperature + ", " + (String)humidity + ", " + (String)data["pm10"] + ", " +
-                  ", " + (String)data["pm25"] + ", " + (String)data["pm100"] + ", " +")";
-
-    int rc = sqlite3_exec(object, sql.c_str(), 0, (void*)"Output:", &zErrorMessage);         
-
-    if (rc != SQLITE_OK) {
-        debugger->print(F("SQL error: "));
-        debugger->print(sqlite3_extended_errcode(object));
-        debugger->print(" ");
-        debugger->println(zErrorMessage);
-        sqlite3_free(zErrorMessage);
-    }
-    
     return rc;
 }
 
 String SQLiteDb::getLocalPath()
 {
     return _localPath;
+}
+
+String SQLiteDb::getRelativePath()
+{
+  return _relativePath;
 }

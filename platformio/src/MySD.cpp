@@ -32,11 +32,22 @@ bool MySD::start(SQLiteDb *object, Stream *debugger)
 
 void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, SQLiteDb *object, Stream *debugger)
 {
+  debugger->println("MySD::save");
     if(begin())
     {
-        debugger->print("SD Card detected");
-        if(SD.exists(object->getLocalPath()))
+        debugger->println("SD Card detected");
+        if(SD.exists(object->getRelativePath()))
         {
+            debugger->println("Database " + object->getLocalPath() + " exists. Saving data...");
+            object->init();
+            object->open();
+            object->save(data, temperature, humidity, timestamp, debugger);
+            object->close();
+            object->kill();
+        }
+        else
+        {
+          debugger->println("Database " + object->getLocalPath() + " don't exist. Saving data...");
             object->init();
             object->open();
             object->createTable(debugger);
@@ -46,5 +57,5 @@ void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humid
         }
         end();
     }
-        
+
 }
