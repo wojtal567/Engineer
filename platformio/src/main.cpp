@@ -617,7 +617,7 @@ void loop()
 }
 
 //TODO zrobić chowanie klawiatury
-//TODO komunikacja z apką
+//TODO dokończyć wysyłanie danych na apkę
 //TODO ŁADNE GUI
 //TODO dodać dark theme (przełącznik w zębatce?)
 //TODO Zbierać wszystkie dane i wyświetlać na przesuwanych ekranach?
