@@ -64,7 +64,7 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
     }
 
 
-    String sql = "INSERT INTO samples ('temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ("+
+    String sql = "INSERT INTO" + _tableName + " ('temperature', 'humidity', 'pm10', 'pm25', 'pm100', 'particles1', 'particles25', 'particles10', 'timestamp') VALUES ("+
           (String)temperature+", "+(String)humidity+", "+(String)data["pm10_standard"]+", "+(String)data["pm25_standard"]+", "+(String)data["pm100_standard"]+", "+(String)data["particles_10um"]+", "
           +(String)data["particles_25um"]+", "+(String)data["particles_100um"]+", '"+timestamp+"')";
 
@@ -81,6 +81,23 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
     }
 
     return rc;
+}
+
+int SQLiteDb::compareWithApp(String appTimestamp, Stream *debugger)
+{
+    if(object == NULL)
+    {
+      debugger->println("Database does not exist. NULL");
+      return 0;
+    }
+    String sql = "SELECT * from" + _tableName + "WHERE DATETIME(" + appTimestamp + ") < " + _tableName +".timestamp";
+    debugger->println("Executing: " + sql);
+    
+}
+
+void compareCallback(void *data, int argc, char **argv, char** azColName)
+{
+
 }
 
 String SQLiteDb::getLocalPath()
