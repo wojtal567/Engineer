@@ -4,6 +4,7 @@
 #include <cstring>
 #include <Stream.h>
 #include <map>
+#include <ArduinoJson.h>
 
 class SQLiteDb
 {
@@ -23,7 +24,7 @@ class SQLiteDb
         void close();
         void createTable(Stream *serial);
         int save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger);
-        int compareWithApp(String appTimestamp, Stream *debugger);
+        int getMissingSamples(int lastID, Stream *debugger);
         String getLocalPath();
         String getRelativePath();
 };

@@ -11,7 +11,6 @@
 #include <WiFiUdp.h>
 #include <MySD.hpp>
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
 #include <time.h>
 
 #define LVGL_TICK_PERIOD 60
@@ -23,6 +22,7 @@ RtcDS1307<TwoWire> Rtc(Wire);
 static const char ntpServerName[] = "europe.pool.ntp.org";
 WiFiUDP ntpUDP;
 NTPClient dateTimeClient(ntpUDP, ntpServerName, 7200);
+bool wasUpdated = false;
 
 TFT_eSPI tft = TFT_eSPI();
 static lv_disp_buf_t disp_buf;
@@ -109,12 +109,13 @@ void fetchLastRecord(lv_task_t *task)
 		if(responseCode == 200)
 		{
 			Serial.println("HTTP RESPONSE CODE: " + (String)responseCode);
-			StaticJsonDocument<300> doc;
+			StaticJsonDocument<50> doc;
+			DynamicJsonDocument samplesToSend(2056);
 			DeserializationError err = deserializeJson(doc, http.getString());
 			Serial.println(err.c_str());
 			JsonObject sample = doc.getElement(0);
-			String timestamp = sample["timestamp"];
-			Serial.println(timestamp);
+			int id = sample["id"];
+			Serial.println(id);
 		}
 		else
 		{
@@ -127,7 +128,7 @@ void config_time(lv_task_t *task)
 {
 	if (WiFi.status() == WL_CONNECTED)
 	{
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 500; i++)
 			dateTimeClient.update();
 		configTime(Rtc, dateTimeClient);
 	}
@@ -277,7 +278,11 @@ void getSampleFunc(lv_task_t *task)
 	Serial.println(temp);
 	Serial.println(humi);
 	char buffer[7];
-
+	if(wasUpdated != true)
+	{
+		lv_task_ready(syn_rtc);
+		wasUpdated = true;
+	} 
 	if (pmsSensor->readData())
 	{
 		std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
@@ -603,11 +608,8 @@ void setup()
 		ssid = getCharArrrayFromRTC(Rtc, 3);
 		password = getCharArrrayFromRTC(Rtc, 28);
 		WiFi.begin(ssid.c_str(), password.c_str());
-		if (WiFi.status() == WL_CONNECTED)
-		{
-			lv_task_ready(syn_rtc);
-		}
 	}
+	lv_task_ready(syn_rtc);
 }
 
 void loop()
