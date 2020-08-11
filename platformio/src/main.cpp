@@ -80,7 +80,7 @@ void containerStyle12Init(void){
 static lv_style_t containerStyle22;
 void containerStyle22Init(void){
 	lv_style_init(&containerStyle22);
-	lv_style_set_text_font(&containerStyle22, LV_STATE_DEFAULT, &lv_font_montserrat_22);
+	lv_style_set_text_font(&containerStyle22, LV_STATE_DEFAULT, &lv_font_montserrat_26);
 	lv_style_set_bg_opa(&containerStyle22, LV_STATE_DEFAULT, LV_OPA_0);
 	lv_style_set_border_color(&containerStyle22, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	lv_style_set_radius(&containerStyle22, LV_STATE_DEFAULT, 0);
@@ -392,7 +392,7 @@ void date_time(lv_task_t *task)
 
 	if (WiFi.status() == WL_CONNECTED)
 	{
-		lv_label_set_text(wifiStatusAtLock, "");
+		lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
 		lv_label_set_text(wifiStatusWarning, "");
 	}
 	else
@@ -404,7 +404,7 @@ void date_time(lv_task_t *task)
 	if (mySDCard.start(&sampleDB, &Serial2))
 	{
 		lv_label_set_text(sdStatusWarning, "");
-		lv_label_set_text(sdStatusAtLock, "");
+		lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
 	}
 	else
 	{
@@ -519,9 +519,9 @@ void main_screen()
 
 	lv_obj_set_pos(labelTempValue, 70, 20);
 	lv_obj_set_pos(labelHumiValue, 70, 20);
-	lv_obj_set_pos(labelPM10Data, 45, 40);
-	lv_obj_set_pos(labelPM25Data, 85, 50);
-	lv_obj_set_pos(labelPM100Data, 40, 40);
+	lv_obj_set_pos(labelPM10Data, 35, 35);
+	lv_obj_set_pos(labelPM25Data, 75, 50);
+	lv_obj_set_pos(labelPM100Data, 30, 35);
 
 	lv_obj_set_pos(sdStatusWarning, 2, 5);
 	lv_obj_set_pos(wifiStatusWarning, 5, 5);
@@ -564,6 +564,7 @@ void wifi_screen()
 	lv_label_set_text(cancel_label, LV_SYMBOL_LEFT);
 	lv_obj_set_size(cancel_btn, 30, 15);
 	lv_obj_set_event_cb(cancel_btn, btn_cancel);
+	lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
 	wifiLabelAtBar = lv_label_create(contBarWiFi, NULL);
 	lv_label_set_text(wifiLabelAtBar, "WiFi settings");
@@ -610,6 +611,8 @@ void lock_screen()
 	//lv_cont_set_fit4(contDateTimeLock,   LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
 	lv_cont_set_fit(contDateTimeLock, LV_FIT_TIGHT);
 	lv_cont_set_layout(contDateTimeLock, LV_LAYOUT_PRETTY_MID);
+	lv_obj_add_style(contDateTimeLock, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_set_style_local_border_opa(contDateTimeLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 
 	lockButton1 = lv_btn_create(lock_scr, NULL);
 	labelLockButton1 = lv_label_create(lockButton1, NULL);
@@ -617,9 +620,7 @@ void lock_screen()
 	lv_label_set_text(labelLockButton1, LV_SYMBOL_POWER);
 	lv_btn_set_fit(lockButton1, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(lockButton1, lockButton_task1);
-	lv_obj_set_style_local_bg_opa(lockButton1, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_border_opa(lockButton1, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_border_opa(lockButton1, LV_BTN_PART_MAIN, LV_BTN_STATE_PRESSED, LV_OPA_TRANSP);
+	lv_obj_add_style(lockButton1, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
 	labelTimeLock = lv_label_create(contDateTimeLock, NULL);
 	lv_label_set_text(labelTimeLock, "Connect\nto wifi");
@@ -637,6 +638,8 @@ void lock_screen()
 	sdStatusAtLock = lv_label_create(contDateTimeLock, NULL);
 	lv_obj_align(sdStatusAtLock, NULL, LV_ALIGN_IN_BOTTOM_MID, -10, 0);
 	lv_label_set_text(sdStatusAtLock, "");
+
+	
 }
 
 void setup()
