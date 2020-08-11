@@ -12,7 +12,9 @@
 #include <MySD.hpp>
 #include <HTTPClient.h>
 #include <time.h>
-
+#include <ESP32Ping.h>
+const char* remote_host = "www.google.com";
+const IPAddress remote_ip(192, 168, 1, 1);
 #define LVGL_TICK_PERIOD 60
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
@@ -132,7 +134,7 @@ lv_obj_t *labelPM100Data;
 //--------------------------------------------------wifi gui
 lv_obj_t *contBarWiFi;
 lv_obj_t *wifiLabelAtBar;
-lv_obj_t *wifi_scr;
+lv_obj_t *wifiConnect_scr;
 lv_obj_t *keyboard;
 lv_obj_t *ssid_ta;
 lv_obj_t *pwd_ta;
@@ -142,6 +144,41 @@ lv_obj_t *apply_btn;
 lv_obj_t *apply_label;
 lv_obj_t *cancel_btn;
 lv_obj_t *cancel_label;
+//--------------------------------------------------settings gui
+lv_obj_t *settings_scr;
+lv_obj_t *contBarSettings;
+lv_obj_t *back_settings_btn;
+lv_obj_t *back_settings_label;
+lv_obj_t *settingsLabelAtBar;
+lv_obj_t *settingsMenu;
+lv_obj_t *WiFiBtnBar;
+lv_obj_t *WiFiBtn;
+lv_obj_t *WiFiBtnLabel;
+
+lv_obj_t *placeholder1Bar;
+lv_obj_t *placeholder1Btn;
+lv_obj_t *placeholder1Label;
+
+lv_obj_t *placeholder2Bar;
+lv_obj_t *placeholder2Btn;
+lv_obj_t *placeholder2Label;
+
+lv_obj_t *placeholder3Bar;
+lv_obj_t *placeholder3Btn;
+lv_obj_t *placeholder3Label;
+//--------------------------------------------------wifi list gui
+lv_obj_t *wifiList_scr;
+lv_obj_t *contBarwifiList;
+lv_obj_t *wifiListLabelAtBar;
+lv_obj_t *back_wifi_btn;
+lv_obj_t *back_wifi_label;
+lv_obj_t *wifi_menu;
+
+int SSIDnumber;
+
+lv_obj_t** SSIDbar;
+lv_obj_t** SSIDBtn;
+lv_obj_t** SSIDLabel;
 //--------------------------------------------------lockscreen gui
 lv_obj_t *lock_scr;
 lv_obj_t *contDateTimeLock;
@@ -156,6 +193,37 @@ lv_task_t *turnFanOn;
 lv_task_t *getSample;
 lv_task_t *syn_rtc;
 lv_task_t *getAppLastRecord;
+lv_task_t *wifilist;
+
+static void wifi_ssid(lv_obj_t *obj, lv_event_t event)
+{
+	lv_obj_t * label = lv_obj_get_child(obj, NULL);
+	const char * ssid = lv_label_get_text(label);
+	Serial.println(ssid);
+	lv_textarea_set_text(ssid_ta, ssid);
+	lv_disp_load_scr(wifiConnect_scr);
+}
+
+void listNetworks(lv_task_t *task) {
+  SSIDnumber = WiFi.scanNetworks(false, false, false, 20);
+  SSIDbar = new lv_obj_t* [SSIDnumber];
+  SSIDBtn = new lv_obj_t* [SSIDnumber];
+  SSIDLabel = new lv_obj_t* [SSIDnumber];
+  for (int thisNet = 0; thisNet<SSIDnumber; thisNet++) {
+	SSIDbar[thisNet] = lv_cont_create(wifi_menu, NULL);
+	lv_obj_set_auto_realign(SSIDbar[thisNet], true);
+	lv_obj_align(SSIDbar[thisNet], NULL, LV_ALIGN_IN_TOP_MID, 0, thisNet*lv_obj_get_height(SSIDbar[thisNet]));
+	lv_cont_set_fit4(SSIDbar[thisNet], LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	SSIDBtn[thisNet] = lv_btn_create(SSIDbar[thisNet], NULL);
+	lv_obj_set_size(SSIDBtn[thisNet], lv_obj_get_width(SSIDbar[thisNet]), lv_obj_get_height(SSIDbar[thisNet]));
+	SSIDLabel[thisNet] = lv_label_create(SSIDBtn[thisNet], NULL);
+	lv_label_set_text(SSIDLabel[thisNet], WiFi.SSID(thisNet).c_str());
+	lv_label_set_align(SSIDLabel[thisNet], LV_ALIGN_IN_LEFT_MID);
+	lv_obj_set_event_cb(SSIDBtn[thisNet], wifi_ssid);
+	lv_obj_add_style(SSIDBtn[thisNet], LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_add_style(SSIDbar[thisNet], LV_OBJ_PART_MAIN, &containerStyle16);
+  }
+}
 
 void fetchLastRecord(lv_task_t *task)
 {
@@ -188,9 +256,18 @@ void config_time(lv_task_t *task)
 {
 	if (WiFi.status() == WL_CONNECTED)
 	{
-		for (int i = 0; i < 500; i++)
-			dateTimeClient.update();
-		configTime(Rtc, dateTimeClient);
+		if(Ping.ping(remote_ip, 1)) {
+    		for (int i = 0; i < 500; i++)
+				dateTimeClient.update();
+			configTime(Rtc, dateTimeClient);
+			wasUpdated=true;
+  		} else {
+    		wasUpdated=false;
+ 		}
+		
+	}else
+	{
+		wasUpdated=false;
 	}
 }
 
@@ -260,17 +337,21 @@ static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 	{
 		if (keyboard == NULL)
 		{
-			keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-			lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-			lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
-			lv_keyboard_set_textarea(keyboard, ta);
+			if(ta!=ssid_ta){				
+				keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+				lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
+				lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+				lv_keyboard_set_textarea(keyboard, ta);
+			}
 		}
 		else
 		{
-			keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-			lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-			lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
-			lv_keyboard_set_textarea(keyboard, ta);
+			if(ta!=ssid_ta){				
+				keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+				lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
+				lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+				lv_keyboard_set_textarea(keyboard, ta);
+			}
 		}
 	}
 }
@@ -309,8 +390,7 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 
 static void setButton_task(lv_obj_t *obj, lv_event_t event)
 {
-	lv_disp_load_scr(wifi_scr);
-	String result = getCharArrrayFromRTC(Rtc, 3);
+	lv_disp_load_scr(settings_scr);
 }
 
 static void lockButton_task(lv_obj_t *obj, lv_event_t event)
@@ -365,8 +445,8 @@ void getSampleFunc(lv_task_t *task)
 
 		itoa(tmpData["particles_100um"], buffer, 10);
 		lv_label_set_text(labelPMParticle[2], buffer);
-*/
-		mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
+*/		if(wasUpdated !=true)
+			mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
 	}
 	itoa(temp, buffer, 10);
 	lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
@@ -413,7 +493,24 @@ void date_time(lv_task_t *task)
 	}
 }
 
+static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
+{
+	lv_disp_load_scr(main_scr);
+}
 
+static void wifi_list_btn_back(lv_obj_t *obj, lv_event_t event)
+{
+	lv_disp_load_scr(settings_scr);
+}
+
+static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
+	wifilist = lv_task_create(listNetworks, 0, LV_TASK_PRIO_LOWEST, NULL);
+
+	lv_task_set_prio(wifilist, LV_TASK_PRIO_LOWEST);
+	lv_task_once(wifilist);
+	lv_disp_load_scr(wifiList_scr);
+	//lv_disp_load_scr(wifiConnect_scr);
+}
 
 void main_screen()
 {
@@ -548,9 +645,118 @@ void main_screen()
 
 }
 
+void wifiList_screen()
+{
+	contBarwifiList = lv_cont_create(wifiList_scr, NULL);
+	lv_obj_set_auto_realign(contBarwifiList, true);
+	lv_obj_align(contBarwifiList, NULL, LV_ALIGN_IN_TOP_MID, 0 ,0);
+	lv_cont_set_fit4(contBarwifiList, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	lv_cont_set_layout(contBarwifiList, LV_LAYOUT_PRETTY_TOP);
+	lv_obj_add_style(contBarwifiList, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_set_style_local_border_opa(contBarwifiList, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
+	lv_obj_set_click(contBarwifiList, false);
+	
+
+	back_wifi_btn=lv_btn_create(contBarwifiList, NULL);
+	back_wifi_label = lv_label_create(back_wifi_btn, NULL);
+	lv_label_set_text(back_wifi_label, LV_SYMBOL_LEFT);
+	lv_obj_set_style_local_bg_opa(back_wifi_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+	lv_obj_set_style_local_border_opa(back_wifi_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+
+	lv_obj_set_size(back_wifi_btn, 30, 15);
+	lv_obj_set_event_cb(back_wifi_btn, wifi_list_btn_back);
+	wifiListLabelAtBar = lv_label_create(contBarwifiList, NULL);
+	lv_label_set_text(wifiListLabelAtBar, "WiFi");
+
+	wifi_menu=lv_page_create(wifiList_scr, NULL);
+	lv_obj_set_size(wifi_menu, SCREEN_WIDTH, lv_obj_get_height(wifiList_scr)-lv_obj_get_height_margin(contBarwifiList));
+	lv_obj_align(wifi_menu, NULL, LV_ALIGN_CENTER, 0, (lv_obj_get_height_margin(contBarwifiList))/2);
+	lv_obj_set_click(wifi_menu, false);
+	lv_obj_set_click(wifi_menu, false);
+	lv_obj_add_style(wifi_menu, LV_OBJ_PART_MAIN, &containerStyle12);
+	lv_obj_set_style_local_border_opa(wifi_menu, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+
+}
+
+void settings_screen()
+{
+	contBarSettings = lv_cont_create(settings_scr, NULL);
+	lv_obj_set_auto_realign(contBarSettings, true);					/*Auto realign when the size changes*/
+	lv_obj_align(contBarSettings, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
+	lv_cont_set_fit4(contBarSettings, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	lv_cont_set_layout(contBarSettings, LV_LAYOUT_PRETTY_TOP);
+	lv_obj_add_style(contBarSettings, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_set_style_local_border_opa(contBarSettings, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
+	lv_obj_set_click(contBarSettings, false);
+
+	back_settings_btn = lv_btn_create(contBarSettings, NULL);
+	back_settings_label = lv_label_create(back_settings_btn, NULL);
+	lv_label_set_text(back_settings_label, LV_SYMBOL_LEFT);
+	lv_obj_set_style_local_bg_opa(back_settings_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+	lv_obj_set_style_local_border_opa(back_settings_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+	lv_obj_set_size(back_settings_btn, 30, 15);
+	lv_obj_set_event_cb(back_settings_btn, btn_settings_back);
+
+	settingsLabelAtBar = lv_label_create (contBarSettings, NULL);
+	lv_label_set_text(settingsLabelAtBar, "Settings");
+
+	settingsMenu=lv_page_create(settings_scr, NULL);
+	lv_obj_set_size(settingsMenu, SCREEN_WIDTH, lv_obj_get_height(settings_scr)-lv_obj_get_height_margin(contBarSettings));
+	lv_obj_align(settingsMenu, NULL, LV_ALIGN_CENTER, 0, (lv_obj_get_height_margin(contBarSettings))/2);
+	lv_obj_set_click(settingsMenu, false);
+	lv_obj_add_style(settingsMenu, LV_OBJ_PART_MAIN, &containerStyle12);
+	lv_obj_set_style_local_border_opa(settingsMenu, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+
+	WiFiBtnBar = lv_cont_create(settingsMenu, NULL);
+	lv_obj_set_auto_realign(WiFiBtnBar, true);
+	lv_obj_align(WiFiBtnBar, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+	lv_cont_set_fit4(WiFiBtnBar, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	WiFiBtn = lv_btn_create(WiFiBtnBar, NULL);
+	lv_obj_set_size(WiFiBtn, lv_obj_get_width(WiFiBtnBar), lv_obj_get_height(WiFiBtnBar));
+	WiFiBtnLabel = lv_label_create(WiFiBtn, NULL);
+	lv_label_set_text(WiFiBtnLabel, "WiFi");
+	lv_label_set_align(WiFiBtnLabel, LV_ALIGN_IN_LEFT_MID);
+	lv_obj_set_event_cb(WiFiBtn, WiFi_btn);
+	lv_obj_add_style(WiFiBtn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_add_style(WiFiBtnBar, LV_OBJ_PART_MAIN, &containerStyle16);
+
+	placeholder1Bar = lv_cont_create(settingsMenu, NULL);
+	lv_obj_align(placeholder1Bar, NULL, LV_ALIGN_IN_TOP_MID, 0, lv_obj_get_height(WiFiBtnBar));
+	lv_cont_set_fit4(placeholder1Bar, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	placeholder1Btn = lv_btn_create(placeholder1Bar, NULL);
+	lv_obj_set_size(placeholder1Btn, lv_obj_get_width(placeholder1Bar), lv_obj_get_height(placeholder1Bar));
+	placeholder1Label = lv_label_create(placeholder1Btn, NULL);
+	lv_label_set_text(placeholder1Label, "placeholder1");
+	lv_label_set_align(placeholder1Label, LV_ALIGN_IN_LEFT_MID);
+	lv_obj_add_style(placeholder1Btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_add_style(placeholder1Bar, LV_OBJ_PART_MAIN, &containerStyle16);
+
+	placeholder2Bar = lv_cont_create(settingsMenu, NULL);
+	lv_obj_align(placeholder2Bar, NULL, LV_ALIGN_IN_TOP_MID, 0, lv_obj_get_height(WiFiBtnBar)*2);
+	lv_cont_set_fit4(placeholder2Bar, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	placeholder2Btn = lv_btn_create(placeholder2Bar, NULL);
+	lv_obj_set_size(placeholder2Btn, lv_obj_get_width(placeholder2Bar), lv_obj_get_height(placeholder2Bar));
+	placeholder2Label = lv_label_create(placeholder2Btn, NULL);
+	lv_label_set_text(placeholder2Label, "placeholder2");
+	lv_label_set_align(placeholder2Label, LV_ALIGN_IN_LEFT_MID);
+	lv_obj_add_style(placeholder2Btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_add_style(placeholder2Bar, LV_OBJ_PART_MAIN, &containerStyle16);
+
+	placeholder3Bar = lv_cont_create(settingsMenu, NULL);
+	lv_obj_align(placeholder3Bar, NULL, LV_ALIGN_IN_TOP_MID, 0, lv_obj_get_height(WiFiBtnBar)*3);
+	lv_cont_set_fit4(placeholder3Bar, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	placeholder3Btn = lv_btn_create(placeholder3Bar, NULL);
+	lv_obj_set_size(placeholder3Btn, lv_obj_get_width(placeholder3Bar), lv_obj_get_height(placeholder3Bar));
+	placeholder3Label = lv_label_create(placeholder3Btn, NULL);
+	lv_label_set_text(placeholder3Label, "placeholder3");
+	lv_label_set_align(placeholder3Label, LV_ALIGN_IN_LEFT_MID);
+	lv_obj_add_style(placeholder3Btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_add_style(placeholder3Bar, LV_OBJ_PART_MAIN, &containerStyle16);
+}
+
 void wifi_screen()
 {
-	contBarWiFi = lv_cont_create(wifi_scr, NULL);
+	contBarWiFi = lv_cont_create(wifiConnect_scr, NULL);
 	lv_obj_set_auto_realign(contBarWiFi, true);					/*Auto realign when the size changes*/
 	lv_obj_align(contBarWiFi, NULL, LV_ALIGN_IN_TOP_MID, 0, 0); /*This parametrs will be sued when realigned*/
 	lv_cont_set_fit4(contBarWiFi, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
@@ -568,11 +774,11 @@ void wifi_screen()
 	wifiLabelAtBar = lv_label_create(contBarWiFi, NULL);
 	lv_label_set_text(wifiLabelAtBar, "WiFi settings");
 
-	ssid_label = lv_label_create(wifi_scr, NULL);
+	ssid_label = lv_label_create(wifiConnect_scr, NULL);
 	lv_label_set_text(ssid_label, "SSID: ");
 	lv_obj_set_pos(ssid_label, 5, 53);
 
-	ssid_ta = lv_textarea_create(wifi_scr, NULL);
+	ssid_ta = lv_textarea_create(wifiConnect_scr, NULL);
 	lv_textarea_set_text(ssid_ta, "");
 	lv_textarea_set_pwd_mode(ssid_ta, false);
 	lv_textarea_set_one_line(ssid_ta, true);
@@ -581,10 +787,10 @@ void wifi_screen()
 	lv_obj_set_width(ssid_ta, LV_HOR_RES / 2 - 20);
 	lv_obj_set_pos(ssid_ta, 100, 45);
 
-	pwd_label = lv_label_create(wifi_scr, NULL);
+	pwd_label = lv_label_create(wifiConnect_scr, NULL);
 	lv_label_set_text(pwd_label, "Password: ");
 	lv_obj_set_pos(pwd_label, 5, 92);
-	pwd_ta = lv_textarea_create(wifi_scr, NULL);
+	pwd_ta = lv_textarea_create(wifiConnect_scr, NULL);
 	lv_textarea_set_text(pwd_ta, "");
 	lv_textarea_set_pwd_mode(pwd_ta, true);
 	lv_textarea_set_one_line(pwd_ta, true);
@@ -593,7 +799,7 @@ void wifi_screen()
 	lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
 	lv_obj_set_pos(pwd_ta, 100, 85);
 
-	apply_btn = lv_btn_create(wifi_scr, NULL);
+	apply_btn = lv_btn_create(wifiConnect_scr, NULL);
 	apply_label = lv_label_create(apply_btn, NULL);
 	lv_label_set_text(apply_label, "Connect");
 	lv_obj_set_style_local_border_opa(apply_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
@@ -641,6 +847,7 @@ void lock_screen()
 
 void setup()
 {
+	wasUpdated=false;
 	pinMode(33, OUTPUT);
 	digitalWrite(33, LOW);
 	sqlite3_initialize();
@@ -683,15 +890,21 @@ void setup()
 	tinySymbolStyleInit();
 
 	main_scr = lv_cont_create(NULL, NULL);
-	wifi_scr = lv_cont_create(NULL, NULL);
+	settings_scr=lv_cont_create(NULL, NULL);
+	wifiConnect_scr = lv_cont_create(NULL, NULL);
+	wifiList_scr=lv_cont_create(NULL, NULL);
 	lock_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-	lv_obj_set_style_local_bg_color(wifi_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_set_style_local_bg_color(wifiConnect_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_set_style_local_bg_color(settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_set_style_local_bg_color(wifiList_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
 	main_screen();
+	settings_screen();
 	wifi_screen();
 	lock_screen();
+	wifiList_screen();
 	lv_disp_load_scr(main_scr);
 
 	lv_task_t *date = lv_task_create(date_time, 1000, LV_TASK_PRIO_MID, NULL);
@@ -720,3 +933,6 @@ void loop()
 	delay(5);
 }
 
+//TODO kolorki ustawien
+//TODO wiecej ustawien
+//TODO zmiana koloru klawiatury
