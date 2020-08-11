@@ -509,7 +509,6 @@ static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
 	lv_task_set_prio(wifilist, LV_TASK_PRIO_LOWEST);
 	lv_task_once(wifilist);
 	lv_disp_load_scr(wifiList_scr);
-	//lv_disp_load_scr(wifiConnect_scr);
 }
 
 void main_screen()
