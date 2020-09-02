@@ -18,39 +18,92 @@
 #define SCREEN_HEIGHT 240
 #define GMT_OFFSET_SEC 7200
 
+//RTC, PMS5003 and SHT30 objects declaration
 RtcDS1307<TwoWire> Rtc(Wire);
+PMS5003 *pmsSensor;
+SHT3X sht30(0x45);
+
+//NTPClient declarations 
 static const char ntpServerName[] = "europe.pool.ntp.org";
 WiFiUDP ntpUDP;
 NTPClient dateTimeClient(ntpUDP, ntpServerName, 7200);
 bool wasUpdated = false;
 
+//TFT display using TFT_eSPI and lvgl library
 TFT_eSPI tft = TFT_eSPI();
 static lv_disp_buf_t disp_buf;
 static lv_color_t buf[LV_HOR_RES_MAX * 10];
+
+//Time between sampling
 int measure_period = 30000;
 
+//SD Card and sqlite database objects declaration
 MySD mySDCard(27);
 SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
+//Is data synchronized variable
 bool date_synchronized = false;
 
+//Wifi connection strings
 String ssid = "";
 String password = "";
 
+//Temperature, relative humidity and pm2.5 per ug/m3 variables
 float temp, humi, pm25Aqi;
-float aqiStandards[5] = {21, 61, 101, 141, 201};
-PMS5003 *pmsSensor;
-SHT3X sht30(0x45);
 
+//
 String fetchLastRecordURL = "";
 
 String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Very unhealthy", "Hazardous" };
 String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
-lv_color_t airQualityColors[6] = { LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
-//--------------------------------------------------styles
+float aqiStandards[5] = {21, 61, 101, 141, 201};
 
-//TODO Style
+//--------------------------------------------------styles
+//Basic container with white border and transparent background
+static lv_style_t containerStyle;
+void containerStyleInit(void){
+	lv_style_init(&containerStyle);
+	lv_style_set_text_font(&containerStyle, LV_STATE_DEFAULT, &lv_font_montserrat_16);
+	lv_style_set_text_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_bg_opa(&containerStyle, LV_STATE_DEFAULT, LV_OPA_0);
+	lv_style_set_border_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_radius(&containerStyle, LV_STATE_DEFAULT, 0);
+}
+//Different font sizes using lvgl styles
+static lv_style_t font12Style;
+static lv_style_t font16Style;
+static lv_style_t font20Style;
+static lv_style_t font22Style;
+
+//Style initialization functions
+void font20StyleInit(void){
+	lv_style_init(&font20Style);
+	lv_style_set_text_font(&font20Style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
+	lv_style_set_text_color(&font20Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+}
+
+void font12StyleInit(void){
+	lv_style_init(&font12Style);
+	lv_style_set_text_font(&font12Style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+	lv_style_set_text_color(&font12Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+}
+void font16StyleInit(void){
+	lv_style_init(&font16Style);
+	lv_style_set_text_font(&font16Style, LV_STATE_DEFAULT, &lv_font_montserrat_16);
+	lv_style_set_text_color(&font16Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+}
+void font22StyleInit(void){
+	lv_style_init(&font22Style);
+	lv_style_set_text_font(&font22Style, LV_STATE_DEFAULT, &lv_font_montserrat_22);
+	lv_style_set_text_color(&font22Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+}
+
+//Additional styles with initalization functions
 static lv_style_t tinySymbolStyle;
+static lv_style_t transparentButtonStyle;
+static lv_style_t lineStyle;
+
+//Tiny symbols to signalize wifi and sd card status
 void tinySymbolStyleInit(void){
 	lv_style_init(&tinySymbolStyle);
 	lv_style_set_text_font(&tinySymbolStyle, LV_STATE_DEFAULT, &lv_font_montserrat_12);
@@ -58,40 +111,8 @@ void tinySymbolStyleInit(void){
 	lv_style_set_border_opa(&tinySymbolStyle, LV_STATE_DEFAULT, LV_OPA_0);
 	lv_style_set_radius(&tinySymbolStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_text_color(&tinySymbolStyle, LV_STATE_DEFAULT, LV_COLOR_RED);
-
 }
 
-static lv_style_t containerStyle16;
-void containerStyle16Init(void){
-	lv_style_init(&containerStyle16);
-	lv_style_set_text_font(&containerStyle16, LV_STATE_DEFAULT, &lv_font_montserrat_16);
-	lv_style_set_bg_opa(&containerStyle16, LV_STATE_DEFAULT, LV_OPA_0);
-	lv_style_set_border_color(&containerStyle16, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-	lv_style_set_radius(&containerStyle16, LV_STATE_DEFAULT, 0);
-	lv_style_set_text_color(&containerStyle16, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-static lv_style_t containerStyle12;
-void containerStyle12Init(void){
-	lv_style_init(&containerStyle12);
-	lv_style_set_text_font(&containerStyle12, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-	lv_style_set_bg_opa(&containerStyle12, LV_STATE_DEFAULT, LV_OPA_0);
-	lv_style_set_border_color(&containerStyle12, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-	lv_style_set_radius(&containerStyle12, LV_STATE_DEFAULT, 0);
-	lv_style_set_text_color(&containerStyle12, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-static lv_style_t containerStyle22;
-void containerStyle22Init(void){
-	lv_style_init(&containerStyle22);
-	lv_style_set_text_font(&containerStyle22, LV_STATE_DEFAULT, &lv_font_montserrat_22);
-	lv_style_set_bg_opa(&containerStyle22, LV_STATE_DEFAULT, LV_OPA_0);
-	lv_style_set_border_color(&containerStyle22, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-	lv_style_set_radius(&containerStyle22, LV_STATE_DEFAULT, 0);
-	lv_style_set_text_color(&containerStyle22, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-static lv_style_t transparentButtonStyle;
 void transparentButtonStyleInit(void){
 	lv_style_init(&transparentButtonStyle);
 	lv_style_set_bg_opa(&transparentButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
@@ -100,7 +121,6 @@ void transparentButtonStyleInit(void){
 	lv_style_set_text_color(&transparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
 
-static lv_style_t lineStyle;
 void lineStyleInit(void){
 	lv_style_init(&lineStyle);
     lv_style_set_line_width(&lineStyle, LV_STATE_DEFAULT, 2);
@@ -108,21 +128,8 @@ void lineStyleInit(void){
     lv_style_set_line_rounded(&lineStyle, LV_STATE_DEFAULT, false);
 }
 
-static lv_style_t whiteFont12Style;
-void whiteFont12StyleInit(void){
-	lv_style_init(&whiteFont12Style);
-	lv_style_set_text_font(&whiteFont12Style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-	lv_style_set_text_color(&whiteFont12Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-static lv_style_t whiteFont20Style;
-void whiteFont20StyleInit(void){
-	lv_style_init(&whiteFont20Style);
-	lv_style_set_text_font(&whiteFont20Style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
-	lv_style_set_text_color(&whiteFont20Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
 //--------------------------------------------------main gui
-
+//Main screen objects declaration
 lv_obj_t *main_scr;
 lv_obj_t *wifiStatus;
 lv_obj_t *sdStatus;
@@ -159,16 +166,20 @@ lv_obj_t *labelNumberTitle;
 lv_obj_t *labelSizes[6];
 lv_obj_t *labelParticlesNumber[5];
 lv_obj_t *contParticlesNumber[5];
-
 static lv_point_t mainLinePoints[] = {{20, 210}, {270, 210}};
+//An array of points pairs instead of multiple names and declarations
 static lv_point_t dividingLinesPoints[][6] = 	{{{20,205}, {20, 215}},
 												{{70,205}, {70, 215}},
 												{{120,205}, {120, 215}},
 												{{170,205}, {170, 215}},
 												{{220,205}, {220, 215}},
 												{{270,205}, {270, 215}}};
+//Main line at the bottom declaration
 lv_obj_t *mainLine;
+//An array of lines dividing main one 
 lv_obj_t *dividingLines[6];
+//An array of colors used depending on actual pm2.5 value
+lv_color_t airQualityColors[6] = { LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
 //--------------------------------------------------wifi gui
 lv_obj_t *contBarWiFi;
 lv_obj_t *wifiLabelAtBar;
@@ -241,6 +252,92 @@ void config_time(lv_task_t *task)
 		for (int i = 0; i < 500; i++)
 			dateTimeClient.update();
 		configTime(Rtc, dateTimeClient);
+	}
+}
+
+void getSampleFunc(lv_task_t *task)
+{
+	sht30.get();
+	temp = sht30.cTemp;
+	humi = sht30.humidity;
+	Serial.println(temp);
+	Serial.println(humi);
+	char buffer[7];
+	if(wasUpdated != true)
+	{
+		lv_task_ready(syn_rtc);
+		wasUpdated = true;
+	} 
+	if (pmsSensor->readData())
+	{
+		std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
+		pmsSensor->dumpSamples();
+
+		itoa(tmpData["pm10_standard"], buffer, 10);
+		lv_label_set_text(labelPM10Data, buffer);
+
+		itoa(tmpData["pm25_standard"], buffer, 10);
+		pm25Aqi = tmpData["pm25_standard"];
+		lv_label_set_text(labelPM25Data, buffer);
+		setAqiStateNColor();
+
+		itoa(tmpData["pm100_standard"], buffer, 10);
+		lv_label_set_text(labelPM100Data, buffer);
+
+		itoa(tmpData["particles_05um"], buffer, 10);
+		lv_label_set_text(labelParticlesNumber[0], buffer);
+
+		itoa(tmpData["particles_10um"], buffer, 10);
+		lv_label_set_text(labelParticlesNumber[1], buffer);
+
+		itoa(tmpData["particles_25um"], buffer, 10);
+		lv_label_set_text(labelParticlesNumber[2], buffer);
+
+		itoa(tmpData["particles_50um"], buffer, 10);
+		lv_label_set_text(labelParticlesNumber[3], buffer);
+
+		itoa(tmpData["particles_100um"], buffer, 10);
+		lv_label_set_text(labelParticlesNumber[4], buffer);
+
+		mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial); //jezeli w bazie danych są inty na temp i humi, to trzeba walnac floaty
+	}
+	itoa(temp, buffer, 10);
+	lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
+	itoa(humi, buffer, 10);
+	lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
+	lv_task_reset(turnFanOn);
+	digitalWrite(33, LOW);
+}
+
+void dateTimeStatusFunc(lv_task_t *task)
+{
+	if (Rtc.GetMemory(1) == 1)
+	{
+		lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
+		lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
+		lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
+	}
+
+	if (WiFi.status() == WL_CONNECTED)
+	{
+		lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
+		lv_label_set_text(wifiStatusWarning, "");
+	}
+	else
+	{
+		lv_label_set_text(wifiStatusAtLock, "");
+		lv_label_set_text(wifiStatusWarning, LV_SYMBOL_CLOSE);
+	}
+
+	if (mySDCard.start(&sampleDB, &Serial2))
+	{
+		lv_label_set_text(sdStatusWarning, "");
+		lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
+	}
+	else
+	{
+		lv_label_set_text(sdStatusWarning, LV_SYMBOL_CLOSE);
+		lv_label_set_text(sdStatusAtLock, "");
 	}
 }
 
@@ -380,97 +477,10 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 	lv_textarea_set_text(pwd_ta, "");
 }
 
-void getSampleFunc(lv_task_t *task)
-{
-	sht30.get();
-	temp = sht30.cTemp;
-	humi = sht30.humidity;
-	Serial.println(temp);
-	Serial.println(humi);
-	char buffer[7];
-	if(wasUpdated != true)
-	{
-		lv_task_ready(syn_rtc);
-		wasUpdated = true;
-	} 
-	if (pmsSensor->readData())
-	{
-		std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
-		pmsSensor->dumpSamples();
-
-		itoa(tmpData["pm10_standard"], buffer, 10);
-		lv_label_set_text(labelPM10Data, buffer);
-
-		itoa(tmpData["pm25_standard"], buffer, 10);
-		pm25Aqi = tmpData["pm25_standard"];
-		lv_label_set_text(labelPM25Data, buffer);
-		setAqiStateNColor();
-
-		itoa(tmpData["pm100_standard"], buffer, 10);
-		lv_label_set_text(labelPM100Data, buffer);
-
-		itoa(tmpData["particles_05um"], buffer, 10);
-		lv_label_set_text(labelParticlesNumber[0], buffer);
-
-		itoa(tmpData["particles_10um"], buffer, 10);
-		lv_label_set_text(labelParticlesNumber[1], buffer);
-
-		itoa(tmpData["particles_25um"], buffer, 10);
-		lv_label_set_text(labelParticlesNumber[2], buffer);
-
-		itoa(tmpData["particles_50um"], buffer, 10);
-		lv_label_set_text(labelParticlesNumber[3], buffer);
-
-		itoa(tmpData["particles_100um"], buffer, 10);
-		lv_label_set_text(labelParticlesNumber[4], buffer);
-
-		mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial); //jezeli w bazie danych są inty na temp i humi, to trzeba walnac floaty
-	}
-	itoa(temp, buffer, 10);
-	lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
-	itoa(humi, buffer, 10);
-	lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
-	lv_task_reset(turnFanOn);
-	digitalWrite(33, LOW);
-}
-
 void turnFanOnFunc(lv_task_t *task)
 {
 	digitalWrite(33, HIGH);
 }
-
-void date_time(lv_task_t *task)
-{
-	if (Rtc.GetMemory(1) == 1)
-	{
-		lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
-		lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
-		lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
-	}
-
-	if (WiFi.status() == WL_CONNECTED)
-	{
-		lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
-		lv_label_set_text(wifiStatusWarning, "");
-	}
-	else
-	{
-		lv_label_set_text(wifiStatusAtLock, "");
-		lv_label_set_text(wifiStatusWarning, LV_SYMBOL_CLOSE);
-	}
-
-	if (mySDCard.start(&sampleDB, &Serial2))
-	{
-		lv_label_set_text(sdStatusWarning, "");
-		lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
-	}
-	else
-	{
-		lv_label_set_text(sdStatusWarning, LV_SYMBOL_CLOSE);
-		lv_label_set_text(sdStatusAtLock, "");
-	}
-}
-
 
 
 void main_screen()
@@ -479,7 +489,7 @@ void main_screen()
 	lv_obj_set_auto_realign(contBar, true);					/*Auto realign when the size changes*/
 	lv_obj_align(contBar, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
 	lv_cont_set_fit4(contBar, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-	lv_obj_add_style(contBar, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_add_style(contBar, LV_OBJ_PART_MAIN, &containerStyle);
 	lv_obj_set_style_local_border_opa(contBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
 	lv_obj_set_click(contBar, false);
 /*
@@ -518,35 +528,38 @@ void main_screen()
 	dateAndTimeAtBar = lv_label_create(contBar, NULL);
 	lv_label_set_text(dateAndTimeAtBar, "Hello!");
 	lv_obj_align(dateAndTimeAtBar, NULL, LV_ALIGN_IN_RIGHT_MID, -120, 0);
-//TODO Styl kontener test
 
 	contTemp = lv_cont_create(main_scr, NULL);
 	lv_obj_set_click(contTemp, false);
-	lv_obj_add_style(contTemp, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_add_style(contTemp, LV_OBJ_PART_MAIN, &containerStyle);
 
 	contHumi = lv_cont_create(main_scr, NULL);
 	lv_obj_set_click(contHumi, false);
-	lv_obj_add_style(contHumi, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_add_style(contHumi, LV_OBJ_PART_MAIN, &containerStyle);
 
 	contPM10 = lv_cont_create(main_scr, NULL);
 	lv_obj_set_click(contPM10, false);
-	lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &containerStyle12);
+	lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &containerStyle);
+	lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &font12Style);
 
 	contPM25 = lv_cont_create(main_scr, NULL);
 	lv_obj_set_click(contPM25, false);
-	lv_obj_add_style(contPM25, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_add_style(contPM25, LV_OBJ_PART_MAIN, &containerStyle);
 
 	contPM100 = lv_cont_create(main_scr, NULL);
 	lv_obj_set_click(contPM100, false);
-	lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &containerStyle12);
+	lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &containerStyle);
+	lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &font12Style);
 	
 	contAQI = lv_cont_create(main_scr, NULL);
 	lv_obj_set_click(contAQI, false);
-	lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &containerStyle12);
+	lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &containerStyle);
+	lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &font12Style);
 
 	contAQIColorBar = lv_cont_create(contAQI, NULL);
 	lv_obj_set_click(contAQIColorBar, false);
-	lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &containerStyle12);
+	lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &containerStyle);
+	lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &font12Style);
 	lv_obj_set_style_local_bg_opa(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_70);
 	lv_obj_set_style_local_bg_color(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
 	
@@ -567,11 +580,11 @@ void main_screen()
 	labelAQI = lv_label_create(contAQI, NULL);
 	labelAQIColorBar = lv_label_create(contAQIColorBar, NULL);
 
-	lv_obj_add_style(labelPM10Data, LV_OBJ_PART_MAIN, &containerStyle22);
-	lv_obj_add_style(labelPM25Data, LV_OBJ_PART_MAIN, &containerStyle22);
-	lv_obj_add_style(labelPM100Data, LV_OBJ_PART_MAIN, &containerStyle22);
-		lv_obj_add_style(labelTempValue, LV_OBJ_PART_MAIN, &whiteFont20Style);
-	lv_obj_add_style(labelHumiValue, LV_OBJ_PART_MAIN, &whiteFont20Style);
+	lv_obj_add_style(labelPM10Data, LV_OBJ_PART_MAIN, &font22Style);
+	lv_obj_add_style(labelPM25Data, LV_OBJ_PART_MAIN, &font22Style);
+	lv_obj_add_style(labelPM100Data, LV_OBJ_PART_MAIN, &font22Style);
+	lv_obj_add_style(labelTempValue, LV_OBJ_PART_MAIN, &font20Style);
+	lv_obj_add_style(labelHumiValue, LV_OBJ_PART_MAIN, &font20Style);
 
 	lv_obj_set_pos(contPM10, 10, 118);
 	lv_obj_set_pos(contPM25, 10, 30);
@@ -635,13 +648,13 @@ void main_screen()
 		lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &lineStyle);
 		labelSizes[i] = lv_label_create(main_scr, NULL);
 		lv_label_set_text(labelSizes[i], particlesSize[i].c_str());
-		lv_obj_add_style(labelSizes[i], LV_LABEL_PART_MAIN, &whiteFont12Style);
+		lv_obj_add_style(labelSizes[i], LV_LABEL_PART_MAIN, &font12Style);
 		lv_obj_set_pos(labelSizes[i], 12+i*49, 190);
 	}
 
 	for(int i=0; i<5;i++){
 		contParticlesNumber[i] = lv_cont_create(main_scr, NULL);
-		lv_obj_add_style(contParticlesNumber[i], LV_OBJ_PART_MAIN, &containerStyle12);
+		lv_obj_add_style(contParticlesNumber[i], LV_OBJ_PART_MAIN, &containerStyle);
 		lv_obj_set_style_local_border_opa(contParticlesNumber[i], LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 		lv_obj_set_click(contParticlesNumber[i], false);
 		labelParticlesNumber[i] = lv_label_create(contParticlesNumber[i], NULL);
@@ -650,7 +663,7 @@ void main_screen()
 		lv_label_set_align(labelParticlesNumber[i], LV_LABEL_ALIGN_CENTER);
 		lv_obj_set_auto_realign(labelParticlesNumber[i], true);
 		lv_label_set_text(labelParticlesNumber[i], "-");
-		lv_obj_add_style(labelParticlesNumber[i], LV_LABEL_PART_MAIN, &whiteFont12Style);
+		lv_obj_add_style(labelParticlesNumber[i], LV_LABEL_PART_MAIN, &font12Style);
 	}
 	mainLine = lv_line_create(main_scr, NULL);
 	lv_line_set_points(mainLine, mainLinePoints, 2);
@@ -675,7 +688,7 @@ void wifi_screen()
 	lv_obj_align(contBarWiFi, NULL, LV_ALIGN_IN_TOP_MID, 0, 0); /*This parametrs will be sued when realigned*/
 	lv_cont_set_fit4(contBarWiFi, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
 	lv_cont_set_layout(contBarWiFi, LV_LAYOUT_PRETTY_TOP);
-	lv_obj_add_style(contBarWiFi, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_add_style(contBarWiFi, LV_OBJ_PART_MAIN, &containerStyle);
 	lv_obj_set_style_local_border_opa(contBarWiFi, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
 	lv_obj_set_click(contBarWiFi, false);
 
@@ -731,7 +744,7 @@ void lock_screen()
 	//lv_cont_set_fit4(contDateTimeLock,   LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
 	lv_cont_set_fit(contDateTimeLock, LV_FIT_TIGHT);
 	lv_cont_set_layout(contDateTimeLock, LV_LAYOUT_PRETTY_MID);
-	lv_obj_add_style(contDateTimeLock, LV_OBJ_PART_MAIN, &containerStyle16);
+	lv_obj_add_style(contDateTimeLock, LV_OBJ_PART_MAIN, &containerStyle);
 	lv_obj_set_style_local_border_opa(contDateTimeLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 
 	lockButton1 = lv_btn_create(lock_scr, NULL);
@@ -799,19 +812,21 @@ void setup()
 	//Set the theme..
 	lv_theme_t *th = lv_theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY, LV_THEME_DEFAULT_FLAG, LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
 	lv_theme_set_act(th);
-	containerStyle12Init();
-	containerStyle16Init();
-	containerStyle22Init();
 	transparentButtonStyleInit();
 	tinySymbolStyleInit();
 	lineStyleInit();
-	whiteFont12StyleInit();
-	whiteFont20StyleInit();
+
+	containerStyleInit();
+	font12StyleInit();
+	font16StyleInit();
+	font20StyleInit();
+	font22StyleInit();
+
 	main_scr = lv_cont_create(NULL, NULL);
-	wifi_scr = lv_cont_create(NULL, NULL);
-	lock_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	wifi_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(wifi_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lock_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
 	main_screen();
@@ -819,7 +834,7 @@ void setup()
 	lock_screen();
 	lv_disp_load_scr(main_scr);
 
-	lv_task_t *date = lv_task_create(date_time, 1000, LV_TASK_PRIO_MID, NULL);
+	lv_task_t *date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
 	syn_rtc = lv_task_create_basic();
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
