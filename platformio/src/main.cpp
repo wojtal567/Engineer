@@ -927,6 +927,7 @@ void wifi_screen()
 	ssid_label = lv_label_create(wifi_scr, NULL);
 	lv_label_set_text(ssid_label, "SSID: ");
 	lv_obj_set_pos(ssid_label, 5, 53);
+	lv_obj_set_style_local_text_color(ssid_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 	ssid_ta = lv_textarea_create(wifi_scr, NULL);
 	lv_textarea_set_text(ssid_ta, "");
@@ -940,6 +941,7 @@ void wifi_screen()
 	pwd_label = lv_label_create(wifi_scr, NULL);
 	lv_label_set_text(pwd_label, "Password: ");
 	lv_obj_set_pos(pwd_label, 5, 92);
+	lv_obj_set_style_local_text_color(pwd_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	pwd_ta = lv_textarea_create(wifi_scr, NULL);
 	lv_textarea_set_text(pwd_ta, "");
 	lv_textarea_set_pwd_mode(pwd_ta, true);
@@ -953,6 +955,7 @@ void wifi_screen()
 	apply_label = lv_label_create(apply_btn, NULL);
 	lv_label_set_text(apply_label, "Connect");
 	lv_obj_set_style_local_border_opa(apply_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+	lv_obj_set_style_local_text_color(apply_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	lv_obj_set_event_cb(apply_btn, btn_connect);
 	lv_obj_set_width(apply_btn, 75);
 	lv_obj_set_pos(apply_btn, 243, 43);
