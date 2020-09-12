@@ -14,6 +14,9 @@
 #include <time.h>
 #include <ESP32Ping.h>
 
+#include <Adafruit_GFX.h>
+#include <Adafruit_BusIO_Register.h>
+
 //checking internet connection
 const IPAddress remote_ip(192, 168, 1, 1);
 
@@ -1011,7 +1014,7 @@ void lock_screen()
 void setup()
 {
 	pinMode(33, OUTPUT);
-	digitalWrite(33, LOW);
+	digitalWrite(33, HIGH);
 	sqlite3_initialize();
 	//Serial debug
 	Serial.begin(115200); 

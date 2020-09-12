@@ -14,7 +14,7 @@
 #include "MySD.hpp"
 #include <HTTPClient.h>
 #include <time.h>
-#include "ESP32Ping.h"
+#include <ESP32Ping.h>
 //checking internet connection
 const IPAddress remote_ip(192, 168, 1, 1);
 
