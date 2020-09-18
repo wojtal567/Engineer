@@ -42,9 +42,9 @@ static lv_disp_buf_t disp_buf;
 static lv_color_t buf[LV_HOR_RES_MAX * 10];
 
 //Time between sampling
-int measure_period = 30000;
+int measure_period;
 //inactive time
-int lcd_lock_time = 600000;
+int lcd_lock_time;
 //SD Card and sqlite database objects declaration
 MySD mySDCard(27);
 SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
@@ -352,6 +352,7 @@ void config_time(lv_task_t *task)
 //Get single sample and set text
 void getSampleFunc(lv_task_t *task)
 {
+	Serial.println("Get Sample");
 	sht30.get();
 	temp = sht30.cTemp;
 	humi = sht30.humidity;
@@ -394,13 +395,14 @@ void getSampleFunc(lv_task_t *task)
 		itoa(tmpData["particles_100um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[4], buffer);
 
-		mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial); //jezeli w bazie danych są inty na temp i humi, to trzeba walnac floaty
+		mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
 	}
 	itoa(temp, buffer, 10);
 	lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
 	itoa(humi, buffer, 10);
 	lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
 	lv_task_reset(turnFanOn);
+	lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
 	digitalWrite(33, LOW);
 }
 
@@ -615,6 +617,16 @@ static void Lcd_save_btn(lv_obj_t *obj, lv_event_t event){
 			lcd_lock_time = 3600000;
 			break;
 	}
+	if(mySDCard.begin())
+	{
+		File settings = SD.open("/settings.csv", FILE_WRITE);
+		String stn = "";
+		stn+=(String)measure_period;
+		stn+="%";
+		stn+=(String)lcd_lock_time;
+		settings.print(stn);
+		settings.close();
+	}
 	lv_disp_load_scr(main_scr);
 	delay(20);
 }
@@ -633,6 +645,7 @@ static void time_settings_btn(lv_obj_t *obj, lv_event_t event){
 void turnFanOnFunc(lv_task_t *task)
 {
 	digitalWrite(33, HIGH);
+	lv_task_set_prio(turnFanOn, LV_TASK_PRIO_OFF);
 }
 
 void timesettings_screen()
@@ -1027,10 +1040,69 @@ void lock_screen()
 	lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
 }
 
+void load_settings()
+{
+	File settings;
+	String stn="";
+	if(mySDCard.begin())
+	{
+		if(SD.exists("/settings.csv"))
+		{
+			settings = SD.open("/settings.csv", FILE_READ);
+			Serial.println("som");
+			while(settings.available())
+			{
+				stn += (char)settings.read();
+			}
+			measure_period=stn.substring(0,stn.indexOf("%")).toInt();
+			lcd_lock_time=stn.substring(stn.indexOf("%")+1).toInt();
+			switch(lcd_lock_time)
+			{
+				case 30000: 
+					lv_dropdown_set_selected(lockScreenDDlist, 0);
+					break;
+				case 60000: 
+					lv_dropdown_set_selected(lockScreenDDlist, 1);
+					break;
+				case 120000:
+					lv_dropdown_set_selected(lockScreenDDlist, 2);
+					break;
+				case 300000:
+					lv_dropdown_set_selected(lockScreenDDlist, 3);
+					break;
+				case 600000:
+					lv_dropdown_set_selected(lockScreenDDlist, 4);
+					break;
+				case 1800000:
+					lv_dropdown_set_selected(lockScreenDDlist, 5);
+					break;
+				case 3600000:
+					lv_dropdown_set_selected(lockScreenDDlist, 6);
+					break;
+			}
+		}else
+		{
+			settings = SD.open("/settings.csv", FILE_WRITE);
+			settings.print("3600000%60000");
+			settings.close();
+			measure_period=3600000;
+			lcd_lock_time=60000;
+			lv_dropdown_set_selected(lockScreenDDlist, 1);
+		}
+		
+	}
+	else
+	{
+		measure_period=3600000;
+		lcd_lock_time=60000;
+		lv_dropdown_set_selected(lockScreenDDlist, 1);
+	}
+}
+
 void setup()
 {
 	pinMode(33, OUTPUT);
-	digitalWrite(33, HIGH);
+	digitalWrite(33, LOW);
 	sqlite3_initialize();
 	//Serial debug
 	Serial.begin(115200); 
@@ -1086,7 +1158,6 @@ void setup()
 	lv_obj_set_style_local_bg_color(wifi_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	lock_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-
 	//Screens initialization function
 	main_screen();
 	wifi_screen();
@@ -1095,13 +1166,13 @@ void setup()
 	lcd_screen();
 	timesettings_screen();
 	lv_disp_load_scr(main_scr);
-
+	load_settings();
 	lv_task_t *date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
 	syn_rtc = lv_task_create_basic();
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
 	getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
-	turnFanOn = lv_task_create(turnFanOnFunc, 240000, LV_TASK_PRIO_HIGH, NULL);
+	turnFanOn = lv_task_create(turnFanOnFunc, measure_period-300000, LV_TASK_PRIO_HIGHEST, NULL);
 	inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
 
 
@@ -1116,7 +1187,6 @@ void setup()
 		WiFi.begin(ssid.c_str(), password.c_str());
 	}
 	delay(500);
-	lv_task_ready(getSample);
 	lv_task_ready(syn_rtc);
 }
 
