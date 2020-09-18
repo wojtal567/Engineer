@@ -1069,8 +1069,17 @@ void load_settings()
 			settings = SD.open("/settings.csv", FILE_WRITE);
 			settings.print("3600000%60000");
 			settings.close();
+			measure_period=3600000;
+			lcd_lock_time=60000;
+			lv_dropdown_set_selected(lockScreenDDlist, 1);
 		}
 		
+	}
+	else
+	{
+		measure_period=3600000;
+		lcd_lock_time=60000;
+		lv_dropdown_set_selected(lockScreenDDlist, 1);
 	}
 }
 
