@@ -234,7 +234,7 @@ void lineStyleInit(void){
 
 //--------------------------------------------------main gui
 //Main screen objects declaration
-lv_obj_t *main_scr;
+lv_obj_t *main_scr; //LVGL Object that represents main screen
 lv_obj_t *wifiStatusAtMain;
 lv_obj_t *sdStatusAtMain;
 lv_obj_t *wifiStatusAtMainWarning;
@@ -257,8 +257,11 @@ lv_obj_t *labelHumi;
 lv_obj_t *labelTempValue;
 lv_obj_t *labelHumiValue;
 lv_obj_t *labelPM10;
+lv_obj_t *labelPM10UpperIndex;
 lv_obj_t *labelPM25;
+lv_obj_t *labelPM25UpperIndex;
 lv_obj_t *labelPM100;
+lv_obj_t *labelPM100UpperIndex;
 lv_obj_t *labelPM10Data;
 lv_obj_t *labelPM25Data;
 lv_obj_t *labelPM100Data;
@@ -269,14 +272,14 @@ lv_obj_t *labelNumberTitle;
 lv_obj_t *labelSizes[6];
 lv_obj_t *labelParticlesNumber[5];
 lv_obj_t *contParticlesNumber[5];
-static lv_point_t mainLinePoints[] = {{20, 210}, {270, 210}};
+static lv_point_t mainLinePoints[] = {{50, 210}, {300, 210}};
 //An array of points pairs instead of multiple names and declarations
-static lv_point_t dividingLinesPoints[][6] = 	{{{20,205}, {20, 215}},
-												{{70,205}, {70, 215}},
-												{{120,205}, {120, 215}},
-												{{170,205}, {170, 215}},
-												{{220,205}, {220, 215}},
-												{{270,205}, {270, 215}}};
+static lv_point_t dividingLinesPoints[][6] = 	{{{50,205}, {50, 215}},
+												{{100,205}, {100, 215}},
+												{{150,205}, {150, 215}},
+												{{200,205}, {200, 215}},
+												{{250,205}, {250, 215}},
+												{{300,205}, {300, 215}}};
 //Main line at the bottom declaration
 lv_obj_t *mainLine;
 //An array of lines dividing main one 
@@ -363,14 +366,14 @@ void setAqiStateNColor(){
 
 //Draw a line-like thing
 void drawSomeLines(){
-		for(int i=0;i<6;i++){
+	for(int i=0;i<6;i++){
 		dividingLines[i] = lv_line_create(main_scr, NULL);
 		lv_line_set_points(dividingLines[i], dividingLinesPoints[i], 2);
 		lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &lineStyle);
 		labelSizes[i] = lv_label_create(main_scr, NULL);
 		lv_label_set_text(labelSizes[i], particlesSize[i].c_str());
 		lv_obj_add_style(labelSizes[i], LV_LABEL_PART_MAIN, &font12Style);
-		lv_obj_set_pos(labelSizes[i], 12+i*49, 190);
+		lv_obj_set_pos(labelSizes[i], 37+i*49, 190); //12
 	}
 
 	for(int j=0; j<5;j++){
@@ -380,7 +383,7 @@ void drawSomeLines(){
 		lv_obj_set_click(contParticlesNumber[j], false);
 		labelParticlesNumber[j] = lv_label_create(contParticlesNumber[j], NULL);
 		lv_obj_set_size(contParticlesNumber[j], 50, 14);
-		lv_obj_set_pos(contParticlesNumber[j], 20+j*50, 215);
+		lv_obj_set_pos(contParticlesNumber[j], 50+j*50, 215);//20
 		lv_label_set_align(labelParticlesNumber[j], LV_LABEL_ALIGN_CENTER);
 		lv_obj_set_auto_realign(labelParticlesNumber[j], true);
 		lv_label_set_text(labelParticlesNumber[j], "-");
@@ -506,24 +509,24 @@ void dateTimeStatusFunc(lv_task_t *task)
 
 	if (WiFi.status() == WL_CONNECTED)
 	{
-		lv_label_set_text(wifiStatusAtLockWarning, "");
-		lv_label_set_text(wifiStatusAtMainWarning, "");
+		lv_obj_set_hidden(wifiStatusAtLockWarning, true);
+		lv_obj_set_hidden(wifiStatusAtMainWarning, true);
 	}
 	else
 	{
-		lv_label_set_text(wifiStatusAtLockWarning, LV_SYMBOL_CLOSE);
-		lv_label_set_text(wifiStatusAtMainWarning, LV_SYMBOL_CLOSE);
+		lv_obj_set_hidden(wifiStatusAtLockWarning, false);
+		lv_obj_set_hidden(wifiStatusAtMainWarning, false);
 	}
 
 	if (mySDCard.start(&sampleDB, &Serial2))
 	{
-		lv_label_set_text(sdStatusAtMainWarning, "");
-		lv_label_set_text(sdStatusAtLockWarning, "");
+		lv_obj_set_hidden(sdStatusAtLockWarning, true);
+		lv_obj_set_hidden(sdStatusAtMainWarning, true);
 	}
 	else
 	{
-		lv_label_set_text(sdStatusAtMainWarning, LV_SYMBOL_CLOSE);
-		lv_label_set_text(sdStatusAtLockWarning, LV_SYMBOL_CLOSE);
+		lv_obj_set_hidden(sdStatusAtLockWarning, false);
+		lv_obj_set_hidden(sdStatusAtMainWarning, false);
 	}
 }
 
@@ -890,12 +893,12 @@ void main_screen()
 	lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 45, 0);
 
 	wifiStatusAtMainWarning = lv_label_create(wifiStatusAtMain, NULL);
-	lv_label_set_text(wifiStatusAtMainWarning, "");
+	lv_label_set_text(wifiStatusAtMainWarning, LV_SYMBOL_CLOSE);
 	lv_obj_add_style(wifiStatusAtMainWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
 	lv_obj_set_pos(wifiStatusAtMainWarning, 5, 5);
 
 	sdStatusAtMainWarning = lv_label_create(sdStatusAtMain, NULL);
-	lv_label_set_text(sdStatusAtMainWarning, "");
+	lv_label_set_text(sdStatusAtMainWarning, LV_SYMBOL_CLOSE);
 	lv_obj_add_style(sdStatusAtMainWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
 	lv_obj_set_pos(sdStatusAtMainWarning, 2, 5);
 
@@ -961,15 +964,28 @@ void main_screen()
 
 	labelPM10 = lv_label_create(contPM10, NULL);
 	lv_obj_set_pos(labelPM10, 5, 5);
-	lv_label_set_text(labelPM10, "PM 1.0 ug/m3");
+	lv_label_set_text(labelPM10, "PM 1.0 ug/m");
+
+	labelPM10UpperIndex = lv_label_create(contPM10, NULL);
+	lv_obj_set_pos(labelPM10UpperIndex, 5, 5);
+	lv_label_set_text(labelPM10UpperIndex, "3");
 
 	labelPM25 = lv_label_create(contPM25, NULL);
 	lv_obj_set_pos(labelPM25, 5, 5);
-	lv_label_set_text(labelPM25, "PM 2.5               ug/m3");
+	lv_label_set_text(labelPM25, "3");
+
+	labelPM25UpperIndex = lv_label_create(contPM25, NULL);
+	lv_obj_align(labelPM25, labelPM25UpperIndex, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
+//	lv_obj_set_pos(labelPM25UpperIndex, 5, 5);
+	lv_label_set_text(labelPM25UpperIndex, "PM 2.5               ug/m");
 
 	labelPM100 = lv_label_create(contPM100, NULL);
 	lv_obj_set_pos(labelPM100, 5, 5);
-	lv_label_set_text(labelPM100, "PM 10 ug/m3");
+	lv_label_set_text(labelPM100, "PM 10 ug/m");
+
+	labelPM100UpperIndex = lv_label_create(contPM100, NULL);
+	lv_obj_set_pos(labelPM100UpperIndex, 5, 5);
+	lv_label_set_text(labelPM100UpperIndex, "3");
 
 	labelTempValue = lv_label_create(contTemp, NULL);
 	lv_obj_add_style(labelTempValue, LV_OBJ_PART_MAIN, &font20Style);
@@ -1107,12 +1123,12 @@ void lock_screen()
 	lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
 
 	wifiStatusAtLockWarning = lv_label_create(wifiStatusAtLock, NULL);
-	lv_label_set_text(wifiStatusAtLockWarning, "");
+	lv_label_set_text(wifiStatusAtLockWarning, LV_SYMBOL_CLOSE);
 	lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
 	lv_obj_set_pos(wifiStatusAtLockWarning, 5, 5);
 
 	sdStatusAtLockWarning = lv_label_create(sdStatusAtLock, NULL);
-	lv_label_set_text(sdStatusAtLockWarning, "");
+	lv_label_set_text(sdStatusAtLockWarning, LV_SYMBOL_CLOSE);
 	lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
 	lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
 }
