@@ -13,6 +13,7 @@
 #include <HTTPClient.h>
 #include <time.h>
 #include <ESP32Ping.h>
+#include <WebServer.h>
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_BusIO_Register.h>
@@ -35,6 +36,9 @@ static const char ntpServerName[] = "europe.pool.ntp.org";
 WiFiUDP ntpUDP;
 NTPClient dateTimeClient(ntpUDP, ntpServerName, 7200);
 bool wasUpdated = false;
+
+//Webserver pointer
+WebServer server;
 
 //TFT display using TFT_eSPI and lvgl library
 TFT_eSPI tft = TFT_eSPI();
@@ -69,6 +73,94 @@ String fetchLastRecordURL = "";
 String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Very unhealthy", "Hazardous" };
 String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
 float aqiStandards[5] = {21, 61, 101, 141, 201};
+
+
+// Serving Hello world
+void setRoom() {
+    String postBody = server.arg("plain");
+    Serial.println(postBody);
+ 
+    DynamicJsonDocument doc(512);
+    DeserializationError error = deserializeJson(doc, postBody);
+    if (error) {
+        // if the file didn't open, print an error:
+        Serial.print(F("Error parsing JSON "));
+        Serial.println(error.c_str());
+ 
+        String msg = error.c_str();
+ 
+        server.send(400, F("text/html"),
+                "Error in parsin json body! <br>" + msg);
+ 
+    } else {
+        JsonObject postObj = doc.as<JsonObject>();
+ 
+        Serial.print(F("HTTP Method: "));
+        Serial.println(server.method());
+ 
+        if (server.method() == HTTP_POST) {
+            if (postObj.containsKey("name") && postObj.containsKey("type")) {
+ 
+                Serial.println(F("done."));
+ 
+                // Here store data or doing operation
+ 
+ 
+                // Create the response
+                // To get the status of the result you can get the http status so
+                // this part can be unusefully
+                DynamicJsonDocument doc(512);
+                doc["status"] = "OK";
+ 
+                Serial.print(F("Stream..."));
+                String buf;
+                serializeJson(doc, buf);
+ 
+                server.send(201, F("application/json"), buf);
+                Serial.print(F("done."));
+ 
+            }else {
+                DynamicJsonDocument doc(512);
+                doc["status"] = "KO";
+                doc["message"] = F("No data found, or incorrect!");
+ 
+                Serial.print(F("Stream..."));
+                String buf;
+                serializeJson(doc, buf);
+ 
+                server.send(400, F("application/json"), buf);
+                Serial.print(F("done."));
+            }
+        }
+    }
+}
+ 
+// Define routing
+void restServerRouting() {
+    server.on("/", HTTP_GET, []() {
+        server.send(200, F("text/html"),
+            F("Welcome to the REST Web Server"));
+    });
+    // handle post request
+    server.on(F("/setRoom"), HTTP_POST, setRoom);
+}
+ 
+// Manage not found URL
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
+}
+
 
 //--------------------------------------------------styles
 //Basic container with white border and transparent background
@@ -586,6 +678,7 @@ static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
 
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
 	lv_scr_load(wifi_scr);
+    Serial.print(WiFi.localIP());
 	delay(20);
 }
 
@@ -1169,14 +1262,29 @@ void setup()
 		ssid = getCharArrrayFromRTC(Rtc, 3);
 		password = getCharArrrayFromRTC(Rtc, 28);
 		WiFi.begin(ssid.c_str(), password.c_str());
+        volatile int attempts = 0;
+        while (attempts != 20) {
+            delay(500);
+            Serial.print(".");
+            attempts++;
+        }
+        if(WiFi.status() == WL_CONNECTED)
+        {
+            restServerRouting();
+            server.onNotFound(handleNotFound);
+            server.begin();
+        }
 	}
 	delay(500);
 	lv_task_ready(syn_rtc);
+
+
 }
 
 void loop()
 {
 	lv_task_handler(); /* let the GUI do its work */
+    server.handleClient();
 	delay(5);
 }
 
