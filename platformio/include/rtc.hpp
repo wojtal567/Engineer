@@ -50,7 +50,7 @@ String getCharArrrayFromRTC(RtcDS1307<TwoWire> &Rtc, int address)
   uint8_t gotten = Rtc.GetMemory(address, buff, sizeof(buff));
   String result = "";
   for (uint8_t ch = 0; ch < gotten; ch++)
-	  if((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && isAlphaNumeric((char)buff[ch]))
+	  if((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && (char)buff[ch] != '\n')
     	result.concat((char)buff[ch]);
 
   Serial.println(result.c_str());
