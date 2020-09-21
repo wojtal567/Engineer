@@ -13,13 +13,12 @@
 #include <HTTPClient.h>
 #include <time.h>
 #include <ESP32Ping.h>
-#include <WebServer.h>
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_BusIO_Register.h>
 
 //checking internet connection
-const IPAddress remote_ip(192, 168, 1, 1);
+const IPAddress remote_ip(216, 58, 207, 78);
 
 #define LVGL_TICK_PERIOD 60
 #define SCREEN_WIDTH 320
@@ -37,10 +36,13 @@ WiFiUDP ntpUDP;
 NTPClient dateTimeClient(ntpUDP, ntpServerName, 7200);
 bool wasUpdated = false;
 
+<<<<<<< HEAD
 //Webserver
 WebServer server;
 String appIpAddress;
 
+=======
+>>>>>>> d9d685ab42ade5685bd609b38917542bccf9c986
 //TFT display using TFT_eSPI and lvgl library
 TFT_eSPI tft = TFT_eSPI();
 static lv_disp_buf_t disp_buf;
@@ -66,7 +68,7 @@ float temp, humi, pm25Aqi;
 
 //declaring photos for settings screen
 LV_IMG_DECLARE(wifi);
-LV_IMG_DECLARE(lcd);
+LV_IMG_DECLARE(info);
 LV_IMG_DECLARE(set_time);
 //
 
@@ -74,6 +76,7 @@ String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Ve
 String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
 float aqiStandards[5] = {21, 61, 101, 141, 201};
 
+<<<<<<< HEAD
 //--------------------------------------------REST WebServer config
 void setAppIp() {
     String postBody = server.arg("plain");
@@ -142,6 +145,8 @@ void handleNotFound() {
 }
 
 
+=======
+>>>>>>> d9d685ab42ade5685bd609b38917542bccf9c986
 //--------------------------------------------------styles
 //Basic container with white border and transparent background
 static lv_style_t containerStyle;
@@ -279,16 +284,15 @@ lv_obj_t *apply_btn;
 lv_obj_t *apply_label;
 lv_obj_t *cancel_btn;
 lv_obj_t *cancel_label;
-//-------------------------------------------------- lcd gui
-lv_obj_t *lcd_scr;
-lv_obj_t *contBarlcd;
-lv_obj_t *back_lcd_btn;
-lv_obj_t *back_lcd_label;
+//-------------------------------------------------- info gui
+lv_obj_t *info_scr;
+lv_obj_t *contBarinfo;
+lv_obj_t *back_info_btn;
+lv_obj_t *back_info_label;
 lv_obj_t *lcdLabelAtBar;
-lv_obj_t *lockScreenLabel;
-lv_obj_t *lockScreenDDlist;
-lv_obj_t *lcd_save_btn;
-lv_obj_t *lcd_save_label;
+
+lv_obj_t *info_wifi_label;
+lv_obj_t *info_wifi_address_label;
 //--------------------------------------------------settings gui
 lv_obj_t *settings_scr;
 lv_obj_t *contBarSettings;
@@ -296,15 +300,35 @@ lv_obj_t *back_settings_btn;
 lv_obj_t *back_settings_label;
 lv_obj_t *settingsLabelAtBar;
 lv_obj_t *WiFiBtn;
-lv_obj_t *LcdBtn;
-lv_obj_t *placeholder2Btn;
+lv_obj_t *infoBtn;
+lv_obj_t *timeBtn;
 //--------------------------------------------------time settings gui
 lv_obj_t *time_settings_scr;
 lv_obj_t *contBarTime;
 lv_obj_t *back_time_settings_btn;
 lv_obj_t *back_time_settings_label;
 lv_obj_t *timeSettingsLabelAtBar;
-lv_obj_t *placeholder;
+lv_obj_t *measure_period_label;
+
+lv_obj_t *measure_period_hour;
+lv_obj_t *measure_period_hour_increment;
+lv_obj_t *measure_period_hour_decrement;
+
+lv_obj_t *colon_label;
+
+lv_obj_t *measure_period_minute;
+lv_obj_t *measure_period_minute_increment;
+lv_obj_t *measure_period_minute_decrement;
+
+lv_obj_t *lockScreenLabel;
+lv_obj_t *lockScreenDDlist;
+
+lv_obj_t *timeSettings_btn;
+lv_obj_t *timeSettings_label;
+lv_obj_t *sync_rtc_btn;
+lv_obj_t *sync_rtc_label;
+lv_obj_t *alertBox;
+
 //--------------------------------------------------lockscreen gui
 lv_obj_t *lock_scr;
 lv_obj_t *contDateTimeAtLock;
@@ -499,11 +523,13 @@ void dateTimeStatusFunc(lv_task_t *task)
 	{
 		lv_obj_set_hidden(wifiStatusAtLockWarning, true);
 		lv_obj_set_hidden(wifiStatusAtMainWarning, true);
+		lv_label_set_text(info_wifi_address_label, WiFi.localIP().toString().c_str());
 	}
 	else
 	{
 		lv_obj_set_hidden(wifiStatusAtLockWarning, false);
 		lv_obj_set_hidden(wifiStatusAtMainWarning, false);
+		lv_label_set_text(info_wifi_address_label, "No WiFi connection.");
 	}
 
 	if (mySDCard.start(&sampleDB, &Serial2))
@@ -634,93 +660,61 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 //Settings button clicked
 static void setButton_task(lv_obj_t *obj, lv_event_t event)
 {
-	lv_disp_load_scr(settings_scr);
-	String result = getCharArrrayFromRTC(Rtc, 3);
-	delay(20);
+	if(event == LV_EVENT_RELEASED)
+		lv_disp_load_scr(settings_scr);
 }
 
 //Locking button clicked
 static void lockButton_task(lv_obj_t *obj, lv_event_t event)
 {
-	lv_disp_load_scr(lock_scr);
+	if(event==LV_EVENT_RELEASED)
+		lv_disp_load_scr(lock_scr);
 }
 
 //Unlocking button clicked
 static void unlockButton_task(lv_obj_t *obj, lv_event_t event)
 {
-	lv_disp_load_scr(main_scr);
-	delay(20);
+	if(event==LV_EVENT_RELEASED)
+		lv_disp_load_scr(main_scr);
 }
 
 //Exit from wifi settings button clicked
 static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 {
-	lv_disp_load_scr(main_scr);
-	lv_textarea_set_text(ssid_ta, "");
-	lv_textarea_set_text(pwd_ta, "");
-	delay(20);
+	if(event==LV_EVENT_RELEASED)
+	{
+		lv_disp_load_scr(settings_scr);
+		lv_textarea_set_text(ssid_ta, "");
+		lv_textarea_set_text(pwd_ta, "");
+	}
 }
 
 static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
 {
-	lv_disp_load_scr(main_scr);
-	delay(20);
+	if(event==LV_EVENT_RELEASED)
+		lv_disp_load_scr(main_scr);
 }
 
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
+<<<<<<< HEAD
 	lv_scr_load(wifi_scr);
     Serial.print(WiFi.localIP());
 	Serial.print(appIpAddress);
 	delay(20);
+=======
+	if(event==LV_EVENT_RELEASED)
+		lv_scr_load(wifi_scr);
+>>>>>>> d9d685ab42ade5685bd609b38917542bccf9c986
 }
 
-static void Lcd_save_btn(lv_obj_t *obj, lv_event_t event){
-	switch(lv_dropdown_get_selected(lockScreenDDlist))
-	{
-		case 0: 
-			lcd_lock_time = 30000;
-			break;
-		case 1: 
-			lcd_lock_time = 60000;
-			break;
-		case 2:
-			lcd_lock_time = 120000;
-			break;
-		case 3:
-			lcd_lock_time = 300000;
-			break;
-		case 4:
-			lcd_lock_time = 600000;
-			break;
-		case 5:
-			lcd_lock_time = 1800000;
-			break;
-		case 6:
-			lcd_lock_time = 3600000;
-			break;
-	}
-	if(mySDCard.begin())
-	{
-		File settings = SD.open("/settings.csv", FILE_WRITE);
-		String stn = "";
-		stn+=(String)measure_period;
-		stn+="%";
-		stn+=(String)lcd_lock_time;
-		settings.print(stn);
-		settings.close();
-	}
-	lv_disp_load_scr(main_scr);
-	delay(20);
-}
-
-static void Lcd_btn(lv_obj_t *obj, lv_event_t event){
-	lv_scr_load(lcd_scr);
-	delay(20);
+static void info_btn(lv_obj_t *obj, lv_event_t event){
+	if(event==LV_EVENT_RELEASED)
+		lv_scr_load(info_scr);
 }
 
 static void time_settings_btn(lv_obj_t *obj, lv_event_t event){
-	lv_scr_load(time_settings_scr);
-	delay(20);	
+	if(event==LV_EVENT_RELEASED)
+		lv_scr_load(time_settings_scr);	
 }
 
 //Function that turns fan on
@@ -728,6 +722,155 @@ void turnFanOnFunc(lv_task_t *task)
 {
 	digitalWrite(33, HIGH);
 	lv_task_set_prio(turnFanOn, LV_TASK_PRIO_OFF);
+}
+
+void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
+{
+	if(event==LV_EVENT_RELEASED)
+	{
+		switch(lcd_lock_time)
+		{
+			case 30000: 
+				lv_dropdown_set_selected(lockScreenDDlist, 0);
+				break;
+			case 60000: 
+				lv_dropdown_set_selected(lockScreenDDlist, 1);
+				break;
+			case 120000:
+				lv_dropdown_set_selected(lockScreenDDlist, 2);
+				break;
+			case 300000:
+				lv_dropdown_set_selected(lockScreenDDlist, 3);
+				break;
+			case 600000:
+				lv_dropdown_set_selected(lockScreenDDlist, 4);
+				break;
+			case 1800000:
+				lv_dropdown_set_selected(lockScreenDDlist, 5);
+				break;
+			case 3600000:
+				lv_dropdown_set_selected(lockScreenDDlist, 6);
+				break;
+		}
+		lv_spinbox_set_value(measure_period_hour, ((measure_period/60000)/60));
+		lv_spinbox_set_value(measure_period_minute, ((measure_period/60000)%60));
+		lv_scr_load(settings_scr);
+	}	
+}
+
+void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
+{
+	if(event ==LV_EVENT_RELEASED)
+	{
+		int get_value=lv_spinbox_get_value(measure_period_hour)*60*60000+lv_spinbox_get_value(measure_period_minute)*60000;
+		if(get_value<300000)
+		{
+			alertBox = lv_msgbox_create(time_settings_scr, NULL);
+			lv_msgbox_set_text(alertBox, "The minimum required sampling time is 5 mins.");
+			lv_msgbox_start_auto_close(alertBox, 5000);
+			lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
+		}
+		else
+		{
+			measure_period = get_value;
+			getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
+			turnFanOn = lv_task_create(turnFanOnFunc, measure_period-299999, LV_TASK_PRIO_HIGHEST, NULL);
+			switch(lv_dropdown_get_selected(lockScreenDDlist))
+			{
+				case 0: 
+					lcd_lock_time = 30000;
+					break;
+				case 1: 
+					lcd_lock_time = 60000;
+					break;
+				case 2:
+					lcd_lock_time = 120000;
+					break;
+				case 3:
+					lcd_lock_time = 300000;
+					break;
+				case 4:
+					lcd_lock_time = 600000;
+					break;
+				case 5:
+					lcd_lock_time = 1800000;
+					break;
+				case 6:
+					lcd_lock_time = 3600000;
+					break;
+			}
+			if(mySDCard.begin())
+			{
+				File settings = SD.open("/settings.csv", FILE_WRITE);
+				String stn = "";
+				stn+=(String)measure_period;
+				stn+="%";
+				stn+=(String)lcd_lock_time;
+				settings.print(stn);
+				settings.close();
+			}
+			lv_disp_load_scr(main_scr);
+		}
+	}	
+}
+
+static void hour_increment(lv_obj_t * btn, lv_event_t e)
+{
+    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_increment(measure_period_hour);
+    }
+}
+
+static void hour_decrement(lv_obj_t * btn, lv_event_t e)
+{
+	if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT){
+		lv_spinbox_decrement(measure_period_hour);
+	}
+}
+
+static void minute_increment(lv_obj_t * btn, lv_event_t e)
+{
+    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_increment(measure_period_minute);
+    }
+}
+
+static void minute_decrement(lv_obj_t * btn, lv_event_t e)
+{
+	if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT){
+		lv_spinbox_decrement(measure_period_minute);
+	}
+}
+
+static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
+{
+	if(event==LV_EVENT_RELEASED)
+	{
+		if (WiFi.status() == WL_CONNECTED)
+		{
+			if(Ping.ping(remote_ip, 1)) {
+				alertBox = lv_msgbox_create(time_settings_scr, NULL);
+				lv_msgbox_set_text(alertBox, "Clock sucessfully synchronized.");
+				lv_msgbox_start_auto_close(alertBox, 5000);
+				lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
+				lv_task_ready(syn_rtc);
+			}
+			else
+			{
+				alertBox = lv_msgbox_create(time_settings_scr, NULL);
+				lv_msgbox_set_text(alertBox, "No internet connection.");
+				lv_msgbox_start_auto_close(alertBox, 5000);
+				lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
+			}
+		}else
+		{
+			alertBox = lv_msgbox_create(time_settings_scr, NULL);
+			lv_msgbox_set_text(alertBox, "No WiFi connection.");
+			lv_msgbox_start_auto_close(alertBox, 5000);
+			lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
+		}
+		
+	}
 }
 
 void timesettings_screen()
@@ -740,16 +883,102 @@ void timesettings_screen()
 	lv_obj_add_style(contBarTime, LV_OBJ_PART_MAIN, &containerStyle);
 	lv_obj_set_style_local_border_opa(contBarTime, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
 	lv_obj_set_click(contBarTime, false);
-
+	
 	back_time_settings_btn = lv_btn_create(contBarTime, NULL);
 	back_time_settings_label = lv_label_create(back_time_settings_btn, NULL);
 	lv_label_set_text(back_time_settings_label, LV_SYMBOL_LEFT);
 	lv_obj_set_size(back_time_settings_btn, 30, 15);
-	lv_obj_set_event_cb(back_time_settings_btn, btn_settings_back);
+	lv_obj_set_event_cb(back_time_settings_btn, timesettings_back_btn);
 	lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
 	timeSettingsLabelAtBar = lv_label_create (contBarTime, NULL);
-	lv_label_set_text(timeSettingsLabelAtBar, "Work in progress");
+	lv_label_set_text(timeSettingsLabelAtBar, "Time Settings");
+
+	measure_period_label = lv_label_create(time_settings_scr, NULL);
+	lv_obj_set_pos(measure_period_label, 5, 71);
+	lv_label_set_text(measure_period_label, "Sampling (Hrs:Min):");
+	lv_obj_set_style_local_text_color(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	
+	measure_period_hour = lv_spinbox_create(time_settings_scr, NULL);
+	lv_textarea_set_cursor_hidden(measure_period_hour, true);
+	lv_textarea_set_text_align(measure_period_hour, LV_LABEL_ALIGN_CENTER);
+	lv_spinbox_set_range(measure_period_hour, 0, 24);
+	lv_spinbox_set_digit_format(measure_period_hour, 2, 0);
+	lv_obj_set_width(measure_period_hour, 40);	
+	lv_obj_set_pos(measure_period_hour, 165, 64);
+
+	measure_period_hour_increment = lv_btn_create(time_settings_scr, NULL);
+	lv_obj_set_size(measure_period_hour_increment, 20, 20);
+	lv_obj_set_pos(measure_period_hour_increment, 175, 42);
+	lv_theme_apply(measure_period_hour_increment, LV_THEME_SPINBOX_BTN);
+	lv_obj_set_style_local_value_str(measure_period_hour_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+	lv_obj_set_event_cb(measure_period_hour_increment, hour_increment);
+
+	measure_period_hour_decrement = lv_btn_create(time_settings_scr, NULL);
+	lv_obj_set_size(measure_period_hour_decrement, 20, 20);
+	lv_obj_set_pos(measure_period_hour_decrement, 175, 101);
+	lv_theme_apply(measure_period_hour_decrement, LV_THEME_SPINBOX_BTN);
+	lv_obj_set_style_local_value_str(measure_period_hour_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+	lv_obj_set_event_cb(measure_period_hour_decrement, hour_decrement);
+
+	colon_label = lv_label_create(time_settings_scr, NULL);
+	lv_obj_set_pos(colon_label, 210, 71);
+	lv_label_set_text(colon_label, ":");
+	lv_obj_set_style_local_text_color(colon_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
+	measure_period_minute=lv_spinbox_create(time_settings_scr, NULL);
+	lv_textarea_set_cursor_hidden(measure_period_minute, true);
+	lv_textarea_set_text_align(measure_period_minute, LV_LABEL_ALIGN_CENTER);
+	lv_spinbox_set_range(measure_period_minute, 0, 59);
+	lv_spinbox_set_digit_format(measure_period_minute, 2, 0);
+	lv_obj_set_width(measure_period_minute, 40);
+	lv_obj_set_pos(measure_period_minute, 219, 64);
+
+	measure_period_minute_increment = lv_btn_create(time_settings_scr, NULL);
+	lv_obj_set_size(measure_period_minute_increment, 20, 20);
+	lv_obj_set_pos(measure_period_minute_increment, 229, 41);
+	lv_theme_apply(measure_period_minute_increment, LV_THEME_SPINBOX_BTN);
+	lv_obj_set_style_local_value_str(measure_period_minute_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+	lv_obj_set_event_cb(measure_period_minute_increment, minute_increment);
+
+	measure_period_minute_decrement = lv_btn_create(time_settings_scr, NULL);
+	lv_obj_set_size(measure_period_minute_decrement, 20, 20);
+	lv_obj_set_pos(measure_period_minute_decrement, 229, 101);
+	lv_theme_apply(measure_period_minute_decrement, LV_THEME_SPINBOX_BTN);
+	lv_obj_set_style_local_value_str(measure_period_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+	lv_obj_set_event_cb(measure_period_minute_decrement, minute_decrement);
+
+	lockScreenLabel = lv_label_create(time_settings_scr, NULL);
+	lv_obj_set_pos(lockScreenLabel, 5, 131);
+	lv_label_set_text(lockScreenLabel, "Lock screen after: ");
+	lv_obj_set_style_local_text_color(lockScreenLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lockScreenDDlist = lv_dropdown_create(time_settings_scr, NULL);
+	lv_dropdown_set_options(lockScreenDDlist, "30 sec\n"
+	"1 min\n"
+	"2 min\n"
+	"5 min\n"
+	"10 min\n"
+	"30 min\n"
+	"60 min" );
+	lv_obj_set_width(lockScreenDDlist, LV_HOR_RES/2-20);
+	lv_obj_set_pos(lockScreenDDlist, 165, 125);
+
+	timeSettings_btn = lv_btn_create(time_settings_scr, NULL);
+	timeSettings_label = lv_label_create(timeSettings_btn, NULL);
+	lv_label_set_text(timeSettings_label, "Save");
+	lv_obj_set_style_local_border_opa(timeSettings_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+	lv_obj_set_style_local_text_color(timeSettings_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);	
+	lv_obj_set_width(timeSettings_btn, 75);
+	lv_obj_set_pos(timeSettings_btn, 240, 190);	
+	lv_obj_set_event_cb(timeSettings_btn, timesettings_save_btn);
+
+	sync_rtc_btn = lv_btn_create(time_settings_scr, NULL);
+	sync_rtc_label = lv_label_create(sync_rtc_btn, NULL);
+	lv_label_set_text(sync_rtc_label, "Sync. Clock");
+	lv_obj_set_style_local_border_opa(sync_rtc_label, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+	lv_obj_set_style_local_text_color(sync_rtc_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_set_pos(sync_rtc_btn, 5, 190);
+	lv_obj_set_event_cb(sync_rtc_btn, sync_rtc_func);
 }
 
 void settings_screen()
@@ -782,69 +1011,54 @@ void settings_screen()
     lv_obj_set_pos(WiFiBtn, 10, 55);
 	lv_obj_set_event_cb(WiFiBtn, WiFi_btn);
 
-	LcdBtn = lv_imgbtn_create(settings_scr, NULL);
-	lv_imgbtn_set_src(LcdBtn, LV_BTN_STATE_RELEASED, &lcd);
-    lv_imgbtn_set_src(LcdBtn, LV_BTN_STATE_PRESSED, &lcd);
-    lv_imgbtn_set_src(LcdBtn, LV_BTN_STATE_CHECKED_RELEASED, &lcd);
-    lv_imgbtn_set_src(LcdBtn, LV_BTN_STATE_CHECKED_PRESSED, &lcd);
-    lv_imgbtn_set_checkable(LcdBtn, true);
-    lv_obj_set_pos(LcdBtn, 110, 55);
-	lv_obj_set_event_cb(LcdBtn, Lcd_btn);
+	infoBtn = lv_imgbtn_create(settings_scr, NULL);
+	lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_RELEASED, &info);
+    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_PRESSED, &info);
+    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_CHECKED_RELEASED, &info);
+    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_CHECKED_PRESSED, &info);
+    lv_imgbtn_set_checkable(infoBtn, true);
+    lv_obj_set_pos(infoBtn, 110, 55);
+	lv_obj_set_event_cb(infoBtn, info_btn);
 
-	placeholder2Btn = lv_imgbtn_create(settings_scr, NULL);
-	lv_imgbtn_set_src(placeholder2Btn, LV_BTN_STATE_RELEASED, &set_time);
-    lv_imgbtn_set_src(placeholder2Btn, LV_BTN_STATE_PRESSED, &set_time);
-    lv_imgbtn_set_src(placeholder2Btn, LV_BTN_STATE_CHECKED_RELEASED, &set_time);
-    lv_imgbtn_set_src(placeholder2Btn, LV_BTN_STATE_CHECKED_PRESSED, &set_time);
-    lv_imgbtn_set_checkable(placeholder2Btn, true);
-    lv_obj_set_pos(placeholder2Btn, 210, 55);
-	lv_obj_set_event_cb(placeholder2Btn, time_settings_btn);	
+	timeBtn = lv_imgbtn_create(settings_scr, NULL);
+	lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_RELEASED, &set_time);
+    lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_PRESSED, &set_time);
+    lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_RELEASED, &set_time);
+    lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_PRESSED, &set_time);
+    lv_imgbtn_set_checkable(timeBtn, true);
+    lv_obj_set_pos(timeBtn, 210, 55);
+	lv_obj_set_event_cb(timeBtn, time_settings_btn);	
 }
 
-void lcd_screen()
+void info_screen()
 {	
-	contBarlcd = lv_cont_create(lcd_scr, NULL);
-	lv_obj_set_auto_realign(contBarlcd, true);					/*Auto realign when the size changes*/
-	lv_obj_align(contBarlcd, NULL, LV_ALIGN_IN_TOP_MID, 0, 0); /*This parametrs will be sued when realigned*/
-	lv_cont_set_fit4(contBarlcd, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-	lv_cont_set_layout(contBarlcd, LV_LAYOUT_PRETTY_TOP);
-	lv_obj_add_style(contBarlcd, LV_OBJ_PART_MAIN, &containerStyle);
-	lv_obj_set_style_local_border_opa(contBarlcd, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-	lv_obj_set_click(contBarlcd, false);
+	contBarinfo = lv_cont_create(info_scr, NULL);
+	lv_obj_set_auto_realign(contBarinfo, true);					/*Auto realign when the size changes*/
+	lv_obj_align(contBarinfo, NULL, LV_ALIGN_IN_TOP_MID, 0, 0); /*This parametrs will be sued when realigned*/
+	lv_cont_set_fit4(contBarinfo, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	lv_cont_set_layout(contBarinfo, LV_LAYOUT_PRETTY_TOP);
+	lv_obj_add_style(contBarinfo, LV_OBJ_PART_MAIN, &containerStyle);
+	lv_obj_set_style_local_border_opa(contBarinfo, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
+	lv_obj_set_click(contBarinfo, false);
 
-	back_lcd_btn = lv_btn_create(contBarlcd, NULL);
-	back_lcd_label = lv_label_create(back_lcd_btn, NULL);
-	lv_label_set_text(back_lcd_label, LV_SYMBOL_LEFT);
-	lv_obj_set_size(back_lcd_btn, 30, 15);
-	lv_obj_set_event_cb(back_lcd_btn, btn_settings_back);
-	lv_obj_add_style(back_lcd_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	back_info_btn = lv_btn_create(contBarinfo, NULL);
+	back_info_label = lv_label_create(back_info_btn, NULL);
+	lv_label_set_text(back_info_label, LV_SYMBOL_LEFT);
+	lv_obj_set_size(back_info_btn, 30, 15);
+	lv_obj_set_event_cb(back_info_btn, setButton_task);
+	lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-	lcdLabelAtBar = lv_label_create (contBarlcd, NULL);
-	lv_label_set_text(lcdLabelAtBar, "LCD Settings");
+	lcdLabelAtBar = lv_label_create (contBarinfo, NULL);
+	lv_label_set_text(lcdLabelAtBar, "Device info");
 
-	lockScreenLabel = lv_label_create(lcd_scr, NULL);
-	lv_obj_set_pos(lockScreenLabel, 5, 58);
-	lv_label_set_text(lockScreenLabel, "Lock screen after: ");
-	lv_obj_set_style_local_text_color(lockScreenLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-	lockScreenDDlist = lv_dropdown_create(lcd_scr, NULL);
-	lv_dropdown_set_options(lockScreenDDlist, "30 sec\n"
-	"1 min\n"
-	"2 min\n"
-	"5 min\n"
-	"10 min\n"
-	"30 min\n"
-	"60 min\n" );
-	lv_obj_set_width(lockScreenDDlist, LV_HOR_RES/2-20);
-	lv_obj_set_pos(lockScreenDDlist, 180, 53);
+	info_wifi_label = lv_label_create(info_scr, NULL);
+	lv_label_set_text(info_wifi_label, "WiFi address: ");
+	lv_obj_set_style_local_text_color(info_wifi_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
-	lcd_save_btn = lv_btn_create(lcd_scr, NULL);
-	lcd_save_label = lv_label_create(lcd_save_btn, NULL);
-	lv_label_set_text(lcd_save_label, "Save");
-	lv_obj_set_size(lcd_save_btn, 50, 15);
-	lv_obj_set_pos(lcd_save_btn, 250, 200);
-	lv_obj_add_style(lcd_save_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-	lv_obj_set_event_cb(lcd_save_btn, Lcd_save_btn);
-	//TODO przycisk styl bo go nie widac
+	lv_obj_set_pos(info_wifi_label, 5, 53);
+	info_wifi_address_label = lv_label_create(info_scr, NULL);
+	lv_obj_set_pos(info_wifi_address_label, 115, 53);
+	lv_obj_set_style_local_text_color(info_wifi_address_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
 
 void main_screen()
@@ -1179,6 +1393,8 @@ void load_settings()
 		lcd_lock_time=60000;
 		lv_dropdown_set_selected(lockScreenDDlist, 1);
 	}
+	lv_spinbox_set_value(measure_period_hour, ((measure_period/60000)/60));
+	lv_spinbox_set_value(measure_period_minute, ((measure_period/60000)%60));
 }
 
 void setup()
@@ -1232,8 +1448,8 @@ void setup()
 	lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	settings_scr=lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-	lcd_scr = lv_cont_create(NULL, NULL);
-	lv_obj_set_style_local_bg_color(lcd_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	info_scr = lv_cont_create(NULL, NULL);
+	lv_obj_set_style_local_bg_color(info_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	time_settings_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(time_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	wifi_scr = lv_cont_create(NULL, NULL);
@@ -1245,7 +1461,7 @@ void setup()
 	wifi_screen();
 	lock_screen();
 	settings_screen();
-	lcd_screen();
+	info_screen();
 	timesettings_screen();
 	lv_disp_load_scr(main_scr);
 	load_settings();
@@ -1254,7 +1470,7 @@ void setup()
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
 	getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
-	turnFanOn = lv_task_create(turnFanOnFunc, measure_period-300000, LV_TASK_PRIO_HIGHEST, NULL);
+	turnFanOn = lv_task_create(turnFanOnFunc, measure_period-299999, LV_TASK_PRIO_HIGHEST, NULL);
 	inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
 
 
@@ -1267,29 +1483,14 @@ void setup()
 		ssid = getCharArrrayFromRTC(Rtc, 3);
 		password = getCharArrrayFromRTC(Rtc, 28);
 		WiFi.begin(ssid.c_str(), password.c_str());
-        volatile int attempts = 0;
-        while (attempts != 20) {
-            delay(500);
-            Serial.print(".");
-            attempts++;
-        }
-        if(WiFi.status() == WL_CONNECTED)
-        {
-            restServerRouting();
-            server.onNotFound(handleNotFound);
-            server.begin();
-        }
 	}
 	delay(500);
 	lv_task_ready(syn_rtc);
-
-
 }
 
 void loop()
 {
 	lv_task_handler(); /* let the GUI do its work */
-    server.handleClient();
 	delay(5);
 }
 
