@@ -635,7 +635,6 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 		WiFi.begin(ssid.c_str(), password.c_str());
 		while (WiFi.status() != WL_CONNECTED and wifiAttempts > 0)
 		{
-			Serial.print(".");
 			delay(500);
 			wifiAttempts--;
 		}
