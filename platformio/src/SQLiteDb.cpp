@@ -83,10 +83,9 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
     return rc;
 }
 
-static int callback(void *data, int argc, char **argv, char **azColName){
+static int callback(void *data, int argc, char **argv, char **azColName) {
    int i;
 
-   
    for (i = 0; i<argc; i++){
        Serial.printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");//argv przechowuje dane
    }
@@ -101,7 +100,7 @@ int SQLiteDb::select(Stream *debugger, String datetime)
         debugger->println("Database does not exist. NULL");
         return 0;
     }
-    String sql = "Select timestamp, temperature, humidity, pm10standard, pm25standard, pm100standard, pm10env, pm25env, pm100env, particles03, particles05, particles10, particles25, particles50, particles100 from " + _tableName +" where timestamp>Datetime('"+datetime+"')";
+    String sql = "select * from " + _tableName + ";" ;
     debugger->println("Executing: "+sql);
     int rc = sqlite3_exec(object, sql.c_str(), callback, (void*)"Output: ", &zErrorMessage);
     if (rc != SQLITE_OK) {
