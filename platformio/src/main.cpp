@@ -692,6 +692,9 @@ static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
 	{
 		mySDCard.select(&sampleDB, &Serial, getMainTimestamp(Rtc));
 		lv_scr_load(wifi_scr);
+		int SSIDnumber = WiFi.scanNetworks();
+      	for (int thisNet = 0; thisNet<SSIDnumber; thisNet++)
+        	Serial.println(WiFi.SSID(thisNet));
 	}
 }
 
@@ -1473,6 +1476,13 @@ void setup()
 		ssid = getCharArrrayFromRTC(Rtc, 3);
 		password = getCharArrrayFromRTC(Rtc, 28);
 		WiFi.begin(ssid.c_str(), password.c_str());
+		volatile int attempts = 0;
+		while (attempts != 20 || WiFi.status() != WL_CONNECTED)
+		{
+			delay (500);
+			Serial.print(".");
+			attempts++;
+		}
         if(WiFi.status() == WL_CONNECTED)
         {
             restServerRouting();
