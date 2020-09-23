@@ -298,6 +298,17 @@ lv_obj_t *apply_btn;
 lv_obj_t *apply_label;
 lv_obj_t *cancel_btn;
 lv_obj_t *cancel_label;
+//-------------------------------------------------- wifilist gui
+lv_obj_t *wifilist_scr;
+lv_obj_t *contBarWiFiList;
+lv_obj_t *wifilistLabelAtBar;
+lv_obj_t *wifiList;
+lv_obj_t *back_wifilist_btn;
+lv_obj_t *back_wifilist_label;
+lv_obj_t *loading_bar;
+lv_obj_t *refresh_btn;
+lv_obj_t *refresh_label;
+//lv_obj_t *wifiList_btn;
 //-------------------------------------------------- info gui
 lv_obj_t *info_scr;
 lv_obj_t *contBarAtMaininfo;
@@ -359,7 +370,17 @@ lv_task_t *getSample;
 lv_task_t *syn_rtc;
 lv_task_t *getAppLastRecord;
 lv_task_t *inactive_time;
+lv_task_t *date;
+lv_task_t *listNetwork_task;
 
+static void WiFi_SSID(lv_obj_t *obj, lv_event_t event)
+{
+	if(event==LV_EVENT_RELEASED)
+	{
+		lv_textarea_set_text(ssid_ta, lv_list_get_btn_text(obj));
+		lv_scr_load(wifi_scr);
+	}
+}
 
 void inactive_screen(lv_task_t *task)
 {
@@ -467,6 +488,18 @@ void config_time(lv_task_t *task)
 	{
 		wasUpdated=false;
 	}
+}
+
+void list_networks(lv_task_t *task)
+{
+	int SSID_number = WiFi.scanNetworks();
+	lv_obj_t *listbtn;
+	for (int thisNet = 0; thisNet<SSID_number; thisNet++)
+    {
+		listbtn = lv_list_add_btn(wifiList, NULL, WiFi.SSID(thisNet).c_str());
+		lv_obj_set_event_cb(listbtn, WiFi_SSID);
+	}
+	lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_OFF);
 }
 
 //Get single sample and set text
@@ -668,6 +701,9 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 				dateTimeClient.update();
 			lv_task_ready(syn_rtc);
 		}
+		lv_disp_load_scr(main_scr);
+		lv_textarea_set_text(ssid_ta, "");
+		lv_textarea_set_text(pwd_ta, "");
 	}
 }
 
@@ -697,7 +733,7 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 {
 	if(event==LV_EVENT_RELEASED)
 	{
-		lv_disp_load_scr(settings_scr);
+		lv_disp_load_scr(wifilist_scr);
 		lv_textarea_set_text(ssid_ta, "");
 		lv_textarea_set_text(pwd_ta, "");
 	}
@@ -709,14 +745,35 @@ static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
 		lv_disp_load_scr(main_scr);
 }
 
+void startbar()
+{
+	loading_bar = lv_bar_create(wifilist_scr, NULL);
+	lv_obj_set_size(loading_bar, 175, 20);
+	lv_obj_set_pos(loading_bar, 5, 205);
+	lv_bar_set_anim_time(loading_bar, 10500);
+	lv_bar_set_value(loading_bar, 100, LV_ANIM_ON);
+}
+
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
 	if(event==LV_EVENT_RELEASED)
 	{
 		mySDCard.select(&sampleDB, &Serial, getMainTimestamp(Rtc));
-		lv_scr_load(wifi_scr);
-		int SSIDnumber = WiFi.scanNetworks();
-      	for (int thisNet = 0; thisNet<SSIDnumber; thisNet++)
-        	Serial.println(WiFi.SSID(thisNet));
+		lv_list_clean(wifiList);
+		lv_scr_load(wifilist_scr);
+		lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
+		lv_task_reset(listNetwork_task);
+		startbar();
+	}
+}
+
+static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
+{
+	if(event==LV_EVENT_RELEASED)
+	{
+		lv_list_clean(wifiList);
+		lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
+		lv_task_reset(listNetwork_task);
+		startbar();
 	}
 }
 
@@ -780,6 +837,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 		{
 			alertBox = lv_msgbox_create(time_settings_scr, NULL);
 			lv_msgbox_set_text(alertBox, "The minimum required sampling time is 5 mins.");
+			lv_msgbox_set_anim_time(alertBox, 0);
 			lv_msgbox_start_auto_close(alertBox, 5000);
 			lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
 		}
@@ -864,6 +922,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 			if(Ping.ping(remote_ip, 1)) {
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
 				lv_msgbox_set_text(alertBox, "Clock sucessfully synchronized.");
+				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
 				lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
 				lv_task_ready(syn_rtc);
@@ -872,6 +931,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 			{
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
 				lv_msgbox_set_text(alertBox, "No internet connection.");
+				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
 				lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
 			}
@@ -879,6 +939,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 		{
 			alertBox = lv_msgbox_create(time_settings_scr, NULL);
 			lv_msgbox_set_text(alertBox, "No WiFi connection.");
+			lv_msgbox_set_anim_time(alertBox, 0);
 			lv_msgbox_start_auto_close(alertBox, 5000);
 			lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
 		}
@@ -1257,6 +1318,40 @@ void main_screen()
 	drawSomeLines();
 }
 
+void wifiList_screen()
+{
+	contBarWiFiList = lv_cont_create(wifilist_scr, NULL);
+	lv_obj_set_auto_realign(contBarWiFiList, true);
+	lv_obj_align(contBarWiFiList, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+	lv_cont_set_fit4(contBarWiFiList, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	lv_cont_set_layout(contBarWiFiList, LV_LAYOUT_PRETTY_TOP);
+	lv_obj_add_style(contBarWiFiList, LV_OBJ_PART_MAIN, &containerStyle);
+	lv_obj_set_style_local_border_opa(contBarWiFiList, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
+	lv_obj_set_click(contBarWiFiList, false);
+	
+	back_wifilist_btn = lv_btn_create(contBarWiFiList, NULL);
+	back_wifilist_label = lv_label_create(back_wifilist_btn, NULL);
+	lv_label_set_text(back_wifilist_label, LV_SYMBOL_LEFT);
+	lv_obj_set_size(back_wifilist_btn, 30, 15);
+	lv_obj_set_event_cb(back_wifilist_btn, setButton_task);
+	lv_obj_add_style(back_wifilist_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+
+	wifilistLabelAtBar = lv_label_create (contBarWiFiList, NULL);
+	lv_label_set_text(wifilistLabelAtBar, "WiFi list:");
+
+	wifiList = lv_list_create(wifilist_scr, NULL);
+	lv_obj_set_size(wifiList, SCREEN_WIDTH, 128);	
+	lv_obj_align(wifiList, NULL, LV_ALIGN_CENTER, 0,0);	
+
+	refresh_btn = lv_btn_create(wifilist_scr, NULL);
+	refresh_label = lv_label_create(refresh_btn, NULL);
+	lv_label_set_text(refresh_label, "Refresh");
+	lv_obj_set_style_local_border_opa(refresh_label, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+	lv_obj_set_style_local_text_color(refresh_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_set_pos(refresh_btn, 185, 192);
+	lv_obj_set_event_cb(refresh_btn, refresh_btn_task);
+}
+
 void wifi_screen()
 {
 	contBarAtMainWiFi = lv_cont_create(wifi_scr, NULL);
@@ -1287,7 +1382,6 @@ void wifi_screen()
 	lv_textarea_set_text(ssid_ta, "");
 	lv_textarea_set_pwd_mode(ssid_ta, false);
 	lv_textarea_set_one_line(ssid_ta, true);
-	lv_obj_set_event_cb(ssid_ta, ta_event_cb);
 	lv_textarea_set_cursor_hidden(ssid_ta, true);
 	lv_obj_set_width(ssid_ta, LV_HOR_RES / 2 - 20);
 	lv_obj_set_pos(ssid_ta, 100, 45);
@@ -1485,6 +1579,8 @@ void setup()
 	lv_obj_set_style_local_bg_color(time_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	wifi_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(wifi_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	wifilist_scr = lv_cont_create(NULL, NULL);
+	lv_obj_set_style_local_bg_color(wifilist_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	lock_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	//Screens initialization function
@@ -1494,16 +1590,17 @@ void setup()
 	settings_screen();
 	info_screen();
 	timesettings_screen();
+	wifiList_screen();
 	lv_disp_load_scr(main_scr);
 	load_settings();
-	lv_task_t *date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
+	date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
 	syn_rtc = lv_task_create_basic();
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
 	getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
 	turnFanOn = lv_task_create(turnFanOnFunc, measure_period-299999, LV_TASK_PRIO_HIGHEST, NULL);
 	inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
-
+	listNetwork_task = lv_task_create(list_networks, 10000, LV_TASK_PRIO_OFF, NULL);
 
 	getAppLastRecord = lv_task_create_basic();
 	lv_task_set_cb(getAppLastRecord, fetchLastRecord);
