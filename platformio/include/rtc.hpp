@@ -53,6 +53,7 @@ String getCharArrrayFromRTC(RtcDS1307<TwoWire> &Rtc, int address)
 	  if((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && (char)buff[ch] != '\n')
     	result.concat((char)buff[ch]);
 
+  result=result.substring(0, result.indexOf("-"));
   Serial.println(result.c_str());
   return result;
 }
