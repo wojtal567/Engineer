@@ -79,7 +79,7 @@ LV_IMG_DECLARE(set_time);
 String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Very unhealthy", "Hazardous" };
 String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
 float aqiStandards[5] = {21, 61, 101, 141, 201};
-
+int labelParticleSizePosX[6] = {56, 103, 153, 198, 245, 288};
 //--------------------------------------------REST WebServer config
 void setAppIp() {
     String postBody = server.arg("plain");
@@ -268,23 +268,25 @@ lv_obj_t *labelAQI;
 lv_obj_t *labelAQIColorBar;
 lv_obj_t *labelSizeTitle;
 lv_obj_t *labelNumberTitle;
-lv_obj_t *labelSizes[6];
+lv_obj_t *labelParticleSizeum[6];
 lv_obj_t *labelParticlesNumber[5];
 lv_obj_t *contParticlesNumber[5];
-static lv_point_t mainLinePoints[] = {{20, 210}, {270, 210}};
+static lv_point_t mainLinePoints[] = {{65, 210}, {300, 210}};
 //An array of points pairs instead of multiple names and declarations
-static lv_point_t dividingLinesPoints[][6] = 	{{{20,205}, {20, 215}},
-												{{70,205}, {70, 215}},
-												{{120,205}, {120, 215}},
-												{{170,205}, {170, 215}},
-												{{220,205}, {220, 215}},
-												{{270,205}, {270, 215}}};
+static lv_point_t dividingLinesPoints[][6] = 	{{{65,205}, {65, 215}},
+												{{112,205}, {112, 215}},
+												{{159,205}, {159, 215}},
+												{{206,205}, {206, 215}},
+												{{253,205}, {253, 215}},
+												{{300,205}, {300, 215}}};
 //Main line at the bottom declaration
 lv_obj_t *mainLine;
 //An array of lines dividing main one 
 lv_obj_t *dividingLines[6];
 //An array of colors used depending on actual pm2.5 value
 lv_color_t airQualityColors[6] = { LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
+
+
 //--------------------------------------------------wifi gui
 lv_obj_t *contBarAtMainWiFi;
 lv_obj_t *wifiLabelAtBar;
@@ -403,17 +405,17 @@ void setAqiStateNColor(){
 }
 
 //Draw a line-like thing
-void drawSomeLines(){
+void drawParticlesIndicator(){
 	for(int i=0;i<6;i++){
 		dividingLines[i] = lv_line_create(main_scr, NULL);
 		lv_line_set_points(dividingLines[i], dividingLinesPoints[i], 2);
 		lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &lineStyle);
-		labelSizes[i] = lv_label_create(main_scr, NULL);
-		lv_label_set_text(labelSizes[i], particlesSize[i].c_str());
-		lv_obj_add_style(labelSizes[i], LV_LABEL_PART_MAIN, &font12Style);
-		//lv_obj_set_auto_realign(labelSizes[i], true);
-		//lv_obj_align_origo(labelSizes[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
-		lv_obj_set_pos(labelSizes[i], 11+i*49, 190); //12
+		labelParticleSizeum[i] = lv_label_create(main_scr, NULL);
+		lv_label_set_text(labelParticleSizeum[i], particlesSize[i].c_str());
+		lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &font12Style);
+		//lv_obj_set_auto_realign(labelParticleSizeum[i], true);
+		//lv_obj_align_origo(labelParticleSizeum[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
+		lv_obj_set_pos(labelParticleSizeum[i], labelParticleSizePosX[i], 190); //12
 	}
 
 	for(int j=0; j<5;j++){
@@ -421,9 +423,9 @@ void drawSomeLines(){
 		lv_obj_add_style(contParticlesNumber[j], LV_OBJ_PART_MAIN, &containerStyle);
 		lv_obj_set_style_local_border_opa(contParticlesNumber[j], LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 		lv_obj_set_click(contParticlesNumber[j], false);
-		lv_obj_set_size(contParticlesNumber[j], 50, 14);
+		lv_obj_set_size(contParticlesNumber[j], 47, 14);
 		labelParticlesNumber[j] = lv_label_create(contParticlesNumber[j], NULL);
-		lv_obj_set_pos(contParticlesNumber[j], 20+j*50, 215);//20
+		lv_obj_set_pos(contParticlesNumber[j], 65+j*46, 215);//20
 		lv_label_set_align(labelParticlesNumber[j], LV_LABEL_ALIGN_CENTER);
 		lv_obj_set_auto_realign(labelParticlesNumber[j], true);
 		lv_label_set_text(labelParticlesNumber[j], "-");
@@ -434,6 +436,17 @@ void drawSomeLines(){
 	lv_line_set_points(mainLine, mainLinePoints, 2);
 	lv_line_set_auto_size(mainLine, true);
 	lv_obj_add_style(mainLine, LV_LINE_PART_MAIN, &lineStyle);
+
+	labelSizeTitle = lv_label_create(main_scr, NULL);
+	lv_obj_set_pos(labelSizeTitle, 10 , 190);
+	lv_label_set_text(labelSizeTitle, "Size");
+	lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &font12Style);
+
+	labelNumberTitle = lv_label_create(main_scr, NULL);
+	lv_obj_set_pos(labelNumberTitle, 10, 215);
+	lv_label_set_text(labelNumberTitle, "N");
+	lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
+
 }
 
 void fetchLastRecord(lv_task_t *task)
@@ -1143,7 +1156,7 @@ void main_screen()
 	lv_obj_add_style(contBarAtMain, LV_OBJ_PART_MAIN, &containerStyle);
 	lv_obj_set_style_local_border_opa(contBarAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
 	lv_obj_set_click(contBarAtMain, false);
-
+/*
 	lockButton = lv_btn_create(main_scr, NULL);
 	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &lockButtonStyle);
 	labelLockButton = lv_label_create(lockButton, NULL);
@@ -1151,7 +1164,7 @@ void main_screen()
 	lv_label_set_text(labelLockButton, MY_LOCK_SYMBOL);
 	lv_btn_set_fit(lockButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(lockButton, lockButton_task);
-
+*/
 	wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
 	lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
 	lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 35, 0);
@@ -1304,18 +1317,8 @@ void main_screen()
 	lv_obj_align(labelAQIColorBar, NULL, LV_ALIGN_CENTER, 0, 0);
 	lv_label_set_text(labelAQIColorBar, "-"); 
 
-	labelSizeTitle = lv_label_create(main_scr, NULL);
-	lv_obj_set_pos(labelSizeTitle, 280 , 190);
-	lv_label_set_text(labelSizeTitle, "um");
-	lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &font12Style);
-
-	labelNumberTitle = lv_label_create(main_scr, NULL);
-	lv_obj_set_pos(labelNumberTitle, 280, 215);
-	lv_label_set_text(labelNumberTitle, "N");
-	lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
-
 	//Function that draws lines and set text above those
-	drawSomeLines();
+ 	drawParticlesIndicator();
 }
 
 void wifiList_screen()
