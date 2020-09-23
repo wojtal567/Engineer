@@ -1477,7 +1477,7 @@ void setup()
 		password = getCharArrrayFromRTC(Rtc, 28);
 		WiFi.begin(ssid.c_str(), password.c_str());
 		volatile int attempts = 0;
-		while (attempts != 20 || WiFi.status() != WL_CONNECTED)
+		while (WiFi.status() != WL_CONNECTED and attempts != 20)
 		{
 			delay (500);
 			Serial.print(".");
