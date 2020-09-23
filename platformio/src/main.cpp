@@ -205,7 +205,7 @@ void font22StyleInit(void){
 static lv_style_t tinySymbolStyle;
 static lv_style_t transparentButtonStyle;
 static lv_style_t lineStyle;
-
+static lv_style_t toast_listStyle;
 //Tiny symbols to signalize wifi and sd card status
 void tinySymbolStyleInit(void){
 	lv_style_init(&tinySymbolStyle);
@@ -231,6 +231,13 @@ void lineStyleInit(void){
     lv_style_set_line_rounded(&lineStyle, LV_STATE_DEFAULT, false);
 }
 
+void toast_listStyleInit(void)
+{
+	lv_style_init(&toast_listStyle);
+	lv_style_set_bg_color(&toast_listStyle, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
+	lv_style_set_text_color(&toast_listStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_radius(&toast_listStyle, LV_STATE_DEFAULT, 0);
+}
 //--------------------------------------------------main gui
 //Main screen objects declaration
 lv_obj_t *main_scr; //LVGL Object that represents main screen
@@ -308,7 +315,6 @@ lv_obj_t *back_wifilist_label;
 lv_obj_t *loading_bar;
 lv_obj_t *refresh_btn;
 lv_obj_t *refresh_label;
-//lv_obj_t *wifiList_btn;
 //-------------------------------------------------- info gui
 lv_obj_t *info_scr;
 lv_obj_t *contBarAtMaininfo;
@@ -498,6 +504,7 @@ void list_networks(lv_task_t *task)
     {
 		listbtn = lv_list_add_btn(wifiList, NULL, WiFi.SSID(thisNet).c_str());
 		lv_obj_set_event_cb(listbtn, WiFi_SSID);
+		lv_obj_add_style(listbtn, LV_STATE_DEFAULT, &toast_listStyle);
 	}
 	lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_OFF);
 }
@@ -836,6 +843,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 		if(get_value<300000)
 		{
 			alertBox = lv_msgbox_create(time_settings_scr, NULL);
+			lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
 			lv_msgbox_set_text(alertBox, "The minimum required sampling time is 5 mins.");
 			lv_msgbox_set_anim_time(alertBox, 0);
 			lv_msgbox_start_auto_close(alertBox, 5000);
@@ -921,6 +929,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 		{
 			if(Ping.ping(remote_ip, 1)) {
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
+				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
 				lv_msgbox_set_text(alertBox, "Clock sucessfully synchronized.");
 				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
@@ -930,6 +939,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 			else
 			{
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
+				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
 				lv_msgbox_set_text(alertBox, "No internet connection.");
 				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
@@ -938,6 +948,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 		}else
 		{
 			alertBox = lv_msgbox_create(time_settings_scr, NULL);
+			lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
 			lv_msgbox_set_text(alertBox, "No WiFi connection.");
 			lv_msgbox_set_anim_time(alertBox, 0);
 			lv_msgbox_start_auto_close(alertBox, 5000);
@@ -970,7 +981,7 @@ void timesettings_screen()
 
 	measure_period_label = lv_label_create(time_settings_scr, NULL);
 	lv_obj_set_pos(measure_period_label, 5, 71);
-	lv_label_set_text(measure_period_label, "Sampling (Hrs:Min):");
+	lv_label_set_text(measure_period_label, "Sampling (Hrs:Min)");
 	lv_obj_set_style_local_text_color(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	
 	measure_period_hour = lv_spinbox_create(time_settings_scr, NULL);
@@ -1342,6 +1353,8 @@ void wifiList_screen()
 	wifiList = lv_list_create(wifilist_scr, NULL);
 	lv_obj_set_size(wifiList, SCREEN_WIDTH, 128);	
 	lv_obj_align(wifiList, NULL, LV_ALIGN_CENTER, 0,0);	
+	lv_obj_set_style_local_bg_color(wifiList, LV_OBJ_PART_MAIN,  LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
+	lv_obj_set_style_local_border_color(wifiList, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
 
 	refresh_btn = lv_btn_create(wifilist_scr, NULL);
 	refresh_label = lv_label_create(refresh_btn, NULL);
@@ -1569,6 +1582,7 @@ void setup()
 	transparentButtonStyleInit();
 	tinySymbolStyleInit();
 	lineStyleInit();
+	toast_listStyleInit();
 	main_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	settings_scr=lv_cont_create(NULL, NULL);
