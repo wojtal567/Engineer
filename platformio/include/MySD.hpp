@@ -11,5 +11,6 @@ class MySD
         void end();
         bool start(SQLiteDb *object, Stream *debugger);
         void save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, SQLiteDb *object, Stream *debugger);
-        void select(SQLiteDb *object, Stream *debugger, String datetime);
+        void select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray* array);
+        void getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray* array);
 };

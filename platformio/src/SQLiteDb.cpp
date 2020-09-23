@@ -79,11 +79,11 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
     return rc;
 }
 
-
-static int callback(void *data, int argc, char **argv, char **azColName)
+static int selectCallback(void *data, int argc, char **argv, char **azColName)
 {
+
     JsonArray *records = static_cast<JsonArray*>(data);
-    StaticJsonDocument<512> doc;
+    StaticJsonDocument<600> doc;
     for (int i = 0; i < argc; i++)
         doc[azColName[i]] = argv[i];
     
@@ -91,7 +91,7 @@ static int callback(void *data, int argc, char **argv, char **azColName)
     return 0;
 }
 
-int SQLiteDb::select(Stream *debugger, String datetime)
+int SQLiteDb::select(Stream *debugger, String datetime, JsonArray* array)
 {
     if (object == NULL)
     {
@@ -99,10 +99,9 @@ int SQLiteDb::select(Stream *debugger, String datetime)
         return 0;
     }
 
-    String sql = "select * from " + _tableName + " where timestamp > '" + datetime.c_str() + "' limit(100);";
+    String sql = "select * from " + _tableName + " where timestamp > '" + datetime.c_str() + "' limit(1);";
     debugger->println("Executing: " + sql);
-    JsonArray records;
-    int rc = sqlite3_exec(object, sql.c_str(), callback, &records, &zErrorMessage);
+    int rc = sqlite3_exec(object, sql.c_str(), selectCallback, array, &zErrorMessage);
     if (rc != SQLITE_OK)
     {
         debugger->println(F("SQL error: "));
@@ -113,20 +112,33 @@ int SQLiteDb::select(Stream *debugger, String datetime)
     }
     else
         debugger->println(zErrorMessage);
+
     return rc;
 }
 
-int SQLiteDb::getMissingSamples(int lastID, Stream *debugger)
+int SQLiteDb::getLastRecord(Stream *debugger, JsonArray* array)
 {
     if (object == NULL)
     {
         debugger->println("Database does not exist. NULL");
         return 0;
     }
-}
+    
+    String sql = "SELECT * FROM " + _tableName+  " order by timestamp desc limit 1";
+    debugger->println("Executing: " + sql);
+    int rc = sqlite3_exec(object, sql.c_str(), selectCallback, array, &zErrorMessage);
+    if (rc != SQLITE_OK)
+    {
+        debugger->println(F("SQL error: "));
+        debugger->println(sqlite3_extended_errcode(object));
+        debugger->print(" ");
+        debugger->println(zErrorMessage);
+        sqlite3_free(zErrorMessage);
+    }
+    else
+        debugger->println(zErrorMessage);
 
-void compareCallback(void *data, int argc, char **argv, char **azColName)
-{
+    return rc;
 }
 
 String SQLiteDb::getLocalPath()

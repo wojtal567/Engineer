@@ -24,8 +24,8 @@ class SQLiteDb
         void close();
         void createTable(Stream *serial);
         int save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger);
-        int select(Stream *debugger, String datetime);
-        int getMissingSamples(int lastID, Stream *debugger);
+        int select(Stream *debugger, String datetime, JsonArray* array);
+        int getLastRecord(Stream *debugger, JsonArray* array);
         String getLocalPath();
         String getRelativePath();
 };

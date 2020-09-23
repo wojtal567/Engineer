@@ -60,7 +60,7 @@ void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humid
 
 }
 
-void MySD::select(SQLiteDb *object, Stream *debugger, String datetime)
+void MySD::select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray* array)
 {
     debugger->println("MySD::select");
     if(begin())
@@ -71,7 +71,26 @@ void MySD::select(SQLiteDb *object, Stream *debugger, String datetime)
             debugger->println("Database " + object->getLocalPath() + " exists.");
             object->init();
             object->open();
-            object->select(debugger, "2020-09-21 22:23:13");
+            object->select(debugger, "2020-09-21 22:23:13", array);
+            object->close();
+            object->kill();
+        }
+        end();
+    }
+}
+
+void MySD::getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray* array)
+{
+    debugger->println("MySD::getLastRecord");
+    if(begin())
+    {
+        debugger->println("SD Card detected");
+        if(SD.exists(object->getRelativePath()))
+        {
+            debugger->println("Database " + object->getLocalPath() + " exists.");
+            object->init();
+            object->open();
+            object->getLastRecord(debugger, array);
             object->close();
             object->kill();
         }

@@ -340,9 +340,8 @@ lv_obj_t *sdStatusAtLockWarning;
 lv_task_t *turnFanOn;
 lv_task_t *getSample;
 lv_task_t *syn_rtc;
-lv_task_t *getAppLastRecord;
+lv_task_t *getAppLastRecordAndSynchronize;
 lv_task_t *inactive_time;
-
 
 void inactive_screen(lv_task_t *task)
 {
@@ -395,30 +394,46 @@ void drawSomeLines(){
 	lv_obj_add_style(mainLine, LV_LINE_PART_MAIN, &lineStyle);
 }
 
-void fetchLastRecord(lv_task_t *task)
+void fetchLastRecordAndSynchronize(lv_task_t *task)
 {
 	if(WiFi.status() == WL_CONNECTED && appIpAddress != "")
 	{
 
-		HTTPClient http;
+		HTTPClient getHttp;
 		String url = "http://" + appIpAddress + "/fetch/last";
 		Serial.print(url);
-		if(http.begin(url.c_str()))
+		if(getHttp.begin(url.c_str()))
 		{
-			
-			uint8_t responseCode = http.GET();
+			uint8_t responseCode = getHttp.GET();
 
-			if(responseCode > 0)
+			if(responseCode >= 200 and responseCode < 300)
 			{
-				Serial.println("HTTP RESPONSE CODE: " + (String)responseCode);
-				StaticJsonDocument<50> doc;
-				DynamicJsonDocument samplesToSend(2056);
-				DeserializationError err = deserializeJson(doc, http.getString());
-				Serial.println(err.c_str());
-				JsonObject sample = doc.getElement(0);
-				int id = sample["id"];
-				Serial.println(id);
-				Serial.print(sample);
+				//Serial.println("HTTP RESPONSE CODE: " + (String)responseCode);
+				StaticJsonDocument<600> response, doc1;
+
+				DeserializationError err = deserializeJson(response, getHttp.getString());
+				//Serial.println(err.c_str());
+
+				JsonArray lastRecord = doc1.to<JsonArray>();
+
+				mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);
+
+				if(response[0]["timestamp"].as<char *>() != lastRecord[0]["timestamp"].as<char *>())
+				{
+					DynamicJsonDocument doc(25000);
+					JsonArray records = doc.to<JsonArray>();
+					mySDCard.select(&sampleDB, &Serial, response[0]["timestamp"].as<char *>(), &records);
+					String json = "";
+					
+					serializeJson(doc, json);
+					Serial.print(json);
+					getHttp.begin("http://192.168.43.181/submit");
+					getHttp.addHeader("Content-Type", "text/plain");
+					getHttp.POST(json);
+					Serial.print("POST RESPONSE:" + getHttp.getString());
+					getHttp.end();
+					//lv_task_ready(getAppLastRecordAndSynchronize);
+				} 
 			}
 			else
 			{
@@ -427,6 +442,7 @@ void fetchLastRecord(lv_task_t *task)
 		} else {
 			Serial.print("Wrong url");
 		}
+		getHttp.end();
 	}
 }
 
@@ -452,12 +468,9 @@ void config_time(lv_task_t *task)
 //Get single sample and set text
 void getSampleFunc(lv_task_t *task)
 {
-	Serial.println("Get Sample");
 	sht30.get();
 	temp = sht30.cTemp;
 	humi = sht30.humidity;
-	Serial.println(temp);
-	Serial.println(humi);
 	char buffer[7];
 	if(wasUpdated != true)
 	{
@@ -683,14 +696,13 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 
 static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event == LV_EVENT_RELEASED)
 		lv_disp_load_scr(main_scr);
 }
 
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
-	if(event==LV_EVENT_RELEASED)
+	if(event == LV_EVENT_RELEASED)
 	{
-		mySDCard.select(&sampleDB, &Serial, getMainTimestamp(Rtc));
 		lv_scr_load(wifi_scr);
 		int SSIDnumber = WiFi.scanNetworks();
       	for (int thisNet = 0; thisNet<SSIDnumber; thisNet++)
@@ -1467,9 +1479,9 @@ void setup()
 	inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
 
 
-	getAppLastRecord = lv_task_create_basic();
-	lv_task_set_cb(getAppLastRecord, fetchLastRecord);
-	lv_task_set_period(getAppLastRecord, 36000);
+	getAppLastRecordAndSynchronize = lv_task_create_basic();
+	lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
+	lv_task_set_period(getAppLastRecordAndSynchronize, 60000);
 
 	if (Rtc.GetMemory(53) == 1)
 	{
