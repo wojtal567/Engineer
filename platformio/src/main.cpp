@@ -26,6 +26,12 @@ const IPAddress remote_ip(216, 58, 207, 78);
 #define SCREEN_HEIGHT 240
 #define GMT_OFFSET_SEC 7200
 
+//Include additional font with lock and unlock symbol
+extern lv_font_t monte16lock;
+
+#define MY_LOCK_SYMBOL "\xEF\x80\xA3"
+#define MY_UNLOCK_SYMBOL "\xEF\x82\x9C"
+
 //RTC, PMS5003 and SHT30 objects declaration
 RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
@@ -155,6 +161,17 @@ void containerStyleInit(void){
 	lv_style_set_border_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	lv_style_set_radius(&containerStyle, LV_STATE_DEFAULT, 0);
 }
+
+static lv_style_t lockButtonStyle;
+void lockButtonStyleInit(void){
+	lv_style_init(&lockButtonStyle);
+	lv_style_set_text_font(&lockButtonStyle, LV_STATE_DEFAULT, &monte16lock);
+	lv_style_set_text_color(&lockButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_bg_opa(&lockButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
+	lv_style_set_border_opa(&lockButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
+	lv_style_set_radius(&lockButtonStyle, LV_STATE_DEFAULT, 0);
+}
+
 //Different font sizes using lvgl styles
 static lv_style_t font12Style;
 static lv_style_t font16Style;
@@ -254,14 +271,14 @@ lv_obj_t *labelNumberTitle;
 lv_obj_t *labelSizes[6];
 lv_obj_t *labelParticlesNumber[5];
 lv_obj_t *contParticlesNumber[5];
-static lv_point_t mainLinePoints[] = {{50, 210}, {300, 210}};
+static lv_point_t mainLinePoints[] = {{20, 210}, {270, 210}};
 //An array of points pairs instead of multiple names and declarations
-static lv_point_t dividingLinesPoints[][6] = 	{{{50,205}, {50, 215}},
-												{{100,205}, {100, 215}},
-												{{150,205}, {150, 215}},
-												{{200,205}, {200, 215}},
-												{{250,205}, {250, 215}},
-												{{300,205}, {300, 215}}};
+static lv_point_t dividingLinesPoints[][6] = 	{{{20,205}, {20, 215}},
+												{{70,205}, {70, 215}},
+												{{120,205}, {120, 215}},
+												{{170,205}, {170, 215}},
+												{{220,205}, {220, 215}},
+												{{270,205}, {270, 215}}};
 //Main line at the bottom declaration
 lv_obj_t *mainLine;
 //An array of lines dividing main one 
@@ -375,7 +392,7 @@ void drawSomeLines(){
 		lv_obj_add_style(labelSizes[i], LV_LABEL_PART_MAIN, &font12Style);
 		//lv_obj_set_auto_realign(labelSizes[i], true);
 		//lv_obj_align_origo(labelSizes[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
-		lv_obj_set_pos(labelSizes[i], 41+i*49, 190); //12
+		lv_obj_set_pos(labelSizes[i], 11+i*49, 190); //12
 	}
 
 	for(int j=0; j<5;j++){
@@ -385,7 +402,7 @@ void drawSomeLines(){
 		lv_obj_set_click(contParticlesNumber[j], false);
 		lv_obj_set_size(contParticlesNumber[j], 50, 14);
 		labelParticlesNumber[j] = lv_label_create(contParticlesNumber[j], NULL);
-		lv_obj_set_pos(contParticlesNumber[j], 56+j*50, 215);//20
+		lv_obj_set_pos(contParticlesNumber[j], 20+j*50, 215);//20
 		lv_label_set_align(labelParticlesNumber[j], LV_LABEL_ALIGN_CENTER);
 		lv_obj_set_auto_realign(labelParticlesNumber[j], true);
 		lv_label_set_text(labelParticlesNumber[j], "-");
@@ -1067,29 +1084,30 @@ void main_screen()
 	lv_obj_set_click(contBarAtMain, false);
 
 	lockButton = lv_btn_create(main_scr, NULL);
+	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &lockButtonStyle);
 	labelLockButton = lv_label_create(lockButton, NULL);
 	lv_obj_align(lockButton, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 40, -55);
-	lv_label_set_text(labelLockButton, LV_SYMBOL_POWER);
+	lv_label_set_text(labelLockButton, MY_LOCK_SYMBOL);
 	lv_btn_set_fit(lockButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(lockButton, lockButton_task);
-	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
 	wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
 	lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
-	lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 45, 0);
+	lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 35, 0);
 
 	sdStatusAtMain = lv_label_create(contBarAtMain, NULL);
 	lv_label_set_text(sdStatusAtMain, LV_SYMBOL_SD_CARD);
-	lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 80, 0);
+	lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 65, 0);
 
-	setButton = lv_btn_create(contBarAtMain, NULL);
+	setButton = lv_btn_create(main_scr, NULL);
 	labelSetButton = lv_label_create(setButton, NULL);
 	lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
-	lv_obj_align(setButton, NULL, LV_ALIGN_IN_LEFT_MID, 10, 0);
-	//lv_btn_set_fit(setButton, LV_FIT_TIGHT);
+	//lv_obj_set_pos(labelSetButton, 0, 0);
+	lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -45, -5);
+	lv_btn_set_fit(setButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(setButton, setButton_task);
 	lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-	lv_btn_set_layout(setButton, LV_LAYOUT_COLUMN_LEFT);
+	//lv_btn_set_layout(setButton, LV_LAYOUT_COLUMN_LEFT);
 
 	wifiStatusAtMainWarning = lv_label_create(wifiStatusAtMain, NULL);
 	lv_label_set_text(wifiStatusAtMainWarning, LV_SYMBOL_CLOSE);
@@ -1226,12 +1244,12 @@ void main_screen()
 	lv_label_set_text(labelAQIColorBar, "-"); 
 
 	labelSizeTitle = lv_label_create(main_scr, NULL);
-	lv_obj_set_pos(labelSizeTitle, 205, 5);
-	lv_label_set_text(labelSizeTitle, "Size");
+	lv_obj_set_pos(labelSizeTitle, 280 , 190);
+	lv_label_set_text(labelSizeTitle, "um");
 	lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &font12Style);
 
 	labelNumberTitle = lv_label_create(main_scr, NULL);
-	lv_obj_set_pos(labelNumberTitle, 215, 5);
+	lv_obj_set_pos(labelNumberTitle, 280, 215);
 	lv_label_set_text(labelNumberTitle, "N");
 	lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
 
@@ -1310,8 +1328,9 @@ void lock_screen()
 
 	unlockButton = lv_btn_create(lock_scr, NULL);
 	labelUnlockButton = lv_label_create(unlockButton, NULL);
+	lv_obj_add_style(labelUnlockButton, LV_OBJ_PART_MAIN, &lockButtonStyle);
 	lv_obj_align(unlockButton, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
-	lv_label_set_text(labelUnlockButton, LV_SYMBOL_POWER);
+	lv_label_set_text(labelUnlockButton, MY_UNLOCK_SYMBOL);
 	lv_btn_set_fit(unlockButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(unlockButton, unlockButton_task);
 	lv_obj_add_style(unlockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
@@ -1448,6 +1467,7 @@ void setup()
 	lv_theme_set_act(th);
 	//Styles initialization functions
 	containerStyleInit();
+	lockButtonStyleInit();
 	font12StyleInit();
 	font16StyleInit();
 	font20StyleInit();
