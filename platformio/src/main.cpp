@@ -1094,13 +1094,16 @@ void settings_screen()
     lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_PRESSED, &wifi);
     lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_RELEASED, &wifi);
     lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_PRESSED, &wifi);
-    lv_imgbtn_set_checkable(WiFiBtn, true);
+ //   lv_imgbtn_set_checkable(WiFiBtn, true);
     lv_obj_set_pos(WiFiBtn, 10, 55);
 	lv_obj_set_event_cb(WiFiBtn, WiFi_btn);
 
 	infoBtn = lv_imgbtn_create(settings_scr, NULL);
 	lv_imgbtn_set_src(infoBtn, LV_STATE_DEFAULT, &info);
-    //lv_imgbtn_set_checkable(infoBtn, true);
+	lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_PRESSED, &info);
+    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_RELEASED, &info);
+    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_PRESSED, &info);
+//	lv_imgbtn_set_checkable(infoBtn, true);
     lv_obj_set_pos(infoBtn, 110, 55);
 	lv_obj_set_event_cb(infoBtn, info_btn);
 
@@ -1109,7 +1112,7 @@ void settings_screen()
     lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_PRESSED, &set_time);
     lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_RELEASED, &set_time);
     lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_PRESSED, &set_time);
-    lv_imgbtn_set_checkable(timeBtn, true);
+//  lv_imgbtn_set_checkable(timeBtn, true);
     lv_obj_set_pos(timeBtn, 210, 55);
 	lv_obj_set_event_cb(timeBtn, time_settings_btn);	
 	
