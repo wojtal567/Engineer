@@ -71,7 +71,7 @@ void MySD::select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray
             debugger->println("Database " + object->getLocalPath() + " exists.");
             object->init();
             object->open();
-            object->select(debugger, "2020-09-21 22:23:13", array);
+            object->select(debugger, datetime, array);
             object->close();
             object->kill();
         }

@@ -473,17 +473,18 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
 
 				mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);
 
-				if(response[0]["timestamp"].as<char *>() != lastRecord[0]["timestamp"].as<char *>())
+				if(response[0]["timestamp"].as<String>() != lastRecord[0]["timestamp"].as<String>())
 				{
 					DynamicJsonDocument doc(25000);
 					JsonArray records = doc.to<JsonArray>();
-					mySDCard.select(&sampleDB, &Serial, response[0]["timestamp"].as<char *>(), &records);
+					serializeJsonPretty(response[0], Serial);
+					mySDCard.select(&sampleDB, &Serial, response[0]["timestamp"].as<String>(), &records);
 					String json = "";
 					
 					serializeJson(doc, json);
 					Serial.print(json);
-					getHttp.begin("http://192.168.43.181/submit");
-					getHttp.addHeader("Content-Type", "text/plain");
+					getHttp.begin("http://" + appIpAddress + "/submit");
+					getHttp.addHeader("Content-Type", "application/json");
 					getHttp.POST(json);
 					Serial.print("POST RESPONSE:" + getHttp.getString());
 					getHttp.end();

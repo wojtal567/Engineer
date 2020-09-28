@@ -99,7 +99,7 @@ int SQLiteDb::select(Stream *debugger, String datetime, JsonArray* array)
         return 0;
     }
 
-    String sql = "select * from " + _tableName + " where timestamp > '" + datetime.c_str() + "' limit(1);";
+    String sql = "select * from " + _tableName + " where timestamp > '" + datetime.c_str() + "' limit 50;";
     debugger->println("Executing: " + sql);
     int rc = sqlite3_exec(object, sql.c_str(), selectCallback, array, &zErrorMessage);
     if (rc != SQLITE_OK)
