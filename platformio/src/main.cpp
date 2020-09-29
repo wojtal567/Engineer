@@ -457,6 +457,7 @@ void drawParticlesIndicator(){
 
 void fetchLastRecordAndSynchronize(lv_task_t *task)
 {
+	
 	if(WiFi.status() == WL_CONNECTED && appIpAddress != "")
 	{
 
@@ -473,29 +474,26 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
 				StaticJsonDocument<600> response, doc1;
 
 				DeserializationError err = deserializeJson(response, getHttp.getString());
-				//Serial.println(err.c_str());
 
 				JsonArray lastRecord = doc1.to<JsonArray>();
 
 				mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);
-
+				DynamicJsonDocument doc(33000);
 				if(response[0]["timestamp"].as<String>() != lastRecord[0]["timestamp"].as<String>())
 				{
-					DynamicJsonDocument doc(25000);
 					JsonArray records = doc.to<JsonArray>();
-					serializeJsonPretty(response[0], Serial);
 					mySDCard.select(&sampleDB, &Serial, response[0]["timestamp"].as<String>(), &records);
 					String json = "";
 					
 					serializeJson(doc, json);
-					Serial.print(json);
 					getHttp.begin("http://" + appIpAddress + "/submit");
 					getHttp.addHeader("Content-Type", "application/json");
 					getHttp.POST(json);
 					Serial.print("POST RESPONSE:" + getHttp.getString());
 					getHttp.end();
 					//lv_task_ready(getAppLastRecordAndSynchronize);
-				} 
+
+				}
 			}
 			else
 			{
@@ -506,6 +504,11 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
 		}
 		getHttp.end();
 	}
+	
+    Serial.printf("\nHeap size: %d\n", ESP.getHeapSize());
+    Serial.printf("Free Heap: %d\n", esp_get_free_heap_size());
+    Serial.printf("Min Free Heap: %d\n", esp_get_minimum_free_heap_size());
+    Serial.printf("Max Alloc Heap: %d\n", ESP.getMaxAllocHeap());
 }
 
 void config_time(lv_task_t *task)
@@ -546,12 +549,14 @@ void getSampleFunc(lv_task_t *task)
 	sht30.get();
 	temp = sht30.cTemp;
 	humi = sht30.humidity;
+
 	char buffer[7];
 	if(wasUpdated != true)
 	{
 		lv_task_ready(syn_rtc);
 		wasUpdated = true;
 	} 
+	
 	if (pmsSensor->readData())
 	{
 		std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
@@ -585,10 +590,9 @@ void getSampleFunc(lv_task_t *task)
 
 		mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
 	}
+	
 	dtostrf(temp, 10, 2, buffer);
-	//itoa(temp, buffer, 10);
 	lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
-	//itoa(humi, buffer, 10);
 	dtostrf(humi, 10, 2, buffer);
 	lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
 	lv_task_reset(turnFanOn);
@@ -598,26 +602,29 @@ void getSampleFunc(lv_task_t *task)
 
 void dateTimeStatusFunc(lv_task_t *task)
 {
+	
 	if (Rtc.GetMemory(1) == 1)
 	{
-		lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
-		lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
-		lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
+		 lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
+		 lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
+		 lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
 	}
 
 	if (WiFi.status() == WL_CONNECTED)
 	{
-		lv_obj_set_hidden(wifiStatusAtLockWarning, true);
-		lv_obj_set_hidden(wifiStatusAtMainWarning, true);
-		lv_label_set_text(info_wifi_address_label, WiFi.localIP().toString().c_str());
+		 lv_obj_set_hidden(wifiStatusAtLockWarning, true);
+		 lv_obj_set_hidden(wifiStatusAtMainWarning, true);
+		 lv_label_set_text(info_wifi_address_label, WiFi.localIP().toString().c_str());
 	}
 	else
 	{
-		lv_obj_set_hidden(wifiStatusAtLockWarning, false);
-		lv_obj_set_hidden(wifiStatusAtMainWarning, false);
-		lv_label_set_text(info_wifi_address_label, "No WiFi connection.");
+		 lv_obj_set_hidden(wifiStatusAtLockWarning, false);
+		 lv_obj_set_hidden(wifiStatusAtMainWarning, false);
+		 lv_label_set_text(info_wifi_address_label, "No WiFi connection.");
 	}
-
+	
+	
+		
 	if (mySDCard.start(&sampleDB, &Serial2))
 	{
 		lv_obj_set_hidden(sdStatusAtLockWarning, true);
@@ -1627,10 +1634,12 @@ void setup()
 	wifiList_screen();
 	lv_disp_load_scr(main_scr);
 	load_settings();
+
 	date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
 	syn_rtc = lv_task_create_basic();
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
+
 	getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
 	turnFanOn = lv_task_create(turnFanOnFunc, measure_period-299999, LV_TASK_PRIO_HIGHEST, NULL);
 	inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);

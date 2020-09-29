@@ -35,6 +35,7 @@ void SQLiteDb::createTable(Stream *serial)
     if (object == NULL)
         serial->println("No database open");
 
+    open();
     String sql = "CREATE table if not exists " + _tableName + " (timestamp datetime NOT NULL PRIMARY KEY, temperature float, humidity FLOAT, pm10standard FLOAT, pm25standard FLOAT, pm100standard float, pm10env FLOAT, pm25env FLOAT, pm100env FLOAT, particles03 INTEGER, particles05 INTEGER, particles10 INTEGER, particles25 INTEGER, particles50 INTEGER, particles100 INTEGER)";
     int rc = sqlite3_exec(
         object,
@@ -51,6 +52,7 @@ void SQLiteDb::createTable(Stream *serial)
         serial->println(zErrorMessage);
         sqlite3_free(zErrorMessage);
     }
+    close();
 }
 
 int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
@@ -66,7 +68,15 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
 
     debugger->println("Executing: " + sql);
 
+    open();
+
     int rc = sqlite3_exec(object, sql.c_str(), 0, (void *)"Output:", &zErrorMessage);
+
+
+    Serial.printf("\nHeap size: %d\n", ESP.getHeapSize());
+    Serial.printf("Free Heap: %d\n", esp_get_free_heap_size());
+    Serial.printf("Min Free Heap: %d\n", esp_get_minimum_free_heap_size());
+    Serial.printf("Max Alloc Heap: %d\n", ESP.getMaxAllocHeap());
 
     if (rc != SQLITE_OK)
     {
@@ -75,7 +85,10 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
         debugger->print(" ");
         debugger->println(zErrorMessage);
         sqlite3_free(zErrorMessage);
+        close();
+        return 1;
     }
+    close();
     return rc;
 }
 
@@ -101,7 +114,14 @@ int SQLiteDb::select(Stream *debugger, String datetime, JsonArray* array)
 
     String sql = "select * from " + _tableName + " where timestamp > '" + datetime.c_str() + "' limit 50;";
     debugger->println("Executing: " + sql);
+    open();
     int rc = sqlite3_exec(object, sql.c_str(), selectCallback, array, &zErrorMessage);
+
+    Serial.printf("\nHeap size: %d\n", ESP.getHeapSize());
+    Serial.printf("Free Heap: %d\n", esp_get_free_heap_size());
+    Serial.printf("Min Free Heap: %d\n", esp_get_minimum_free_heap_size());
+    Serial.printf("Max Alloc Heap: %d\n", ESP.getMaxAllocHeap());
+
     if (rc != SQLITE_OK)
     {
         debugger->println(F("SQL error: "));
@@ -109,10 +129,13 @@ int SQLiteDb::select(Stream *debugger, String datetime, JsonArray* array)
         debugger->print(" ");
         debugger->println(zErrorMessage);
         sqlite3_free(zErrorMessage);
+        close();
+        return 1;
     }
     else
         debugger->println(zErrorMessage);
 
+    close();
     return rc;
 }
 

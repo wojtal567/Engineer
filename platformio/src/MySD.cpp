@@ -18,6 +18,7 @@ void MySD::end()
 bool MySD::start(SQLiteDb *object, Stream *debugger)
 {
     bool result = begin();
+
     if(result)
     {
         object->init();
@@ -25,7 +26,6 @@ bool MySD::start(SQLiteDb *object, Stream *debugger)
         object->createTable(debugger);
         object->close();
         object->kill();
-        end();
     }
     return result;
 }
@@ -55,7 +55,6 @@ void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humid
             object->close();
             object->kill();
         }
-        end();
     }
 
 }
@@ -75,7 +74,6 @@ void MySD::select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray
             object->close();
             object->kill();
         }
-        end();
     }
 }
 
@@ -94,6 +92,5 @@ void MySD::getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray* array)
             object->close();
             object->kill();
         }
-        end();
     }
 }
