@@ -311,6 +311,8 @@ lv_obj_t *apply_btn;
 lv_obj_t *apply_label;
 lv_obj_t *cancel_btn;
 lv_obj_t *cancel_label;
+lv_obj_t *show_hide_btn;
+lv_obj_t *show_hide_btn_label;
 //-------------------------------------------------- wifilist gui
 lv_obj_t *wifilist_scr;
 lv_obj_t *contBarWiFiList;
@@ -913,7 +915,7 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
 
 void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 {
-	if(event ==LV_EVENT_RELEASED)
+	if(event ==LV_EVENT_CLICKED)
 	{
 		int get_value=lv_spinbox_get_value(measure_period_hour)*60*60000+lv_spinbox_get_value(measure_period_minute)*60000;
 		if(get_value<300000)
@@ -979,6 +981,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 				Serial.println(datet);
 				RtcDateTime *dt = new RtcDateTime(atoi(datet.substring(6,10).c_str()), atoi(datet.substring(3, 6).c_str()), atoi(datet.substring(0, 2).c_str()), datet.substring(10, 12).toDouble(), datet.substring(13, 15).toDouble(), 0);
 				Rtc.SetDateTime(*dt);
+				Rtc.SetMemory(1, 1);
 			}
 			if(date_changed==true)
 			{
@@ -986,6 +989,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 				String date = lv_label_get_text(date_btn_label); 
 				RtcDateTime *dt = new RtcDateTime(atoi(date.substring(6).c_str()), atoi(date.substring(3, 6).c_str()), atoi(date.substring(0, 2).c_str()), ori.Hour(), ori.Minute(), ori.Second());
 				Rtc.SetDateTime(*dt);
+				Rtc.SetMemory(1, 1);
 			}
 			lv_disp_load_scr(main_scr);
 			in_time_settings=false;
@@ -1183,6 +1187,23 @@ static void date_button_func(lv_obj_t *btn, lv_event_t event)
     	today.day = atoi(now.substring(0, 2).c_str());
 		lv_calendar_set_today_date(calendar, &today);
 		lv_calendar_set_showed_date(calendar, &today);
+	}
+}
+
+static void show_hide_btn_func(lv_obj_t *btn, lv_event_t event)
+{
+	if(event==LV_EVENT_CLICKED)
+	{	
+		if(lv_textarea_get_pwd_mode(pwd_ta))
+		{
+			lv_textarea_set_pwd_mode(pwd_ta, false);
+			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
+		}
+		else
+		{
+			lv_textarea_set_pwd_mode(pwd_ta, true);
+			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_CLOSE);
+		}
 	}
 }
 
@@ -1706,7 +1727,14 @@ void wifi_screen()
 	lv_textarea_set_cursor_hidden(pwd_ta, true);
 	lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
 	lv_obj_set_pos(pwd_ta, 100, 85);
-
+	show_hide_btn = lv_btn_create(wifi_scr, NULL);
+	show_hide_btn_label = lv_label_create(show_hide_btn, NULL);
+	lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_CLOSE);
+	lv_obj_set_pos(show_hide_btn, 243, 85);
+	lv_obj_set_width(show_hide_btn, 75);
+	lv_obj_add_style(show_hide_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_set_style_local_text_color(show_hide_btn_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_obj_set_event_cb(show_hide_btn, show_hide_btn_func);
 	apply_btn = lv_btn_create(wifi_scr, NULL);
 	apply_label = lv_label_create(apply_btn, NULL);
 	lv_label_set_text(apply_label, "Connect");
