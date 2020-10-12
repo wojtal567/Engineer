@@ -1197,12 +1197,12 @@ static void show_hide_btn_func(lv_obj_t *btn, lv_event_t event)
 		if(lv_textarea_get_pwd_mode(pwd_ta))
 		{
 			lv_textarea_set_pwd_mode(pwd_ta, false);
-			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
+			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_CLOSE);
 		}
 		else
 		{
 			lv_textarea_set_pwd_mode(pwd_ta, true);
-			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_CLOSE);
+			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
 		}
 	}
 }
@@ -1729,7 +1729,7 @@ void wifi_screen()
 	lv_obj_set_pos(pwd_ta, 100, 85);
 	show_hide_btn = lv_btn_create(wifi_scr, NULL);
 	show_hide_btn_label = lv_label_create(show_hide_btn, NULL);
-	lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_CLOSE);
+	lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
 	lv_obj_set_pos(show_hide_btn, 243, 85);
 	lv_obj_set_width(show_hide_btn, 75);
 	lv_obj_add_style(show_hide_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
