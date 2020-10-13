@@ -209,7 +209,7 @@ void font22StyleInit(void){
 static lv_style_t tinySymbolStyle;
 static lv_style_t transparentButtonStyle;
 static lv_style_t lineStyle;
-static lv_style_t toast_listStyle;
+static lv_style_t toastListStyle;
 //Tiny symbols to signalize wifi and sd card status
 void tinySymbolStyleInit(void){
 	lv_style_init(&tinySymbolStyle);
@@ -235,12 +235,12 @@ void lineStyleInit(void){
     lv_style_set_line_rounded(&lineStyle, LV_STATE_DEFAULT, false);
 }
 
-void toast_listStyleInit(void)
+void toastListStyleInit(void)
 {
-	lv_style_init(&toast_listStyle);
-	lv_style_set_bg_color(&toast_listStyle, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
-	lv_style_set_text_color(&toast_listStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-	lv_style_set_radius(&toast_listStyle, LV_STATE_DEFAULT, 0);
+	lv_style_init(&toastListStyle);
+	lv_style_set_bg_color(&toastListStyle, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
+	lv_style_set_text_color(&toastListStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_radius(&toastListStyle, LV_STATE_DEFAULT, 0);
 }
 //--------------------------------------------------main gui
 //Main screen objects declaration
@@ -409,7 +409,7 @@ lv_task_t *listNetwork_task;
 
 static void WiFi_SSID(lv_obj_t *obj, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 	{
 		lv_textarea_set_text(ssid_ta, lv_list_get_btn_text(obj));
 		lv_scr_load(wifi_scr);
@@ -564,7 +564,7 @@ void list_networks(lv_task_t *task)
     {
 		listbtn = lv_list_add_btn(wifiList, NULL, WiFi.SSID(thisNet).c_str());
 		lv_obj_set_event_cb(listbtn, WiFi_SSID);
-		lv_obj_add_style(listbtn, LV_STATE_DEFAULT, &toast_listStyle);
+		lv_obj_add_style(listbtn, LV_STATE_DEFAULT, &toastListStyle);
 	}
 	lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_OFF);
 }
@@ -758,7 +758,7 @@ static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 
 static void btn_connect(lv_obj_t *obj, lv_event_t event)
 {
-	if (event == LV_EVENT_RELEASED and ((lv_textarea_get_text(ssid_ta) != NULL and lv_textarea_get_text(ssid_ta) != '\0') or (lv_textarea_get_text(pwd_ta) != NULL and lv_textarea_get_text(pwd_ta) != '\0')))
+	if (event == LV_EVENT_CLICKED and ((lv_textarea_get_text(ssid_ta) != NULL and lv_textarea_get_text(ssid_ta) != '\0') or (lv_textarea_get_text(pwd_ta) != NULL and lv_textarea_get_text(pwd_ta) != '\0')))
 	{
 		uint8_t wifiAttempts = 10;
 
@@ -790,28 +790,28 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 //Settings button clicked
 static void setButton_task(lv_obj_t *obj, lv_event_t event)
 {
-	if(event == LV_EVENT_RELEASED)
+	if(event == LV_EVENT_CLICKED)
 		lv_disp_load_scr(settings_scr);
 }
 
 //Locking button clicked
 static void lockButton_task(lv_obj_t *obj, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 		lv_disp_load_scr(lock_scr);
 }
 
 //Unlocking button clicked
 static void unlockButton_task(lv_obj_t *obj, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 		lv_disp_load_scr(main_scr);
 }
 
 //Exit from wifi settings button clicked
 static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 	{
 		lv_disp_load_scr(wifilist_scr);
 		lv_textarea_set_text(ssid_ta, "");
@@ -821,7 +821,7 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 
 static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
 {
-	if(event == LV_EVENT_RELEASED)
+	if(event == LV_EVENT_CLICKED)
 		lv_disp_load_scr(main_scr);
 }
 
@@ -835,7 +835,7 @@ void startbar()
 }
 
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
-	if(event == LV_EVENT_RELEASED)
+	if(event == LV_EVENT_CLICKED)
 	{
 		lv_list_clean(wifiList);
 		lv_scr_load(wifilist_scr);
@@ -847,7 +847,7 @@ static void WiFi_btn(lv_obj_t *obj, lv_event_t event){
 
 static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 	{
 		lv_list_clean(wifiList);
 		lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
@@ -857,7 +857,7 @@ static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
 }
 
 static void info_btn(lv_obj_t *obj, lv_event_t event){
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 		lv_scr_load(info_scr);
 }
 
@@ -878,7 +878,7 @@ void turnFanOnFunc(lv_task_t *task)
 
 void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 	{
 		switch(lcd_lock_time)
 		{
@@ -921,7 +921,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 		if(get_value<300000)
 		{
 			alertBox = lv_msgbox_create(time_settings_scr, NULL);
-			lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
+			lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
 			lv_msgbox_set_text(alertBox, "The minimum required sampling time is 5 mins.");
 			lv_msgbox_set_anim_time(alertBox, 0);
 			lv_msgbox_start_auto_close(alertBox, 5000);
@@ -1098,13 +1098,13 @@ static void sampling_minute_decrement(lv_obj_t * btn, lv_event_t e)
 
 static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 {
-	if(event==LV_EVENT_RELEASED)
+	if(event==LV_EVENT_CLICKED)
 	{
 		if (WiFi.status() == WL_CONNECTED)
 		{
 			if(Ping.ping(remote_ip, 1)) {
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
-				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
+				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
 				lv_msgbox_set_text(alertBox, "Clock sucessfully synchronized.");
 				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
@@ -1114,7 +1114,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 			else
 			{
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
-				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
+				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
 				lv_msgbox_set_text(alertBox, "No internet connection.");
 				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
@@ -1123,7 +1123,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 		}else
 		{
 			alertBox = lv_msgbox_create(time_settings_scr, NULL);
-			lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toast_listStyle);
+			lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
 			lv_msgbox_set_text(alertBox, "No WiFi connection.");
 			lv_msgbox_set_anim_time(alertBox, 0);
 			lv_msgbox_start_auto_close(alertBox, 5000);
@@ -1202,6 +1202,7 @@ static void show_hide_btn_func(lv_obj_t *btn, lv_event_t event)
 		else
 		{
 			lv_textarea_set_pwd_mode(pwd_ta, true);
+			lv_textarea_set_text(pwd_ta, lv_textarea_get_text(pwd_ta));
 			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
 		}
 	}
@@ -1905,7 +1906,7 @@ void setup()
 	transparentButtonStyleInit();
 	tinySymbolStyleInit();
 	lineStyleInit();
-	toast_listStyleInit();
+	toastListStyleInit();
 	main_scr = lv_cont_create(NULL, NULL);
 	lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 	settings_scr=lv_cont_create(NULL, NULL);
