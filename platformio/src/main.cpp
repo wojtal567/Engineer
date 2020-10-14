@@ -417,11 +417,14 @@ static void WiFi_SSID(lv_obj_t *obj, lv_event_t event)
 }
 
 void inactive_screen(lv_task_t *task)
-{
-	if(lv_disp_get_inactive_time(NULL)>lcd_lock_time)
+{	
+	if(lcd_lock_time!=-1)
 	{
-		if(lv_scr_act()!=lock_scr)
-			lv_disp_load_scr(lock_scr);
+		if(lv_disp_get_inactive_time(NULL)>lcd_lock_time)
+		{
+			if(lv_scr_act()!=lock_scr)
+				lv_disp_load_scr(lock_scr);
+		}
 	}
 }
 
@@ -936,34 +939,28 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 			{
 				case 0: 
 					lcd_lock_time = 30000;
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_HIGH);
 					break;
 				case 1: 
 					lcd_lock_time = 60000;
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_HIGH);
 					break;
 				case 2:
 					lcd_lock_time = 120000;
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_HIGH);
 					break;
 				case 3:
 					lcd_lock_time = 300000;
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_HIGH);
 					break;
 				case 4:
 					lcd_lock_time = 600000;
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_HIGH);
 					break;
 				case 5:
 					lcd_lock_time = 1800000;
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_HIGH);
 					break;
 				case 6:
 					lcd_lock_time = 3600000;
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_HIGH);
 					break;
 				case 7:
-					lv_task_set_prio(inactive_time, LV_TASK_PRIO_OFF);
+					lcd_lock_time = -1;
+					break;
 			}
 			if(mySDCard.begin())
 			{
@@ -1815,6 +1812,9 @@ void load_settings()
 			lcd_lock_time=stn.substring(stn.indexOf("%")+1).toInt();
 			switch(lcd_lock_time)
 			{
+				case -1:
+					lv_dropdown_set_selected(lockScreenDDlist, 7);
+					break;
 				case 30000: 
 					lv_dropdown_set_selected(lockScreenDDlist, 0);
 					break;
