@@ -1199,7 +1199,9 @@ static void show_hide_btn_func(lv_obj_t *btn, lv_event_t event)
 		else
 		{
 			lv_textarea_set_pwd_mode(pwd_ta, true);
+			lv_textarea_set_pwd_show_time(pwd_ta, 1);
 			lv_textarea_set_text(pwd_ta, lv_textarea_get_text(pwd_ta));
+			lv_textarea_set_pwd_show_time(pwd_ta, 5000);
 			lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
 		}
 	}
@@ -1719,6 +1721,7 @@ void wifi_screen()
 	lv_obj_set_style_local_text_color(pwd_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	pwd_ta = lv_textarea_create(wifi_scr, NULL);
 	lv_textarea_set_text(pwd_ta, "");
+	lv_textarea_set_pwd_show_time(pwd_ta, 5000);
 	lv_textarea_set_pwd_mode(pwd_ta, true);
 	lv_textarea_set_one_line(pwd_ta, true);
 	lv_obj_set_event_cb(pwd_ta, ta_event_cb);
