@@ -36,6 +36,27 @@ extern lv_font_t monte16lock;
 RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
 SHT3X sht30(0x45);
+uint currentSample=0;
+uint samplesNumber=5;
+int averageTime=5000;
+std::map<std::string, uint16_t> data;
+const char* labels[15] = { 
+	"framelen",
+    "pm10_standard",
+    "pm25_standard",
+    "pm100_standard",
+    "pm10_env",
+    "pm25_env",
+    "pm100_env",
+    "particles_03um",
+    "particles_05um",
+    "particles_10um",
+    "particles_25um",
+    "particles_50um",
+    "particles_100um",
+    "unused",
+    "checksum"
+}; 
 
 //NTPClient declarations 
 static const char ntpServerName[] = "europe.pool.ntp.org";
@@ -576,57 +597,84 @@ void list_networks(lv_task_t *task)
 void getSampleFunc(lv_task_t *task)
 {
 	sht30.get();
-	temp = sht30.cTemp;
-	humi = sht30.humidity;
-
-	char buffer[7];
 	if(wasUpdated != true)
 	{
 		lv_task_ready(syn_rtc);
 		wasUpdated = true;
 	} 
-	
-	if (pmsSensor->readData())
+	if(currentSample==0)
+	{
+		//TODO tu odpalenie tego leda ze pomiar idzie
+		if (pmsSensor->readData())
+		{
+			std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
+			pmsSensor->dumpSamples();
+			data=tmpData;
+			currentSample++;
+			lv_task_set_period(getSample, averageTime);
+			temp = sht30.cTemp;
+			humi = sht30.humidity;
+		}		
+	}
+	if(currentSample!=0 && currentSample<samplesNumber)
 	{
 		std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
 		pmsSensor->dumpSamples();
+		for(uint8_t i = 0; i < 15; i++)
+		{
+			data[labels[i]] += tmpData[labels[i]];
+		}
+		currentSample++;
+		temp+= sht30.cTemp;
+		humi+= sht30.humidity;
+	}
+	if(currentSample==samplesNumber)
+	{
+		char buffer[7];
+		for(uint8_t i=0; i<15; i++)
+			data[labels[i]] = data[labels[i]]/samplesNumber;
+		currentSample=0;
+		temp= temp/7;
+		humi= humi/7;
+		lv_task_set_period(getSample, measure_period);
 
-		itoa(tmpData["pm10_standard"], buffer, 10);
+		itoa(data["pm10_standard"], buffer, 10);
 		lv_label_set_text(labelPM10Data, buffer);
 
-		itoa(tmpData["pm25_standard"], buffer, 10);
-		pm25Aqi = tmpData["pm25_standard"];
+		itoa(data["pm25_standard"], buffer, 10);
+		pm25Aqi = data["pm25_standard"];
 		lv_label_set_text(labelPM25Data, buffer);
 		setAqiStateNColor();
 
-		itoa(tmpData["pm100_standard"], buffer, 10);
+		itoa(data["pm100_standard"], buffer, 10);
 		lv_label_set_text(labelPM100Data, buffer);
 
-		itoa(tmpData["particles_05um"], buffer, 10);
+		itoa(data["particles_05um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[0], buffer);
 
-		itoa(tmpData["particles_10um"], buffer, 10);
+		itoa(data["particles_10um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[1], buffer);
 
-		itoa(tmpData["particles_25um"], buffer, 10);
+		itoa(data["particles_25um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[2], buffer);
 
-		itoa(tmpData["particles_50um"], buffer, 10);
+		itoa(data["particles_50um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[3], buffer);
 
-		itoa(tmpData["particles_100um"], buffer, 10);
+		itoa(data["particles_100um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[4], buffer);
 
-		mySDCard.save(tmpData, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
+		mySDCard.save(data, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
+
+		dtostrf(temp, 10, 2, buffer);
+		lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
+		dtostrf(humi, 10, 2, buffer);
+		lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
+		lv_task_reset(turnFanOn);
+		lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
+		digitalWrite(33, LOW);
 	}
 	
-	dtostrf(temp, 10, 2, buffer);
-	lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
-	dtostrf(humi, 10, 2, buffer);
-	lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
-	lv_task_reset(turnFanOn);
-	lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
-	digitalWrite(33, LOW);
 }
 
 void dateTimeStatusFunc(lv_task_t *task)
