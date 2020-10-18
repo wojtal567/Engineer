@@ -992,6 +992,8 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 		else
 		{
 			measure_period = get_value;
+			samplesNumber = lv_spinbox_get_value(measure_number);
+			averageTime = lv_spinbox_get_value(measure_av_period)*1000;
 			getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
 			turnFanOn = lv_task_create(turnFanOnFunc, measure_period-299999, LV_TASK_PRIO_HIGHEST, NULL);
 			switch(lv_dropdown_get_selected(lockScreenDDlist))
@@ -1028,6 +1030,10 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 				stn+=(String)measure_period;
 				stn+="%";
 				stn+=(String)lcd_lock_time;
+				stn+="%";
+				stn+=(String)samplesNumber;
+				stn+="%";
+				stn+=(String)averageTime;
 				settings.print(stn);
 				settings.close();
 			}
@@ -1265,6 +1271,30 @@ static void show_hide_btn_func(lv_obj_t *btn, lv_event_t event)
 	}
 }
 
+static void measure_number_increment_func(lv_obj_t *btn, lv_event_t event)
+{
+	if(event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+		lv_spinbox_increment(measure_number);
+}
+
+static void measure_number_decrement_func(lv_obj_t *btn, lv_event_t event)
+{
+	if(event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+		lv_spinbox_decrement(measure_number);
+}
+
+static void av_period_increment(lv_obj_t *btn, lv_event_t event)
+{
+	if(event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+		lv_spinbox_increment(measure_av_period);
+}
+
+static void av_period_decrement(lv_obj_t *btn, lv_event_t event)
+{
+	if(event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+		lv_spinbox_decrement(measure_av_period);
+}
+
 void timesettings_screen()
 {	
 	contBarAtMainTime = lv_cont_create(time_settings_scr, NULL);
@@ -1415,7 +1445,7 @@ void timesettings_screen()
 
 	measure_number_label = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(measure_number_label, 5, 263);
-	lv_label_set_text(measure_number_label, "TODO");
+	lv_label_set_text(measure_number_label, "ilosc pomiarow:");
 	lv_obj_set_style_local_text_color(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 	measure_number = lv_spinbox_create(time_scroll_page, NULL);
@@ -1431,18 +1461,18 @@ void timesettings_screen()
 	lv_obj_set_pos(measure_number_increment, 175, 232);
 	lv_theme_apply(measure_number_increment, LV_THEME_SPINBOX_BTN);
 	lv_obj_set_style_local_value_str(measure_number_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-	//lv_obj_set_event_cb(measure_number_increment, measure_number_increment_func);
+	lv_obj_set_event_cb(measure_number_increment, measure_number_increment_func);
 
 	measure_number_decrement = lv_btn_create(time_scroll_page, NULL);
 	lv_obj_set_size(measure_number_decrement, 20, 20);
 	lv_obj_set_pos(measure_number_decrement, 175, 292);
 	lv_theme_apply(measure_number_decrement, LV_THEME_SPINBOX_BTN);
 	lv_obj_set_style_local_value_str(measure_number_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-	//lv_obj_set_event_cb(measure_number_decrement, measure_number_decrement_func);
+	lv_obj_set_event_cb(measure_number_decrement, measure_number_decrement_func);
 	
 	measure_av_period_label = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(measure_av_period_label, 5, 353);
-	lv_label_set_text(measure_av_period_label, "TODO");
+	lv_label_set_text(measure_av_period_label, "ten czas:");
 	lv_obj_set_style_local_text_color(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 	measure_av_period = lv_spinbox_create(time_scroll_page, NULL);
@@ -1458,14 +1488,14 @@ void timesettings_screen()
 	lv_obj_set_pos(measure_av_period_increment, 175, 322);
 	lv_theme_apply(measure_av_period_increment, LV_THEME_SPINBOX_BTN);
 	lv_obj_set_style_local_value_str(measure_av_period_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-	//lv_obj_set_event_cb(measure_av_period_increment, av_period_increment);
+	lv_obj_set_event_cb(measure_av_period_increment, av_period_increment);
 
 	measure_av_period_decrement = lv_btn_create(time_scroll_page, NULL);
 	lv_obj_set_size(measure_av_period_decrement, 20, 20);
 	lv_obj_set_pos(measure_av_period_decrement, 175, 382);
 	lv_theme_apply(measure_av_period_decrement, LV_THEME_SPINBOX_BTN);
 	lv_obj_set_style_local_value_str(measure_av_period_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-	//lv_obj_set_event_cb(measure_av_period_decrement, av_period_decrement);
+	lv_obj_set_event_cb(measure_av_period_decrement, av_period_decrement);
 
 	lockScreenLabel = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(lockScreenLabel, 5, 415);
@@ -1923,8 +1953,14 @@ void load_settings()
 			{
 				stn += (char)settings.read();
 			}
+			int pos = stn.indexOf("%");
 			measure_period=stn.substring(0,stn.indexOf("%")).toInt();
-			lcd_lock_time=stn.substring(stn.indexOf("%")+1).toInt();
+			stn[pos]='0';
+			lcd_lock_time=stn.substring(pos+1, stn.indexOf("%")).toInt();
+			pos = stn.indexOf("%");
+			stn[pos]='0';
+			samplesNumber = stn.substring(pos+1, stn.indexOf("%")).toInt();
+			averageTime = stn.substring(stn.indexOf("%")+1).toInt();
 			switch(lcd_lock_time)
 			{
 				case -1:
@@ -1967,9 +2003,13 @@ void load_settings()
 	{
 		measure_period=3600000;
 		lcd_lock_time=60000;
+		samplesNumber=5;
+		averageTime=5000;
 		lv_dropdown_set_selected(lockScreenDDlist, 1);
 	}
 	lv_spinbox_set_value(measure_period_hour, ((measure_period/60000)/60));
+	lv_spinbox_set_value(measure_av_period, (averageTime/1000));
+	lv_spinbox_set_value(measure_number, samplesNumber);
 	lv_spinbox_set_value(measure_period_minute, ((measure_period/60000)%60));
 }
 
