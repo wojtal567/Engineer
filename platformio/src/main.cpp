@@ -229,6 +229,7 @@ void font22StyleInit(void){
 //Additional styles with initalization functions
 static lv_style_t tinySymbolStyle;
 static lv_style_t transparentButtonStyle;
+static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
 static lv_style_t toastListStyle;
 //Tiny symbols to signalize wifi and sd card status
@@ -243,10 +244,17 @@ void tinySymbolStyleInit(void){
 
 void transparentButtonStyleInit(void){
 	lv_style_init(&transparentButtonStyle);
-	lv_style_set_bg_opa(&transparentButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
+	lv_style_set_bg_opa(&transparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
 	lv_style_set_border_opa(&transparentButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
 	lv_style_set_radius(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_text_color(&transparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+}
+
+void whiteButtonStyleInit(void){
+	lv_style_init(&whiteButtonStyle);
+	lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
+	lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 }
 
 void lineStyleInit(void){
@@ -363,7 +371,7 @@ lv_obj_t *infoBtn;
 lv_obj_t *timeBtn;
 //--------------------------------------------------time settings gui
 lv_obj_t *time_settings_scr;
-lv_obj_t *contBarAtMainTime;
+lv_obj_t *contBarAtTimeSettings;
 lv_obj_t *back_time_settings_btn;
 lv_obj_t *back_time_settings_label;
 lv_obj_t *timeSettingsLabelAtBar;
@@ -865,7 +873,7 @@ static void lockButton_task(lv_obj_t *obj, lv_event_t event)
 
 //Unlocking button clicked
 static void unlockButton_task(lv_obj_t *obj, lv_event_t event)
-{
+{Serial.print(lv_btn_get_state(unlockButton));
 	if(event==LV_EVENT_CLICKED)
 		lv_disp_load_scr(main_scr);
 }
@@ -1297,29 +1305,30 @@ static void av_period_decrement(lv_obj_t *btn, lv_event_t event)
 
 void timesettings_screen()
 {	
-	contBarAtMainTime = lv_cont_create(time_settings_scr, NULL);
-	lv_obj_set_auto_realign(contBarAtMainTime, true);					/*Auto realign when the size changes*/
-	lv_obj_align(contBarAtMainTime, NULL, LV_ALIGN_IN_TOP_MID, 0, 0); /*This parametrs will be sued when realigned*/
-	lv_cont_set_fit4(contBarAtMainTime, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-	lv_cont_set_layout(contBarAtMainTime, LV_LAYOUT_PRETTY_TOP);
-	lv_obj_add_style(contBarAtMainTime, LV_OBJ_PART_MAIN, &containerStyle);
-	lv_obj_set_style_local_border_opa(contBarAtMainTime, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-	lv_obj_set_click(contBarAtMainTime, false);
+	contBarAtTimeSettings = lv_cont_create(time_settings_scr, NULL);
+	lv_obj_set_auto_realign(contBarAtTimeSettings, true);					/*Auto realign when the size changes*/
+	lv_obj_align(contBarAtTimeSettings, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
+	lv_cont_set_fit4(contBarAtTimeSettings, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
+	lv_cont_set_layout(contBarAtTimeSettings, LV_LAYOUT_PRETTY_TOP);
+	lv_obj_add_style(contBarAtTimeSettings, LV_OBJ_PART_MAIN, &containerStyle);
+	lv_obj_set_style_local_border_opa(contBarAtTimeSettings, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
+	lv_obj_set_click(contBarAtTimeSettings, false);
 
-	back_time_settings_btn = lv_btn_create(contBarAtMainTime, NULL);
+	back_time_settings_btn = lv_btn_create(contBarAtTimeSettings, NULL);
 	back_time_settings_label = lv_label_create(back_time_settings_btn, NULL);
 	lv_label_set_text(back_time_settings_label, LV_SYMBOL_LEFT);
 	lv_obj_set_size(back_time_settings_btn, 30, 15);
 	lv_obj_set_event_cb(back_time_settings_btn, timesettings_back_btn);
 	lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-	timeSettingsLabelAtBar = lv_label_create (contBarAtMainTime, NULL);
+	timeSettingsLabelAtBar = lv_label_create (contBarAtTimeSettings, NULL);
 	lv_label_set_text(timeSettingsLabelAtBar, "Time Settings");
 
 	time_scroll_page = lv_page_create(time_settings_scr, NULL);
-	lv_obj_set_size(time_scroll_page, SCREEN_WIDTH, SCREEN_HEIGHT-lv_obj_get_height(contBarAtMainTime));	
-	lv_obj_align(time_scroll_page, NULL, LV_ALIGN_CENTER, 0, lv_obj_get_height(contBarAtMainTime)/2);	
+	lv_obj_set_size(time_scroll_page, SCREEN_WIDTH, SCREEN_HEIGHT-lv_obj_get_height(contBarAtTimeSettings));	
+	lv_obj_align(time_scroll_page, NULL, LV_ALIGN_CENTER, 0, lv_obj_get_height(contBarAtTimeSettings)/2);	
 	lv_obj_set_style_local_bg_color(time_scroll_page, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_set_style_local_border_opa(time_scroll_page, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 
 	time_label = lv_label_create (time_scroll_page, NULL);
 	lv_obj_set_pos(time_label, 5, 31);
@@ -1525,8 +1534,7 @@ void timesettings_screen()
 	sync_rtc_btn = lv_btn_create(time_scroll_page, NULL);
 	sync_rtc_label = lv_label_create(sync_rtc_btn, NULL);
 	lv_label_set_text(sync_rtc_label, "Sync. Clock");
-	lv_obj_set_style_local_border_opa(sync_rtc_label, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_text_color(sync_rtc_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_add_style(sync_rtc_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 	lv_obj_set_pos(sync_rtc_btn, 5, 465);
 	lv_obj_set_event_cb(sync_rtc_btn, sync_rtc_func);
 }
@@ -1557,16 +1565,16 @@ void settings_screen()
     lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_PRESSED, &wifi);
     lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_RELEASED, &wifi);
     lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_PRESSED, &wifi);
- //   lv_imgbtn_set_checkable(WiFiBtn, true);
+
     lv_obj_set_pos(WiFiBtn, 10, 55);
 	lv_obj_set_event_cb(WiFiBtn, WiFi_btn);
 
 	infoBtn = lv_imgbtn_create(settings_scr, NULL);
 	lv_imgbtn_set_src(infoBtn, LV_STATE_DEFAULT, &info);
-	lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_PRESSED, &info);
-    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_RELEASED, &info);
-    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_PRESSED, &info);
-//	lv_imgbtn_set_checkable(infoBtn, true);
+	lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_PRESSED, &info);
+    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_CHECKED_RELEASED, &info);
+    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_CHECKED_PRESSED, &info);
+
     lv_obj_set_pos(infoBtn, 110, 55);
 	lv_obj_set_event_cb(infoBtn, info_btn);
 
@@ -1585,7 +1593,7 @@ void info_screen()
 {	
 	contBarAtMaininfo = lv_cont_create(info_scr, NULL);
 	lv_obj_set_auto_realign(contBarAtMaininfo, true);					/*Auto realign when the size changes*/
-	lv_obj_align(contBarAtMaininfo, NULL, LV_ALIGN_IN_TOP_MID, 0, 0); /*This parametrs will be sued when realigned*/
+	lv_obj_align(contBarAtMaininfo, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
 	lv_cont_set_fit4(contBarAtMaininfo, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
 	lv_cont_set_layout(contBarAtMaininfo, LV_LAYOUT_PRETTY_TOP);
 	lv_obj_add_style(contBarAtMaininfo, LV_OBJ_PART_MAIN, &containerStyle);
@@ -1791,7 +1799,7 @@ void wifiList_screen()
 {
 	contBarWiFiList = lv_cont_create(wifilist_scr, NULL);
 	lv_obj_set_auto_realign(contBarWiFiList, true);
-	lv_obj_align(contBarWiFiList, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+	lv_obj_align(contBarWiFiList, NULL, LV_ALIGN_IN_TOP_MID, 0, -5);
 	lv_cont_set_fit4(contBarWiFiList, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
 	lv_cont_set_layout(contBarWiFiList, LV_LAYOUT_PRETTY_TOP);
 	lv_obj_add_style(contBarWiFiList, LV_OBJ_PART_MAIN, &containerStyle);
@@ -1827,7 +1835,7 @@ void wifi_screen()
 {
 	contBarAtMainWiFi = lv_cont_create(wifi_scr, NULL);
 	lv_obj_set_auto_realign(contBarAtMainWiFi, true);					
-	lv_obj_align(contBarAtMainWiFi, NULL, LV_ALIGN_IN_TOP_MID, 0, 0); 
+	lv_obj_align(contBarAtMainWiFi, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); 
 	lv_cont_set_fit4(contBarAtMainWiFi, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
 	lv_cont_set_layout(contBarAtMainWiFi, LV_LAYOUT_PRETTY_TOP);
 	lv_obj_add_style(contBarAtMainWiFi, LV_OBJ_PART_MAIN, &containerStyle);
@@ -2059,6 +2067,7 @@ void setup()
 	font20StyleInit();
 	font22StyleInit();
 	transparentButtonStyleInit();
+	whiteButtonStyleInit();
 	tinySymbolStyleInit();
 	lineStyleInit();
 	toastListStyleInit();
