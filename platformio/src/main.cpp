@@ -1031,20 +1031,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 					lcd_lock_time = -1;
 					break;
 			}
-			if(mySDCard.begin())
-			{
-				File settings = SD.open("/settings.csv", FILE_WRITE);
-				String stn = "";
-				stn+=(String)measure_period;
-				stn+="%";
-				stn+=(String)lcd_lock_time;
-				stn+="%";
-				stn+=(String)samplesNumber;
-				stn+="%";
-				stn+=(String)averageTime;
-				settings.print(stn);
-				settings.close();
-			}
+			mySDCard.saveConfig(&sampleDB, measure_period, lcd_lock_time, samplesNumber, averageTime);
 			if(time_changed==true)
 			{
 				String datet=lv_label_get_text(date_btn_label)+(String)lv_textarea_get_text(time_hour)+":"+(String)lv_textarea_get_text(time_minute);

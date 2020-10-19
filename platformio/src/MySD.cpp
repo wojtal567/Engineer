@@ -27,6 +27,7 @@ bool MySD::start(SQLiteDb *object, Stream *debugger)
         object->close();
         object->kill();
     }
+    end();
     return result;
 }
 
@@ -56,7 +57,7 @@ void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humid
             object->kill();
         }
     }
-
+    end();
 }
 
 void MySD::select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray* array)
@@ -75,6 +76,7 @@ void MySD::select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray
             object->kill();
         }
     }
+    end();
 }
 
 void MySD::getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray* array)
@@ -93,4 +95,27 @@ void MySD::getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray* array)
             object->kill();
         }
     }
+    end();
+}
+
+void MySD::saveConfig(SQLiteDb *object, int measurePeriod, int lockTime, int samplesNumber, int avgTime)
+{
+
+    if(begin())
+    {
+        File settings = SD.open("/settings.csv", FILE_WRITE);
+        std::string temp = "";
+        char buffer[10];
+        itoa(measurePeriod, buffer, 10);
+        temp += std::string(buffer + '%');
+        itoa(lockTime, buffer, 10);
+        temp += std::string(buffer + '%');
+        itoa(samplesNumber, buffer, 10);
+        temp += std::string(buffer + '%');
+        itoa(avgTime, buffer, 10);
+        temp += std::string(buffer);
+        settings.print(temp.c_str());
+        settings.close();
+    }
+    end();
 }
