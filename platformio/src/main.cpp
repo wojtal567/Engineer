@@ -1961,6 +1961,7 @@ void load_settings()
 			stn[pos]='0';
 			samplesNumber = stn.substring(pos+1, stn.indexOf("%")).toInt();
 			averageTime = stn.substring(stn.indexOf("%")+1).toInt();
+			settings.close();
 			switch(lcd_lock_time)
 			{
 				case -1:
