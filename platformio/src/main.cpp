@@ -245,7 +245,8 @@ void tinySymbolStyleInit(void){
 void transparentButtonStyleInit(void){
 	lv_style_init(&transparentButtonStyle);
 	lv_style_set_bg_opa(&transparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
-	lv_style_set_border_opa(&transparentButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
+	lv_style_set_border_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
+	lv_style_set_outline_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_radius(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_text_color(&transparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
@@ -253,6 +254,8 @@ void transparentButtonStyleInit(void){
 void whiteButtonStyleInit(void){
 	lv_style_init(&whiteButtonStyle);
 	lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_border_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
+	lv_style_set_outline_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
 	lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 }
@@ -1512,11 +1515,10 @@ void timesettings_screen()
 	timeSettings_btn = lv_btn_create(time_scroll_page, NULL);
 	timeSettings_label = lv_label_create(timeSettings_btn, NULL);
 	lv_label_set_text(timeSettings_label, "Save");
-	lv_obj_set_style_local_border_opa(timeSettings_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_text_color(timeSettings_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);	
 	lv_obj_set_width(timeSettings_btn, 75);
 	lv_obj_set_pos(timeSettings_btn, 215, 465);	
 	lv_obj_set_event_cb(timeSettings_btn, timesettings_save_btn);
+	lv_obj_add_style(timeSettings_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 	
 	sync_rtc_btn = lv_btn_create(time_scroll_page, NULL);
 	sync_rtc_label = lv_label_create(sync_rtc_btn, NULL);
@@ -1812,8 +1814,7 @@ void wifiList_screen()
 	refresh_btn = lv_btn_create(wifilist_scr, NULL);
 	refresh_label = lv_label_create(refresh_btn, NULL);
 	lv_label_set_text(refresh_label, "Refresh");
-	lv_obj_set_style_local_border_opa(refresh_label, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_text_color(refresh_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+		lv_obj_add_style(refresh_btn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
 	lv_obj_set_pos(refresh_btn, 185, 192);
 	lv_obj_set_event_cb(refresh_btn, refresh_btn_task);
 }
@@ -1876,8 +1877,7 @@ void wifi_screen()
 	apply_btn = lv_btn_create(wifi_scr, NULL);
 	apply_label = lv_label_create(apply_btn, NULL);
 	lv_label_set_text(apply_label, "Connect");
-	lv_obj_set_style_local_border_opa(apply_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_text_color(apply_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_add_style(apply_btn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
 	lv_obj_set_event_cb(apply_btn, btn_connect);
 	lv_obj_set_width(apply_btn, 75);
 	lv_obj_set_pos(apply_btn, 243, 43);
