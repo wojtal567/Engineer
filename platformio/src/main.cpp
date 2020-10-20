@@ -1934,81 +1934,6 @@ void lock_screen()
 	lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
 }
 
-void load_settings()
-{
-	File settings;
-	String stn="";
-	if(mySDCard.begin())
-	{
-		if(SD.exists("/settings.csv"))
-		{
-			settings = SD.open("/settings.csv", FILE_READ);
-			Serial.println("som");
-			while(settings.available())
-			{
-				stn += (char)settings.read();
-			}
-			int pos = stn.indexOf("%");
-			measure_period=stn.substring(0,stn.indexOf("%")).toInt();
-			stn[pos]='0';
-			lcd_lock_time=stn.substring(pos+1, stn.indexOf("%")).toInt();
-			pos = stn.indexOf("%");
-			stn[pos]='0';
-			samplesNumber = stn.substring(pos+1, stn.indexOf("%")).toInt();
-			averageTime = stn.substring(stn.indexOf("%")+1).toInt();
-			settings.close();
-			switch(lcd_lock_time)
-			{
-				case -1:
-					lv_dropdown_set_selected(lockScreenDDlist, 7);
-					break;
-				case 30000: 
-					lv_dropdown_set_selected(lockScreenDDlist, 0);
-					break;
-				case 60000: 
-					lv_dropdown_set_selected(lockScreenDDlist, 1);
-					break;
-				case 120000:
-					lv_dropdown_set_selected(lockScreenDDlist, 2);
-					break;
-				case 300000:
-					lv_dropdown_set_selected(lockScreenDDlist, 3);
-					break;
-				case 600000:
-					lv_dropdown_set_selected(lockScreenDDlist, 4);
-					break;
-				case 1800000:
-					lv_dropdown_set_selected(lockScreenDDlist, 5);
-					break;
-				case 3600000:
-					lv_dropdown_set_selected(lockScreenDDlist, 6);
-					break;
-			}
-		}else
-		{
-			settings = SD.open("/settings.csv", FILE_WRITE);
-			settings.print("3600000%60000");
-			settings.close();
-			measure_period=3600000;
-			lcd_lock_time=60000;
-			lv_dropdown_set_selected(lockScreenDDlist, 1);
-		}
-		
-	}
-	else
-	{
-		measure_period=3600000;
-		lcd_lock_time=60000;
-		samplesNumber=5;
-		averageTime=5000;
-		lv_dropdown_set_selected(lockScreenDDlist, 1);
-	}
-	lv_spinbox_set_value(measure_period_hour, ((measure_period/60000)/60));
-	lv_spinbox_set_value(measure_av_period, (averageTime/1000));
-	lv_spinbox_set_value(measure_number, samplesNumber);
-	lv_spinbox_set_value(measure_period_minute, ((measure_period/60000)%60));
-}
-
 void setup()
 {
 	pinMode(33, OUTPUT);
@@ -2082,12 +2007,17 @@ void setup()
 	timesettings_screen();
 	wifiList_screen();
 	lv_disp_load_scr(main_scr);
-	load_settings();
+
+	lv_dropdown_set_selected(lockScreenDDlist, mySDCard.loadConfig(measure_period, lcd_lock_time, samplesNumber, averageTime));
 
 	date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
 	syn_rtc = lv_task_create_basic();
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
+	lv_spinbox_set_value(measure_period_hour, ((measure_period/60000)/60));
+	lv_spinbox_set_value(measure_av_period, (averageTime/1000));
+	lv_spinbox_set_value(measure_number, samplesNumber);
+	lv_spinbox_set_value(measure_period_minute, ((measure_period/60000)%60));
 
 	getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
 	turnFanOn = lv_task_create(turnFanOnFunc, measure_period-299999, LV_TASK_PRIO_HIGHEST, NULL);
