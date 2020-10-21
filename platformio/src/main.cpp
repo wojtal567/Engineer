@@ -697,10 +697,19 @@ void getSampleFunc(lv_task_t *task)
 		lv_task_reset(turnFanOn);
 		lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
 		digitalWrite(33, LOW);
-		if(isLastSampleSaved())
+		if(isLastSampleSaved()){
 			lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
-		else
-			lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
+			lv_obj_set_style_local_bg_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+			lv_obj_set_style_local_shadow_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+			lv_obj_set_style_local_shadow_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+		}
+		else{
+			lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+			lv_obj_set_style_local_bg_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+			lv_obj_set_style_local_shadow_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+			lv_obj_set_style_local_shadow_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+		}
+
 
 
 	}
@@ -1173,7 +1182,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 			if(Ping.ping(remote_ip, 1)) {
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
 				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
-				lv_msgbox_set_text(alertBox, "Clock sucessfully synchronized.");
+				lv_msgbox_set_text(alertBox, "Time synchronized");
 				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
 				lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -1792,9 +1801,9 @@ void main_screen()
 	lv_obj_set_size(ledAtMain, 10, 10);
 	lv_obj_set_pos(ledAtMain, 305, 225);
 	lv_led_set_bright(ledAtMain, 200);
-	lv_obj_set_style_local_bg_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
-		lv_obj_set_style_local_border_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
-			lv_obj_set_style_local_outline_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+	lv_obj_set_style_local_bg_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+	lv_obj_set_style_local_shadow_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+
 	//Function that draws lines and st text above those
  	drawParticlesIndicator();
 }
@@ -1949,7 +1958,11 @@ void lock_screen()
 	lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
 
 	ledAtLock = lv_led_create(lock_scr, NULL);
-
+	lv_obj_set_size(ledAtLock, 10, 10);
+	lv_obj_set_pos(ledAtLock, 305, 225);
+	lv_led_set_bright(ledAtLock, 200);
+	lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
+	lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
 }
 
 void setup()
@@ -2027,7 +2040,7 @@ void setup()
 
 	lv_dropdown_set_selected(lockScreenDDlist, mySDCard.loadConfig(measure_period, lcd_lock_time, samplesNumber, averageTime));
 
-	date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
+	date = lv_task_create(dateTimeStatusFunc, 800, LV_TASK_PRIO_MID, NULL);
 	syn_rtc = lv_task_create_basic();
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
