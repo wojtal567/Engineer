@@ -465,6 +465,10 @@ void inactive_screen(lv_task_t *task)
 bool isLastSampleSaved(){
 	JsonArray lastRecord;
 	mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);
+	Serial.print("Global: ");
+	Serial.print(lastSampleTimestamp);
+	Serial.print(" Baza: ");
+	Serial.print(lastRecord[0]["timestamp"].as<String>());
 	if(lastSampleTimestamp == lastRecord[0]["timestamp"].as<String>())
 		return true;
 	else 
