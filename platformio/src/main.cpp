@@ -81,6 +81,7 @@ int lcd_lock_time;
 MySD mySDCard(27);
 SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
+String lastSampleTimestamp;
 //Is data synchronized variable
 bool date_synchronized = false;
 
@@ -304,6 +305,7 @@ lv_obj_t *labelNumberTitle;
 lv_obj_t *labelParticleSizeum[6];
 lv_obj_t *labelParticlesNumber[5];
 lv_obj_t *contParticlesNumber[5];
+lv_obj_t * ledAtMain;
 static lv_point_t mainLinePoints[] = {{65, 210}, {300, 210}};
 //An array of points pairs instead of multiple names and declarations
 static lv_point_t dividingLinesPoints[][6] = 	{{{65,205}, {65, 215}},
@@ -430,6 +432,7 @@ lv_obj_t *wifiStatusAtLock;
 lv_obj_t *sdStatusAtLock;
 lv_obj_t *wifiStatusAtLockWarning;
 lv_obj_t *sdStatusAtLockWarning;
+lv_obj_t * ledAtLock;
 //--------------------------------------------------tasks
 lv_task_t *turnFanOn;
 lv_task_t *getSample;
@@ -459,6 +462,15 @@ void inactive_screen(lv_task_t *task)
 		}
 	}
 }
+bool isLastSampleSaved(){
+	JsonArray lastRecord;
+	mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);
+	if(lastSampleTimestamp == lastRecord[0]["timestamp"].as<String>())
+		return true;
+	else 
+		return false;
+}
+
 
 //Check pm2,5ug/m3 value and set status (text and color at main screen)
 void setAqiStateNColor(){
@@ -675,16 +687,22 @@ void getSampleFunc(lv_task_t *task)
 		itoa(data["particles_100um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[4], buffer);
 
-		mySDCard.save(data, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
-
 		dtostrf(temp, 10, 2, buffer);
 		lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
+
 		dtostrf(humi, 10, 2, buffer);
 		lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
+		lastSampleTimestamp = getMainTimestamp(Rtc);
+		mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
 		lv_task_reset(turnFanOn);
 		lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
 		digitalWrite(33, LOW);
-		//TODO led off
+		if(isLastSampleSaved())
+			lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+		else
+			lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
+
+
 	}
 	
 }
@@ -1770,7 +1788,14 @@ void main_screen()
 	lv_obj_align(labelAQIColorBar, NULL, LV_ALIGN_CENTER, 0, 0);
 	lv_label_set_text(labelAQIColorBar, "-"); 
 
-	//Function that draws lines and set text above those
+	ledAtMain = lv_led_create(main_scr, NULL);
+	lv_obj_set_size(ledAtMain, 10, 10);
+	lv_obj_set_pos(ledAtMain, 305, 225);
+	lv_led_set_bright(ledAtMain, 200);
+	lv_obj_set_style_local_bg_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+		lv_obj_set_style_local_border_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+			lv_obj_set_style_local_outline_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+	//Function that draws lines and st text above those
  	drawParticlesIndicator();
 }
 
@@ -1922,6 +1947,9 @@ void lock_screen()
 	lv_label_set_text(sdStatusAtLockWarning, LV_SYMBOL_CLOSE);
 	lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
 	lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
+
+	ledAtLock = lv_led_create(lock_scr, NULL);
+
 }
 
 void setup()
