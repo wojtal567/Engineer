@@ -1961,8 +1961,8 @@ void lock_screen()
 	lv_obj_set_size(ledAtLock, 10, 10);
 	lv_obj_set_pos(ledAtLock, 305, 225);
 	lv_led_set_bright(ledAtLock, 200);
-	lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
-	lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
+	lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+	lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
 }
 
 void setup()
