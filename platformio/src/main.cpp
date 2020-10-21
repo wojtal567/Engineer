@@ -101,7 +101,7 @@ LV_IMG_DECLARE(info);
 LV_IMG_DECLARE(set_time);
 //
 
-String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Very unhealthy", "Hazardous" };
+String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Bad", "Hazardous" };
 String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
 float aqiStandards[5] = {21, 61, 101, 141, 201};
 int labelParticleSizePosX[6] = {56, 103, 153, 198, 245, 288};
@@ -185,16 +185,6 @@ void containerStyleInit(void){
 	lv_style_set_bg_opa(&containerStyle, LV_STATE_DEFAULT, LV_OPA_0);
 	lv_style_set_border_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	lv_style_set_radius(&containerStyle, LV_STATE_DEFAULT, 0);
-}
-
-static lv_style_t lockButtonStyle;
-void lockButtonStyleInit(void){
-	lv_style_init(&lockButtonStyle);
-	lv_style_set_text_font(&lockButtonStyle, LV_STATE_DEFAULT, &monte16lock);
-	lv_style_set_text_color(&lockButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-	lv_style_set_bg_opa(&lockButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
-	lv_style_set_border_opa(&lockButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
-	lv_style_set_radius(&lockButtonStyle, LV_STATE_DEFAULT, 0);
 }
 
 //Different font sizes using lvgl styles
@@ -1444,7 +1434,7 @@ void timesettings_screen()
 
 	measure_number_label = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(measure_number_label, 5, 263);
-	lv_label_set_text(measure_number_label, "ilosc pomiarow:");
+	lv_label_set_text(measure_number_label, "Averaged samples");
 	lv_obj_set_style_local_text_color(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 	measure_number = lv_spinbox_create(time_scroll_page, NULL);
@@ -1471,7 +1461,7 @@ void timesettings_screen()
 	
 	measure_av_period_label = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(measure_av_period_label, 5, 353);
-	lv_label_set_text(measure_av_period_label, "ten czas:");
+	lv_label_set_text(measure_av_period_label, "Czas usredniania?");
 	lv_obj_set_style_local_text_color(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 	measure_av_period = lv_spinbox_create(time_scroll_page, NULL);
@@ -1498,7 +1488,7 @@ void timesettings_screen()
 
 	lockScreenLabel = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(lockScreenLabel, 5, 415);
-	lv_label_set_text(lockScreenLabel, "Lock screen after: ");
+	lv_label_set_text(lockScreenLabel, "Lock screen after ");
 	lv_obj_set_style_local_text_color(lockScreenLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	lockScreenDDlist = lv_dropdown_create(time_scroll_page, NULL);
 	lv_dropdown_set_options(lockScreenDDlist, "30 sec\n"
@@ -1803,7 +1793,7 @@ void wifiList_screen()
 	lv_obj_add_style(back_wifilist_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
 	wifilistLabelAtBar = lv_label_create (contBarWiFiList, NULL);
-	lv_label_set_text(wifilistLabelAtBar, "WiFi list:");
+	lv_label_set_text(wifilistLabelAtBar, "WiFi list");
 
 	wifiList = lv_list_create(wifilist_scr, NULL);
 	lv_obj_set_size(wifiList, SCREEN_WIDTH, 128);	
@@ -1896,12 +1886,12 @@ void lock_screen()
 
 	unlockButton = lv_btn_create(lock_scr, NULL);
 	labelUnlockButton = lv_label_create(unlockButton, NULL);
-	lv_obj_add_style(labelUnlockButton, LV_OBJ_PART_MAIN, &lockButtonStyle);
 	lv_obj_align(unlockButton, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
 	lv_label_set_text(labelUnlockButton, MY_UNLOCK_SYMBOL);
 	lv_btn_set_fit(unlockButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(unlockButton, unlockButton_task);
 	lv_obj_add_style(unlockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_set_style_local_text_font(unlockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
 
 	labelTimeLock = lv_label_create(contDateTimeAtLock, NULL);
 	lv_label_set_text(labelTimeLock, "Connect to wifi");
@@ -1974,7 +1964,6 @@ void setup()
 	lv_theme_set_act(th);
 	//Styles initialization functions
 	containerStyleInit();
-	lockButtonStyleInit();
 	font12StyleInit();
 	font16StyleInit();
 	font20StyleInit();
