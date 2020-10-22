@@ -107,11 +107,14 @@ void MySD::saveConfig(SQLiteDb *object, int measurePeriod, int lockTime, int sam
         std::string temp = "";
         char buffer[10];
         itoa(measurePeriod, buffer, 10);
-        temp += std::string(buffer + '%');
+        temp += std::string(buffer);
+        temp +="%";
         itoa(lockTime, buffer, 10);
-        temp += std::string(buffer + '%');
+        temp += std::string(buffer);
+        temp +="%";
         itoa(samplesNumber, buffer, 10);
-        temp += std::string(buffer + '%');
+        temp += std::string(buffer);
+        temp +="%";
         itoa(avgTime, buffer, 10);
         temp += std::string(buffer);
         settings.print(temp.c_str());
