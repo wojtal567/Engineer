@@ -15,4 +15,5 @@ class MySD
         void select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray* array);
         void getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray* array);
         void saveConfig(SQLiteDb *object, int measurePeriod, int lockTime, int samplesNumber, int avgTime);
+        int loadConfig(int& measure_period, int& lcd_lock_time, uint& samplesNumber, int& averageTime);
 };

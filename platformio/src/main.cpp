@@ -81,6 +81,7 @@ int lcd_lock_time;
 MySD mySDCard(27);
 SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
+String lastSampleTimestamp;
 //Is data synchronized variable
 bool date_synchronized = false;
 
@@ -101,7 +102,7 @@ LV_IMG_DECLARE(info);
 LV_IMG_DECLARE(set_time);
 //
 
-String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Very unhealthy", "Hazardous" };
+String airQualityStates[6] = { "Excellent", "Good", "Moderate", "Unhealthy", "Bad", "Hazardous" };
 String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
 float aqiStandards[5] = {21, 61, 101, 141, 201};
 int labelParticleSizePosX[6] = {56, 103, 153, 198, 245, 288};
@@ -187,16 +188,6 @@ void containerStyleInit(void){
 	lv_style_set_radius(&containerStyle, LV_STATE_DEFAULT, 0);
 }
 
-static lv_style_t lockButtonStyle;
-void lockButtonStyleInit(void){
-	lv_style_init(&lockButtonStyle);
-	lv_style_set_text_font(&lockButtonStyle, LV_STATE_DEFAULT, &monte16lock);
-	lv_style_set_text_color(&lockButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-	lv_style_set_bg_opa(&lockButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
-	lv_style_set_border_opa(&lockButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
-	lv_style_set_radius(&lockButtonStyle, LV_STATE_DEFAULT, 0);
-}
-
 //Different font sizes using lvgl styles
 static lv_style_t font12Style;
 static lv_style_t font16Style;
@@ -245,7 +236,8 @@ void tinySymbolStyleInit(void){
 void transparentButtonStyleInit(void){
 	lv_style_init(&transparentButtonStyle);
 	lv_style_set_bg_opa(&transparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
-	lv_style_set_border_opa(&transparentButtonStyle, LV_STATE_DEFAULT, LV_OPA_0);
+	lv_style_set_border_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
+	lv_style_set_outline_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_radius(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_text_color(&transparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
@@ -253,6 +245,8 @@ void transparentButtonStyleInit(void){
 void whiteButtonStyleInit(void){
 	lv_style_init(&whiteButtonStyle);
 	lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+	lv_style_set_border_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
+	lv_style_set_outline_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
 	lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
 	lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 }
@@ -311,6 +305,7 @@ lv_obj_t *labelNumberTitle;
 lv_obj_t *labelParticleSizeum[6];
 lv_obj_t *labelParticlesNumber[5];
 lv_obj_t *contParticlesNumber[5];
+lv_obj_t * ledAtMain;
 static lv_point_t mainLinePoints[] = {{65, 210}, {300, 210}};
 //An array of points pairs instead of multiple names and declarations
 static lv_point_t dividingLinesPoints[][6] = 	{{{65,205}, {65, 215}},
@@ -437,6 +432,7 @@ lv_obj_t *wifiStatusAtLock;
 lv_obj_t *sdStatusAtLock;
 lv_obj_t *wifiStatusAtLockWarning;
 lv_obj_t *sdStatusAtLockWarning;
+lv_obj_t * ledAtLock;
 //--------------------------------------------------tasks
 lv_task_t *turnFanOn;
 lv_task_t *getSample;
@@ -466,6 +462,19 @@ void inactive_screen(lv_task_t *task)
 		}
 	}
 }
+bool isLastSampleSaved(){
+	JsonArray lastRecord;
+	mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);
+	Serial.print("Global: ");
+	Serial.print(lastSampleTimestamp);
+	Serial.print(" Baza: ");
+	Serial.print(lastRecord[0]["timestamp"].as<String>());
+	if(lastSampleTimestamp == lastRecord[0]["timestamp"].as<String>())
+		return true;
+	else 
+		return false;
+}
+
 
 //Check pm2,5ug/m3 value and set status (text and color at main screen)
 void setAqiStateNColor(){
@@ -682,16 +691,31 @@ void getSampleFunc(lv_task_t *task)
 		itoa(data["particles_100um"], buffer, 10);
 		lv_label_set_text(labelParticlesNumber[4], buffer);
 
-		mySDCard.save(data, temp, humi, getMainTimestamp(Rtc), &sampleDB, &Serial);
-
 		dtostrf(temp, 10, 2, buffer);
 		lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
+
 		dtostrf(humi, 10, 2, buffer);
 		lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
+		lastSampleTimestamp = getMainTimestamp(Rtc);
+		mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
 		lv_task_reset(turnFanOn);
 		lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
 		digitalWrite(33, LOW);
-		//TODO led off
+		if(isLastSampleSaved()){
+			lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+			lv_obj_set_style_local_bg_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+			lv_obj_set_style_local_shadow_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+			lv_obj_set_style_local_shadow_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+		}
+		else{
+			lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+			lv_obj_set_style_local_bg_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+			lv_obj_set_style_local_shadow_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+			lv_obj_set_style_local_shadow_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
+		}
+
+
+
 	}
 	
 }
@@ -1162,7 +1186,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
 			if(Ping.ping(remote_ip, 1)) {
 				alertBox = lv_msgbox_create(time_settings_scr, NULL);
 				lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
-				lv_msgbox_set_text(alertBox, "Clock sucessfully synchronized.");
+				lv_msgbox_set_text(alertBox, "Time synchronized");
 				lv_msgbox_set_anim_time(alertBox, 0);
 				lv_msgbox_start_auto_close(alertBox, 5000);
 				lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -1441,7 +1465,7 @@ void timesettings_screen()
 
 	measure_number_label = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(measure_number_label, 5, 263);
-	lv_label_set_text(measure_number_label, "ilosc pomiarow:");
+	lv_label_set_text(measure_number_label, "Averaged samples");
 	lv_obj_set_style_local_text_color(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 	measure_number = lv_spinbox_create(time_scroll_page, NULL);
@@ -1468,7 +1492,7 @@ void timesettings_screen()
 	
 	measure_av_period_label = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(measure_av_period_label, 5, 353);
-	lv_label_set_text(measure_av_period_label, "ten czas:");
+	lv_label_set_text(measure_av_period_label, "Czas usredniania?");
 	lv_obj_set_style_local_text_color(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 	measure_av_period = lv_spinbox_create(time_scroll_page, NULL);
@@ -1495,7 +1519,7 @@ void timesettings_screen()
 
 	lockScreenLabel = lv_label_create(time_scroll_page, NULL);
 	lv_obj_set_pos(lockScreenLabel, 5, 415);
-	lv_label_set_text(lockScreenLabel, "Lock screen after: ");
+	lv_label_set_text(lockScreenLabel, "Lock screen after ");
 	lv_obj_set_style_local_text_color(lockScreenLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 	lockScreenDDlist = lv_dropdown_create(time_scroll_page, NULL);
 	lv_dropdown_set_options(lockScreenDDlist, "30 sec\n"
@@ -1512,11 +1536,10 @@ void timesettings_screen()
 	timeSettings_btn = lv_btn_create(time_scroll_page, NULL);
 	timeSettings_label = lv_label_create(timeSettings_btn, NULL);
 	lv_label_set_text(timeSettings_label, "Save");
-	lv_obj_set_style_local_border_opa(timeSettings_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_text_color(timeSettings_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);	
 	lv_obj_set_width(timeSettings_btn, 75);
 	lv_obj_set_pos(timeSettings_btn, 215, 465);	
 	lv_obj_set_event_cb(timeSettings_btn, timesettings_save_btn);
+	lv_obj_add_style(timeSettings_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 	
 	sync_rtc_btn = lv_btn_create(time_scroll_page, NULL);
 	sync_rtc_label = lv_label_create(sync_rtc_btn, NULL);
@@ -1778,7 +1801,14 @@ void main_screen()
 	lv_obj_align(labelAQIColorBar, NULL, LV_ALIGN_CENTER, 0, 0);
 	lv_label_set_text(labelAQIColorBar, "-"); 
 
-	//Function that draws lines and set text above those
+	ledAtMain = lv_led_create(main_scr, NULL);
+	lv_obj_set_size(ledAtMain, 10, 10);
+	lv_obj_set_pos(ledAtMain, 305, 225);
+	lv_led_set_bright(ledAtMain, 200);
+	lv_obj_set_style_local_bg_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+	lv_obj_set_style_local_shadow_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+
+	//Function that draws lines and st text above those
  	drawParticlesIndicator();
 }
 
@@ -1801,7 +1831,7 @@ void wifiList_screen()
 	lv_obj_add_style(back_wifilist_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
 	wifilistLabelAtBar = lv_label_create (contBarWiFiList, NULL);
-	lv_label_set_text(wifilistLabelAtBar, "WiFi list:");
+	lv_label_set_text(wifilistLabelAtBar, "WiFi list");
 
 	wifiList = lv_list_create(wifilist_scr, NULL);
 	lv_obj_set_size(wifiList, SCREEN_WIDTH, 128);	
@@ -1812,8 +1842,7 @@ void wifiList_screen()
 	refresh_btn = lv_btn_create(wifilist_scr, NULL);
 	refresh_label = lv_label_create(refresh_btn, NULL);
 	lv_label_set_text(refresh_label, "Refresh");
-	lv_obj_set_style_local_border_opa(refresh_label, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_text_color(refresh_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+		lv_obj_add_style(refresh_btn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
 	lv_obj_set_pos(refresh_btn, 185, 192);
 	lv_obj_set_event_cb(refresh_btn, refresh_btn_task);
 }
@@ -1876,8 +1905,7 @@ void wifi_screen()
 	apply_btn = lv_btn_create(wifi_scr, NULL);
 	apply_label = lv_label_create(apply_btn, NULL);
 	lv_label_set_text(apply_label, "Connect");
-	lv_obj_set_style_local_border_opa(apply_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-	lv_obj_set_style_local_text_color(apply_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+	lv_obj_add_style(apply_btn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
 	lv_obj_set_event_cb(apply_btn, btn_connect);
 	lv_obj_set_width(apply_btn, 75);
 	lv_obj_set_pos(apply_btn, 243, 43);
@@ -1896,12 +1924,12 @@ void lock_screen()
 
 	unlockButton = lv_btn_create(lock_scr, NULL);
 	labelUnlockButton = lv_label_create(unlockButton, NULL);
-	lv_obj_add_style(labelUnlockButton, LV_OBJ_PART_MAIN, &lockButtonStyle);
 	lv_obj_align(unlockButton, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
 	lv_label_set_text(labelUnlockButton, MY_UNLOCK_SYMBOL);
 	lv_btn_set_fit(unlockButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(unlockButton, unlockButton_task);
 	lv_obj_add_style(unlockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_set_style_local_text_font(unlockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
 
 	labelTimeLock = lv_label_create(contDateTimeAtLock, NULL);
 	lv_label_set_text(labelTimeLock, "Connect to wifi");
@@ -1932,81 +1960,13 @@ void lock_screen()
 	lv_label_set_text(sdStatusAtLockWarning, LV_SYMBOL_CLOSE);
 	lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
 	lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
-}
 
-void load_settings()
-{
-	File settings;
-	String stn="";
-	if(mySDCard.begin())
-	{
-		if(SD.exists("/settings.csv"))
-		{
-			settings = SD.open("/settings.csv", FILE_READ);
-			Serial.println("som");
-			while(settings.available())
-			{
-				stn += (char)settings.read();
-			}
-			int pos = stn.indexOf("%");
-			measure_period=stn.substring(0,stn.indexOf("%")).toInt();
-			stn[pos]='0';
-			lcd_lock_time=stn.substring(pos+1, stn.indexOf("%")).toInt();
-			pos = stn.indexOf("%");
-			stn[pos]='0';
-			samplesNumber = stn.substring(pos+1, stn.indexOf("%")).toInt();
-			averageTime = stn.substring(stn.indexOf("%")+1).toInt();
-			settings.close();
-			switch(lcd_lock_time)
-			{
-				case -1:
-					lv_dropdown_set_selected(lockScreenDDlist, 7);
-					break;
-				case 30000: 
-					lv_dropdown_set_selected(lockScreenDDlist, 0);
-					break;
-				case 60000: 
-					lv_dropdown_set_selected(lockScreenDDlist, 1);
-					break;
-				case 120000:
-					lv_dropdown_set_selected(lockScreenDDlist, 2);
-					break;
-				case 300000:
-					lv_dropdown_set_selected(lockScreenDDlist, 3);
-					break;
-				case 600000:
-					lv_dropdown_set_selected(lockScreenDDlist, 4);
-					break;
-				case 1800000:
-					lv_dropdown_set_selected(lockScreenDDlist, 5);
-					break;
-				case 3600000:
-					lv_dropdown_set_selected(lockScreenDDlist, 6);
-					break;
-			}
-		}else
-		{
-			settings = SD.open("/settings.csv", FILE_WRITE);
-			settings.print("3600000%60000");
-			settings.close();
-			measure_period=3600000;
-			lcd_lock_time=60000;
-			lv_dropdown_set_selected(lockScreenDDlist, 1);
-		}
-		
-	}
-	else
-	{
-		measure_period=3600000;
-		lcd_lock_time=60000;
-		samplesNumber=5;
-		averageTime=5000;
-		lv_dropdown_set_selected(lockScreenDDlist, 1);
-	}
-	lv_spinbox_set_value(measure_period_hour, ((measure_period/60000)/60));
-	lv_spinbox_set_value(measure_av_period, (averageTime/1000));
-	lv_spinbox_set_value(measure_number, samplesNumber);
-	lv_spinbox_set_value(measure_period_minute, ((measure_period/60000)%60));
+	ledAtLock = lv_led_create(lock_scr, NULL);
+	lv_obj_set_size(ledAtLock, 10, 10);
+	lv_obj_set_pos(ledAtLock, 305, 225);
+	lv_led_set_bright(ledAtLock, 200);
+	lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+	lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
 }
 
 void setup()
@@ -2049,7 +2009,6 @@ void setup()
 	lv_theme_set_act(th);
 	//Styles initialization functions
 	containerStyleInit();
-	lockButtonStyleInit();
 	font12StyleInit();
 	font16StyleInit();
 	font20StyleInit();
@@ -2082,12 +2041,17 @@ void setup()
 	timesettings_screen();
 	wifiList_screen();
 	lv_disp_load_scr(main_scr);
-	load_settings();
 
-	date = lv_task_create(dateTimeStatusFunc, 900, LV_TASK_PRIO_MID, NULL);
+	lv_dropdown_set_selected(lockScreenDDlist, mySDCard.loadConfig(measure_period, lcd_lock_time, samplesNumber, averageTime));
+
+	date = lv_task_create(dateTimeStatusFunc, 800, LV_TASK_PRIO_MID, NULL);
 	syn_rtc = lv_task_create_basic();
 	lv_task_set_cb(syn_rtc, config_time);
 	lv_task_set_period(syn_rtc, 3600000);
+	lv_spinbox_set_value(measure_period_hour, ((measure_period/60000)/60));
+	lv_spinbox_set_value(measure_av_period, (averageTime/1000));
+	lv_spinbox_set_value(measure_number, samplesNumber);
+	lv_spinbox_set_value(measure_period_minute, ((measure_period/60000)%60));
 
 	getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
 	turnFanOn = lv_task_create(turnFanOnFunc, measure_period-299999, LV_TASK_PRIO_HIGHEST, NULL);
