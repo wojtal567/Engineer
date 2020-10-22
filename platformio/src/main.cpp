@@ -528,7 +528,7 @@ void drawParticlesIndicator(){
 
 	labelNumberTitle = lv_label_create(main_scr, NULL);
 	lv_obj_set_pos(labelNumberTitle, 10, 215);
-	lv_label_set_text(labelNumberTitle, "N");
+	lv_label_set_text(labelNumberTitle, "Number");
 	lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
 
 }
@@ -1653,17 +1653,17 @@ void main_screen()
 */
 	wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
 	lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
-	lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 35, 0);
+	lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 55, 0);
 
 	sdStatusAtMain = lv_label_create(contBarAtMain, NULL);
 	lv_label_set_text(sdStatusAtMain, LV_SYMBOL_SD_CARD);
-	lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 65, 0);
+	lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 80, 0);
 
 	setButton = lv_btn_create(main_scr, NULL);
 	labelSetButton = lv_label_create(setButton, NULL);
 	lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
 	//lv_obj_set_pos(labelSetButton, 0, 0);
-	lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -45, -5);
+	lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -25, -5);
 	lv_btn_set_fit(setButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(setButton, setButton_task);
 	lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
@@ -1804,12 +1804,12 @@ void main_screen()
 	lv_label_set_text(labelAQIColorBar, "-"); 
 
 	ledAtMain = lv_led_create(main_scr, NULL);
-	lv_obj_set_size(ledAtMain, 10, 10);
-	lv_obj_set_pos(ledAtMain, 305, 225);
+	lv_obj_set_size(ledAtMain, 12, 12);
+	lv_obj_set_pos(ledAtMain, 13, 10);
 	lv_led_set_bright(ledAtMain, 200);
 	lv_obj_set_style_local_bg_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
 	lv_obj_set_style_local_shadow_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
-
+	lv_obj_set_style_local_border_opa(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 	//Function that draws lines and st text above those
  	drawParticlesIndicator();
 }
@@ -1964,11 +1964,12 @@ void lock_screen()
 	lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
 
 	ledAtLock = lv_led_create(lock_scr, NULL);
-	lv_obj_set_size(ledAtLock, 10, 10);
-	lv_obj_set_pos(ledAtLock, 305, 225);
+	lv_obj_set_size(ledAtLock, 12, 12);
+	lv_obj_set_pos(ledAtLock, 13, 10);
 	lv_led_set_bright(ledAtLock, 200);
 	lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
 	lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+	lv_obj_set_style_local_border_opa(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 }
 
 void setup()
