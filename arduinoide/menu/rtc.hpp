@@ -30,8 +30,8 @@ void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password)
 {
     char _ssid[24] = "-----------------------";
     char _password[24] = "-----------------------";
-	  Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid));
-	  Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password));
+    Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid));
+    Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password));
 
     for(int i = 0; i < 24; i++)
     {
@@ -39,7 +39,7 @@ void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password)
       _password[i] = password[i];
     }
 
-	  Rtc.SetMemory(53, 1);
+    Rtc.SetMemory(53, 1);
     Rtc.SetMemory(3, (const uint8_t*)_ssid, sizeof(_ssid)-1);
     Rtc.SetMemory(28, (const uint8_t*)_password, sizeof(_password)-1);
 }
@@ -50,9 +50,10 @@ String getCharArrrayFromRTC(RtcDS1307<TwoWire> &Rtc, int address)
   uint8_t gotten = Rtc.GetMemory(address, buff, sizeof(buff));
   String result = "";
   for (uint8_t ch = 0; ch < gotten; ch++)
-	  if((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && isAlphaNumeric((char)buff[ch]))
-    	result.concat((char)buff[ch]);
+    if((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && isAlphaNumeric((char)buff[ch]))
+      result.concat((char)buff[ch]);
 
+  result = result.substring(0, result.indexOf("-"));
   Serial.println(result.c_str());
   return result;
 }
@@ -116,4 +117,3 @@ String getTime(RtcDS1307<TwoWire> &Rtc)
     );
     return String(timestring);
 }
-
