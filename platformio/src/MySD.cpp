@@ -176,10 +176,12 @@ int MySD::loadConfig(int& measure_period, int& lcd_lock_time, uint& samplesNumbe
 		}else
 		{
 			settings = SD.open("/settings.csv", FILE_WRITE);
-			settings.print("3600000%60000");
+			settings.print("3600000%60000%5%5000");
 			settings.close();
 			measure_period=3600000;
 			lcd_lock_time=60000;
+            samplesNumber=5;
+            averageTime=5000;
 			return 1;
 		}
 		
