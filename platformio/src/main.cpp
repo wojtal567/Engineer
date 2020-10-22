@@ -463,13 +463,14 @@ void inactive_screen(lv_task_t *task)
 	}
 }
 bool isLastSampleSaved(){
-	JsonArray lastRecord;
-	mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);
+	StaticJsonDocument<600> docA;
+	JsonArray lastRecordToCheck = docA.to<JsonArray>();
+	mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecordToCheck);
 	Serial.print("Global: ");
 	Serial.print(lastSampleTimestamp);
 	Serial.print(" Baza: ");
-	Serial.print(lastRecord[0]["timestamp"].as<String>());
-	if(lastSampleTimestamp == lastRecord[0]["timestamp"].as<String>())
+	Serial.print(lastRecordToCheck[0]["timestamp"].as<String>());
+	if(lastSampleTimestamp == lastRecordToCheck[0]["timestamp"].as<String>())
 		return true;
 	else 
 		return false;
@@ -697,6 +698,7 @@ void getSampleFunc(lv_task_t *task)
 		dtostrf(humi, 10, 2, buffer);
 		lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
 		lastSampleTimestamp = getMainTimestamp(Rtc);
+		Serial.print("lastSampleTimestamp przed wrzuceniem do bazy: " + lastSampleTimestamp);
 		mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
 		lv_task_reset(turnFanOn);
 		lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
