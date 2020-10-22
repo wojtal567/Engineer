@@ -463,7 +463,8 @@ void inactive_screen(lv_task_t *task)
 	}
 }
 bool isLastSampleSaved(){
-	JsonArray lastRecordToCheck;
+	StaticJsonDocument<600> docA;
+	JsonArray lastRecordToCheck = docA.to<JsonArray>();
 	mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecordToCheck);
 	Serial.print("Global: ");
 	Serial.print(lastSampleTimestamp);
