@@ -524,7 +524,7 @@ void drawParticlesIndicator(){
 
   labelNumberTitle = lv_label_create(main_scr, NULL);
   lv_obj_set_pos(labelNumberTitle, 10, 215);
-  lv_label_set_text(labelNumberTitle, "N");
+  lv_label_set_text(labelNumberTitle, "Number");
   lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
 
 }
