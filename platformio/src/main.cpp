@@ -2096,7 +2096,7 @@ void setup()
 
 	getAppLastRecordAndSynchronize = lv_task_create_basic();
 	lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
-	lv_task_set_period(getAppLastRecordAndSynchronize, 3000);
+	lv_task_set_period(getAppLastRecordAndSynchronize, 300);
 
 	if (Rtc.GetMemory(53) == 1)
 	{
