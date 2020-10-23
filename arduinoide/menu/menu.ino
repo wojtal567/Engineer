@@ -15,6 +15,7 @@
 #include <ESP32Ping.h>
 #include <WebServer.h>
 //checking internet connection
+//checking internet connection
 const IPAddress remote_ip(216, 58, 207, 78);
 
 #define LVGL_TICK_PERIOD 60
@@ -544,6 +545,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
 
       if(responseCode >= 200 and responseCode < 300)
       {
+        //Serial.println("HTTP RESPONSE CODE: " + (String)responseCode);
         StaticJsonDocument<600> response, doc1;
 
         DeserializationError err = deserializeJson(response, getHttp.getString());
@@ -564,6 +566,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
           getHttp.POST(json);
           Serial.print("POST RESPONSE:" + getHttp.getString());
           getHttp.end();
+          //lv_task_ready(getAppLastRecordAndSynchronize);
 
         }
       }
@@ -626,6 +629,7 @@ void getSampleFunc(lv_task_t *task)
   } 
   if(currentSample==0)
   {
+    //TODO tu odpalenie tego leda ze pomiar idzie
     if (pmsSensor->readData())
     {
       std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
@@ -796,15 +800,29 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 
   if (touchX > SCREEN_WIDTH || touchY > SCREEN_HEIGHT)
   {
+    //Serial.println("Y or y outside of expected parameters..");
+    //Serial.print("y:");
+    //Serial.print(touchX);
+    //Serial.print(" x:");
+    //Serial.print(touchY);
   }
   else
   {
 
     data->state = touched ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-    
+
+    /*Save the state and save the pressed coordinate*/
+    //if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
+
     /*Set the coordinates (if released use the last pressed coordinates)*/
     data->point.x = touchX;
     data->point.y = touchY;
+
+    //Serial.print("Data x");
+    //Serial.println(touchX);
+    //
+    //Serial.print("Data y");
+    //Serial.println(touchY);
   }
 
   return false; /*Return `false` because we are not buffering and no more data to read*/
@@ -1574,6 +1592,7 @@ void settings_screen()
     lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_PRESSED, &set_time);
     lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_RELEASED, &set_time);
     lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_PRESSED, &set_time);
+//  lv_imgbtn_set_checkable(timeBtn, true);
     lv_obj_set_pos(timeBtn, 210, 55);
   lv_obj_set_event_cb(timeBtn, time_settings_btn);  
   
@@ -1631,19 +1650,21 @@ void main_screen()
 */
   wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
   lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
-  lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 35, 0);
+  lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 52, 0);
 
   sdStatusAtMain = lv_label_create(contBarAtMain, NULL);
   lv_label_set_text(sdStatusAtMain, LV_SYMBOL_SD_CARD);
-  lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 65, 0);
+  lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 77, 0);
 
   setButton = lv_btn_create(main_scr, NULL);
   labelSetButton = lv_label_create(setButton, NULL);
   lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
-  lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -45, -5);
+  //lv_obj_set_pos(labelSetButton, 0, 0);
+  lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -25, -5);
   lv_btn_set_fit(setButton, LV_FIT_TIGHT);
   lv_obj_set_event_cb(setButton, setButton_task);
   lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+  //lv_btn_set_layout(setButton, LV_LAYOUT_COLUMN_LEFT);
 
   wifiStatusAtMainWarning = lv_label_create(wifiStatusAtMain, NULL);
   lv_label_set_text(wifiStatusAtMainWarning, LV_SYMBOL_CLOSE);
@@ -1714,7 +1735,7 @@ void main_screen()
   labelTempValue = lv_label_create(contTemp, NULL);
   lv_obj_add_style(labelTempValue, LV_OBJ_PART_MAIN, &font20Style);
   lv_obj_set_pos(labelTempValue, 16, 22);
-  lv_label_set_text(labelTempValue, "");
+  lv_label_set_text(labelTempValue, "         -");
   lv_label_set_align(labelTempValue, LV_LABEL_ALIGN_LEFT);
   labelHumi = lv_label_create(contHumi, NULL);
   lv_obj_set_pos(labelHumi, 5, 3);
@@ -1723,7 +1744,7 @@ void main_screen()
   labelHumiValue = lv_label_create(contHumi, NULL);
   lv_obj_add_style(labelHumiValue, LV_OBJ_PART_MAIN, &font20Style);
   lv_obj_set_pos(labelHumiValue, 16, 22);
-  lv_label_set_text(labelHumiValue, "");
+  lv_label_set_text(labelHumiValue, "         -");
 
   labelPM10 = lv_label_create(contPM10, NULL);
   lv_obj_set_pos(labelPM10, 5, 5);
@@ -1738,6 +1759,7 @@ void main_screen()
   lv_label_set_text(labelPM25, "PM 2.5                ug/m");
 
   labelPM25UpperIndex = lv_label_create(contPM25, NULL);
+//  lv_obj_align(labelPM25, labelPM25UpperIndex, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
   lv_obj_set_pos(labelPM25UpperIndex, 167, 3);
   lv_label_set_text(labelPM25UpperIndex, "3");
   lv_obj_add_style(labelPM25UpperIndex, LV_OBJ_PART_MAIN, &font12Style);
@@ -1779,12 +1801,12 @@ void main_screen()
   lv_label_set_text(labelAQIColorBar, "-"); 
 
   ledAtMain = lv_led_create(main_scr, NULL);
-  lv_obj_set_size(ledAtMain, 10, 10);
-  lv_obj_set_pos(ledAtMain, 305, 225);
+  lv_obj_set_size(ledAtMain, 13, 13);
+  lv_obj_set_pos(ledAtMain, 13, 10);
   lv_led_set_bright(ledAtMain, 200);
   lv_obj_set_style_local_bg_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
   lv_obj_set_style_local_shadow_color(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
-
+  lv_obj_set_style_local_border_opa(ledAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
   //Function that draws lines and st text above those
   drawParticlesIndicator();
 }
@@ -1893,6 +1915,7 @@ void lock_screen()
   contDateTimeAtLock = lv_cont_create(lock_scr, NULL);
   lv_obj_set_auto_realign(contDateTimeAtLock, true);         
   lv_obj_align(contDateTimeAtLock, NULL, LV_ALIGN_CENTER, 0, -40);
+  //lv_cont_set_fit4(contDateTimeLock,   LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
   lv_cont_set_fit(contDateTimeAtLock, LV_FIT_TIGHT);
   lv_cont_set_layout(contDateTimeAtLock, LV_LAYOUT_PRETTY_MID);
   lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &containerStyle);
@@ -1938,11 +1961,12 @@ void lock_screen()
   lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
 
   ledAtLock = lv_led_create(lock_scr, NULL);
-  lv_obj_set_size(ledAtLock, 10, 10);
-  lv_obj_set_pos(ledAtLock, 305, 225);
+  lv_obj_set_size(ledAtLock, 13, 13);
+  lv_obj_set_pos(ledAtLock, 13, 10);
   lv_led_set_bright(ledAtLock, 200);
   lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
   lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+  lv_obj_set_style_local_border_opa(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 }
 
 void setup()
@@ -2069,3 +2093,4 @@ void loop()
     server.handleClient();
   delay(5);
 }
+
