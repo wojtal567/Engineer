@@ -14,12 +14,24 @@
 #include <time.h>
 #include <ESP32Ping.h>
 #include <WebServer.h>
-
 #include <Adafruit_GFX.h>
 #include <Adafruit_BusIO_Register.h>
 
-//checking internet connection
-const IPAddress remote_ip(216, 58, 207, 78);
+#define FAN_PIN 33        // * number of PIN which controls the PMS fan
+#define MY_SD_CARD_PIN 27 // * pin of SD_CS
+
+// ! CONFIG ============================================|
+std::string configFilePath = "/settings.json";
+
+Config config =
+    {
+        "",
+        "",
+        60000,
+        3600000,
+        5000,
+        5,
+        0};
 
 #define LVGL_TICK_PERIOD 60
 #define SCREEN_WIDTH 320
@@ -28,7 +40,6 @@ const IPAddress remote_ip(216, 58, 207, 78);
 
 //Include additional font with lock and unlock symbol
 extern lv_font_t monte16lock;
-
 #define MY_LOCK_SYMBOL "\xEF\x80\xA3"
 #define MY_UNLOCK_SYMBOL "\xEF\x82\x9C"
 
@@ -36,9 +47,7 @@ extern lv_font_t monte16lock;
 RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
 SHT3X sht30(0x45);
-uint currentSample = 0;
-uint samplesNumber = 5;
-int averageTime = 5000;
+
 std::map<std::string, uint16_t> data;
 const char *labels[15] = {
     "framelen",
@@ -72,25 +81,17 @@ TFT_eSPI tft = TFT_eSPI();
 static lv_disp_buf_t disp_buf;
 static lv_color_t buf[LV_HOR_RES_MAX * 10];
 
-//Time between sampling
-int measure_period;
-//inactive time
-int lcd_lock_time;
 //SD Card and sqlite database objects declaration
-MySD mySDCard(27);
+MySD mySDCard(MY_SD_CARD_PIN);
 SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
 String lastSampleTimestamp;
+
 //Is data synchronized variable
 bool date_synchronized = false;
-
 bool in_time_settings = false;
 bool time_changed = false;
 bool date_changed = false;
-
-//Wifi connection strings
-String ssid = "";
-String password = "";
 
 //Temperature, relative humidity and pm2.5 per ug/m3 variables
 float temp, humi, pm25Aqi;
@@ -99,13 +100,13 @@ float temp, humi, pm25Aqi;
 LV_IMG_DECLARE(wifi);
 LV_IMG_DECLARE(info);
 LV_IMG_DECLARE(set_time);
-//
 
 String airQualityStates[6] = {"Excellent", "Good", "Moderate", "Unhealthy", "Bad", "Hazardous"};
 String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
 float aqiStandards[5] = {21, 61, 101, 141, 201};
 int labelParticleSizePosX[6] = {56, 103, 153, 198, 245, 288};
-//--------------------------------------------REST WebServer config
+
+// ! --------------------------------------------REST WebServer config
 void setAppIp()
 {
     String postBody = server.arg("plain");
@@ -174,7 +175,7 @@ void handleNotFound()
     server.send(404, "text/plain", message);
 }
 
-//--------------------------------------------------styles
+// ? --------------------------------------------------styles
 //Basic container with white border and transparent background
 static lv_style_t containerStyle;
 void containerStyleInit(void)
@@ -226,6 +227,7 @@ static lv_style_t transparentButtonStyle;
 static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
 static lv_style_t toastListStyle;
+
 //Tiny symbols to signalize wifi and sd card status
 void tinySymbolStyleInit(void)
 {
@@ -272,7 +274,8 @@ void toastListStyleInit(void)
     lv_style_set_text_color(&toastListStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_radius(&toastListStyle, LV_STATE_DEFAULT, 0);
 }
-//--------------------------------------------------main gui
+
+// ? --------------------------------------------------main gui
 //Main screen objects declaration
 lv_obj_t *main_scr; //LVGL Object that represents main screen
 lv_obj_t *wifiStatusAtMain;
@@ -328,7 +331,7 @@ lv_obj_t *dividingLines[6];
 //An array of colors used depending on actual pm2.5 value
 lv_color_t airQualityColors[6] = {LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
 
-//--------------------------------------------------wifi gui
+// ? --------------------------------------------------wifi gui
 lv_obj_t *contBarAtMainWiFi;
 lv_obj_t *wifiLabelAtBar;
 lv_obj_t *wifi_scr;
@@ -343,7 +346,7 @@ lv_obj_t *cancel_btn;
 lv_obj_t *cancel_label;
 lv_obj_t *show_hide_btn;
 lv_obj_t *show_hide_btn_label;
-//-------------------------------------------------- wifilist gui
+// ? -------------------------------------------------- wifilist gui
 lv_obj_t *wifilist_scr;
 lv_obj_t *contBarWiFiList;
 lv_obj_t *wifilistLabelAtBar;
@@ -353,7 +356,7 @@ lv_obj_t *back_wifilist_label;
 lv_obj_t *loading_bar;
 lv_obj_t *refresh_btn;
 lv_obj_t *refresh_label;
-//-------------------------------------------------- info gui
+// ? -------------------------------------------------- info gui
 lv_obj_t *info_scr;
 lv_obj_t *contBarAtMaininfo;
 lv_obj_t *back_info_btn;
@@ -361,7 +364,7 @@ lv_obj_t *back_info_label;
 lv_obj_t *lcdLabelAtBar;
 lv_obj_t *info_wifi_label;
 lv_obj_t *info_wifi_address_label;
-//--------------------------------------------------settings gui
+// ? --------------------------------------------------settings gui
 lv_obj_t *settings_scr;
 lv_obj_t *contBarAtMainSettings;
 lv_obj_t *back_settings_btn;
@@ -370,7 +373,7 @@ lv_obj_t *settingsLabelAtBar;
 lv_obj_t *WiFiBtn;
 lv_obj_t *infoBtn;
 lv_obj_t *timeBtn;
-//--------------------------------------------------time settings gui
+// ? --------------------------------------------------time settings gui
 lv_obj_t *time_settings_scr;
 lv_obj_t *contBarAtTimeSettings;
 lv_obj_t *back_time_settings_btn;
@@ -425,8 +428,7 @@ lv_obj_t *timeSettings_label;
 lv_obj_t *sync_rtc_btn;
 lv_obj_t *sync_rtc_label;
 lv_obj_t *alertBox;
-
-//--------------------------------------------------lockscreen gui
+// ? --------------------------------------------------lockscreen gui
 lv_obj_t *lock_scr;
 lv_obj_t *contDateTimeAtLock;
 lv_obj_t *labelUnlockButton;
@@ -438,7 +440,7 @@ lv_obj_t *sdStatusAtLock;
 lv_obj_t *wifiStatusAtLockWarning;
 lv_obj_t *sdStatusAtLockWarning;
 lv_obj_t *ledAtLock;
-//--------------------------------------------------tasks
+// ? --------------------------------------------------tasks
 lv_task_t *turnFanOn;
 lv_task_t *getSample;
 lv_task_t *syn_rtc;
@@ -458,9 +460,9 @@ static void WiFi_SSID(lv_obj_t *obj, lv_event_t event)
 
 void inactive_screen(lv_task_t *task)
 {
-    if (lcd_lock_time != -1)
+    if (config.lcdLockTime != -1)
     {
-        if (lv_disp_get_inactive_time(NULL) > lcd_lock_time)
+        if (lv_disp_get_inactive_time(NULL) > config.lcdLockTime)
         {
             if (lv_scr_act() != lock_scr)
                 lv_disp_load_scr(lock_scr);
@@ -600,7 +602,7 @@ void config_time(lv_task_t *task)
 {
     if (WiFi.status() == WL_CONNECTED)
     {
-        if (Ping.ping(remote_ip, 1))
+        if (Ping.ping(ntpServerName, 1))
         {
             for (int i = 0; i < 500; i++)
                 dateTimeClient.update();
@@ -640,7 +642,7 @@ void getSampleFunc(lv_task_t *task)
         lv_task_ready(syn_rtc);
         wasUpdated = true;
     }
-    if (currentSample == 0)
+    if (config.currentSampleNumber == 0)
     {
         //TODO tu odpalenie tego leda ze pomiar idzie
         if (pmsSensor->readData())
@@ -648,13 +650,13 @@ void getSampleFunc(lv_task_t *task)
             std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
             pmsSensor->dumpSamples();
             data = tmpData;
-            currentSample++;
-            lv_task_set_period(getSample, averageTime);
+            config.currentSampleNumber++;
+            lv_task_set_period(getSample, config.measurePeriod);
             temp = sht30.cTemp;
             humi = sht30.humidity;
         }
     }
-    if (currentSample != 0 && currentSample < samplesNumber)
+    if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.countOfSamples)
     {
         std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
         pmsSensor->dumpSamples();
@@ -662,19 +664,19 @@ void getSampleFunc(lv_task_t *task)
         {
             data[labels[i]] += tmpData[labels[i]];
         }
-        currentSample++;
+        config.currentSampleNumber++;
         temp += sht30.cTemp;
         humi += sht30.humidity;
     }
-    if (currentSample == samplesNumber)
+    if (config.currentSampleNumber == config.countOfSamples)
     {
         char buffer[7];
         for (uint8_t i = 0; i < 15; i++)
-            data[labels[i]] = data[labels[i]] / samplesNumber;
-        currentSample = 0;
-        temp = temp / samplesNumber;
-        humi = humi / samplesNumber;
-        lv_task_set_period(getSample, measure_period);
+            data[labels[i]] = data[labels[i]] / config.countOfSamples;
+        config.currentSampleNumber = 0;
+        temp = temp / config.countOfSamples;
+        humi = humi / config.countOfSamples;
+        lv_task_set_period(getSample, config.timeBetweenSavingSample);
 
         itoa(data["pm10_standard"], buffer, 10);
         lv_label_set_text(labelPM10Data, buffer);
@@ -712,7 +714,7 @@ void getSampleFunc(lv_task_t *task)
         mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
         lv_task_reset(turnFanOn);
         lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
-        digitalWrite(33, LOW);
+        digitalWrite(FAN_PIN, LOW);
         if (isLastSampleSaved())
         {
             lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
@@ -863,12 +865,12 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
     {
         uint8_t wifiAttempts = 10;
 
-        ssid = lv_textarea_get_text(ssid_ta);
-        Serial.println(ssid);
-        password = lv_textarea_get_text(pwd_ta);
+        config.ssid = lv_textarea_get_text(ssid_ta);
+        Serial.println(config.ssid.c_str());
+        config.password = lv_textarea_get_text(pwd_ta);
 
-        saveWiFiToRtcMemory(Rtc, ssid, password);
-        WiFi.begin(ssid.c_str(), password.c_str());
+        //TODO saveWiFiToRtcMemory(Rtc, ssid, password);
+        WiFi.begin(config.ssid.c_str(), config.password.c_str());
         while (WiFi.status() != WL_CONNECTED and wifiAttempts > 0)
         {
             delay(500);
@@ -977,7 +979,7 @@ static void time_settings_btn(lv_obj_t *obj, lv_event_t event)
 //Function that turns fan on
 void turnFanOnFunc(lv_task_t *task)
 {
-    digitalWrite(33, HIGH);
+    digitalWrite(FAN_PIN, HIGH);
     lv_task_set_prio(turnFanOn, LV_TASK_PRIO_OFF);
 }
 
@@ -985,7 +987,7 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        switch (lcd_lock_time)
+        switch (config.lcdLockTime)
         {
         case 30000:
             lv_dropdown_set_selected(lockScreenDDlist, 0);
@@ -1009,8 +1011,8 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
             lv_dropdown_set_selected(lockScreenDDlist, 6);
             break;
         }
-        lv_spinbox_set_value(measure_period_hour, ((measure_period / 60000) / 60));
-        lv_spinbox_set_value(measure_period_minute, ((measure_period / 60000) % 60));
+        lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
+        lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
         lv_scr_load(settings_scr);
         in_time_settings = false;
         time_changed = false;
@@ -1034,39 +1036,39 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
         }
         else
         {
-            measure_period = get_value;
-            samplesNumber = lv_spinbox_get_value(measure_number);
-            averageTime = lv_spinbox_get_value(measure_av_period) * 1000;
-            getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
-            turnFanOn = lv_task_create(turnFanOnFunc, measure_period - 299999, LV_TASK_PRIO_HIGHEST, NULL);
+            config.timeBetweenSavingSample = get_value;
+            config.countOfSamples = lv_spinbox_get_value(measure_number);
+            config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
+            getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
+            turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - 299999, LV_TASK_PRIO_HIGHEST, NULL);
             switch (lv_dropdown_get_selected(lockScreenDDlist))
             {
             case 0:
-                lcd_lock_time = 30000;
+                config.lcdLockTime = 30000;
                 break;
             case 1:
-                lcd_lock_time = 60000;
+                config.lcdLockTime = 60000;
                 break;
             case 2:
-                lcd_lock_time = 120000;
+                config.lcdLockTime = 120000;
                 break;
             case 3:
-                lcd_lock_time = 300000;
+                config.lcdLockTime = 300000;
                 break;
             case 4:
-                lcd_lock_time = 600000;
+                config.lcdLockTime = 600000;
                 break;
             case 5:
-                lcd_lock_time = 1800000;
+                config.lcdLockTime = 1800000;
                 break;
             case 6:
-                lcd_lock_time = 3600000;
+                config.lcdLockTime = 3600000;
                 break;
             case 7:
-                lcd_lock_time = -1;
+                config.lcdLockTime = -1;
                 break;
             }
-            mySDCard.saveConfig(&sampleDB, measure_period, lcd_lock_time, samplesNumber, averageTime);
+            mySDCard.saveConfig(config, configFilePath);
             if (time_changed == true)
             {
                 String datet = lv_label_get_text(date_btn_label) + (String)lv_textarea_get_text(time_hour) + ":" + (String)lv_textarea_get_text(time_minute);
@@ -1201,7 +1203,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
     {
         if (WiFi.status() == WL_CONNECTED)
         {
-            if (Ping.ping(remote_ip, 1))
+            if (Ping.ping(ntpServerName, 1))
             {
                 alertBox = lv_msgbox_create(time_settings_scr, NULL);
                 lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
@@ -1987,10 +1989,62 @@ void lock_screen()
     lv_obj_set_style_local_border_opa(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
 }
 
+int getDDListIndexBasedOnLcdLockTime(int lcdLockTime)
+{
+    switch (lcdLockTime)
+    {
+    case -1:
+    {
+        return 7;
+        break;
+    }
+
+    case 30000:
+    {
+        return 0;
+        break;
+    }
+    case 60000:
+    {
+        return 1;
+        break;
+    }
+    case 120000:
+    {
+        return 2;
+        break;
+    }
+    case 300000:
+    {
+        return 3;
+        break;
+    }
+    case 600000:
+    {
+        return 4;
+        break;
+    }
+    case 1800000:
+    {
+        return 5;
+        break;
+    }
+    case 3600000:
+    {
+        return 6;
+        break;
+    }
+    default:
+    {
+        return 1;
+    }
+    }
+}
+
 void setup()
 {
-    pinMode(33, OUTPUT);
-    digitalWrite(33, LOW);
+    pinMode(FAN_PIN, OUTPUT);
+    digitalWrite(FAN_PIN, LOW);
     sqlite3_initialize();
     //Serial debug
     Serial.begin(115200);
@@ -2025,6 +2079,7 @@ void setup()
     //Set theme
     lv_theme_t *th = lv_theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY, LV_THEME_DEFAULT_FLAG, LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
     lv_theme_set_act(th);
+
     //Styles initialization functions
     containerStyleInit();
     font12StyleInit();
@@ -2036,6 +2091,7 @@ void setup()
     tinySymbolStyleInit();
     lineStyleInit();
     toastListStyleInit();
+
     main_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     settings_scr = lv_cont_create(NULL, NULL);
@@ -2050,6 +2106,7 @@ void setup()
     lv_obj_set_style_local_bg_color(wifilist_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lock_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+
     //Screens initialization function
     main_screen();
     wifi_screen();
@@ -2060,19 +2117,20 @@ void setup()
     wifiList_screen();
     lv_disp_load_scr(main_scr);
 
-    lv_dropdown_set_selected(lockScreenDDlist, mySDCard.loadConfig(measure_period, lcd_lock_time, samplesNumber, averageTime));
+    mySDCard.loadConfig(config, configFilePath);
+    lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
     date = lv_task_create(dateTimeStatusFunc, 800, LV_TASK_PRIO_MID, NULL);
     syn_rtc = lv_task_create_basic();
     lv_task_set_cb(syn_rtc, config_time);
     lv_task_set_period(syn_rtc, 3600000);
-    lv_spinbox_set_value(measure_period_hour, ((measure_period / 60000) / 60));
-    lv_spinbox_set_value(measure_av_period, (averageTime / 1000));
-    lv_spinbox_set_value(measure_number, samplesNumber);
-    lv_spinbox_set_value(measure_period_minute, ((measure_period / 60000) % 60));
+    lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
+    lv_spinbox_set_value(measure_av_period, (config.measurePeriod / 1000));
+    lv_spinbox_set_value(measure_number, config.countOfSamples);
+    lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
 
-    getSample = lv_task_create(getSampleFunc, measure_period, LV_TASK_PRIO_HIGH, NULL);
-    turnFanOn = lv_task_create(turnFanOnFunc, measure_period - 299999, LV_TASK_PRIO_HIGHEST, NULL);
+    getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
+    turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - 299999, LV_TASK_PRIO_HIGHEST, NULL);
     inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     listNetwork_task = lv_task_create(list_networks, 10000, LV_TASK_PRIO_OFF, NULL);
 
@@ -2082,9 +2140,10 @@ void setup()
 
     if (Rtc.GetMemory(53) == 1)
     {
-        ssid = getCharArrrayFromRTC(Rtc, 3);
-        password = getCharArrrayFromRTC(Rtc, 28);
-        WiFi.begin(ssid.c_str(), password.c_str());
+        // TODO
+        //config.ssid = getCharArrrayFromRTC(Rtc, 3);
+        //config.password = getCharArrrayFromRTC(Rtc, 28);
+        WiFi.begin(config.ssid.c_str(), config.password.c_str());
         volatile int attempts = 0;
         while (WiFi.status() != WL_CONNECTED and attempts != 20)
         {
