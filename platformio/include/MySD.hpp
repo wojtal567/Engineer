@@ -27,5 +27,5 @@ public:
     void getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray *array);
     void saveConfig(Config config, std::string filePath);
     void loadConfig(Config &config, std::string filePath);
-    void printConfig()
+    void printConfig(std::string filePath);
 };

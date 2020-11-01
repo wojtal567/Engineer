@@ -133,7 +133,10 @@ void MySD::loadConfig(Config &config, std::string filePath)
         File configurationFile = SD.open(filePath.c_str(), FILE_READ);
         if (!configurationFile)
         {
-            Serial.print("Failed to read configuration file.");
+            Serial.print("Failed to read configuration file. Creating file...");
+            configurationFile.close();
+            end();
+            saveConfig(config, filePath);
             return;
         }
 

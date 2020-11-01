@@ -735,7 +735,7 @@ void getSampleFunc(lv_task_t *task)
 void dateTimeStatusFunc(lv_task_t *task)
 {
 
-    if (Rtc.GetMemory(1) == 1)
+    if (Rtc.GetIsRunning())
     {
         lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
         lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
@@ -869,7 +869,8 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
         Serial.println(config.ssid.c_str());
         config.password = lv_textarea_get_text(pwd_ta);
 
-        //TODO saveWiFiToRtcMemory(Rtc, ssid, password);
+        mySDCard.saveConfig(config, configFilePath);
+        mySDCard.printConfig(configFilePath);
         WiFi.begin(config.ssid.c_str(), config.password.c_str());
         while (WiFi.status() != WL_CONNECTED and wifiAttempts > 0)
         {
@@ -1069,6 +1070,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
                 break;
             }
             mySDCard.saveConfig(config, configFilePath);
+            mySDCard.printConfig(configFilePath);
             if (time_changed == true)
             {
                 String datet = lv_label_get_text(date_btn_label) + (String)lv_textarea_get_text(time_hour) + ":" + (String)lv_textarea_get_text(time_minute);
@@ -2117,7 +2119,6 @@ void setup()
     wifiList_screen();
     lv_disp_load_scr(main_scr);
 
-    mySDCard.loadConfig(config, configFilePath);
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
     date = lv_task_create(dateTimeStatusFunc, 800, LV_TASK_PRIO_MID, NULL);
@@ -2137,12 +2138,11 @@ void setup()
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, 300);
-
-    if (Rtc.GetMemory(53) == 1)
+    mySDCard.loadConfig(config, configFilePath);
+    if (config.ssid != "")
     {
-        // TODO
-        //config.ssid = getCharArrrayFromRTC(Rtc, 3);
-        //config.password = getCharArrrayFromRTC(Rtc, 28);
+        mySDCard.printConfig(configFilePath);
+        Serial.print(getMainTimestamp(Rtc).c_str());
         WiFi.begin(config.ssid.c_str(), config.password.c_str());
         volatile int attempts = 0;
         while (WiFi.status() != WL_CONNECTED and attempts != 20)
