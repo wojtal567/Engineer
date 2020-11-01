@@ -880,6 +880,7 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 
         if (WiFi.status() == WL_CONNECTED)
         {
+            Rtc.SetIsRunning(true);
             dateTimeClient.begin();
             for (int i = 0; i < 3; i++)
                 dateTimeClient.update();
@@ -2153,6 +2154,7 @@ void setup()
         }
         if (WiFi.status() == WL_CONNECTED)
         {
+            Rtc.SetIsRunning(true);
             restServerRouting();
             server.onNotFound(handleNotFound);
             server.begin();
