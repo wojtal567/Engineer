@@ -1,39 +1,51 @@
 # ILI9341 GUI
 
-### SHT 30 AND RTC (I2C)
+# ESP32 modules wiring
 
-|||
-|---|--:|
-|VCC|3.3 V|
+### SHT30 (through I2C)
+|Module PIN|ESP32 PIN|
+|:-:|:-:|
+|3V3(VCC)|3V3(3.3 V)|
+|G(GND)|GND|
+|D1(SCL)|D22|
+|D2(SDA)|D21|
+
+### RTC DS 1307 (through I2C)
+
+|Module PIN|ESP32 PIN|
+|:-:|:-:|
+|VCC|3V3|
 |GND|GND|
 |SCL|D22|
 |SDA|D21|
 
+### ILI9341 TFT screen with touch sensor and SD card module(through hardware SPI)
 
-### SPI MODULES
-|||
-|---|--:|
-|RST|D2|
-|D/C|D15|
-|MOSI|D23|
-|SCK|D18|
-|MISO|D19|
-
-
-|IlI9341 TFT TOUCH DISPLAY||
-|---|--:|
-|VCC|3.3 V|
+|Module PIN|ESP32 PIN|
+|:-:|:-:|
+|VCC|VIN(5 V)|
 |GND|GND|
 |CS|D5|
-|LED|3.3 V|
+|RESET|D2|
+|DC|D15|
+|SDI(MOSI)|D23|
+|SCK|D18|
+|LED|3V3|
+|SDO(MISO)|D19|
+|T_CLK|D18|
+|T_CS|D14|
+|T_DIN|D23|
+|T_DO|D19|
+|T_IRQ|-|
+|SD_CS|D27|
+|SD_MOSI|D23|
+|SD_MISO|D19|
+|SD_SCK|D18|
 
-|TOUCH||
-|---|--:|
-|CS|D14|
-
-|SD CARD||
-|---|--:|
-|VCC|3.3 V|
-|GND|GND|
-|CS|D27|
-
+### Plantower PMS5003 Air Quality Sensor
+|Module PIN|ESP32 PIN|
+|:-:|:-:|
+|1(VCC)|VIN|
+|2(GND)|GND|
+|4(RX)|TX2|
+|5(TX)|RX2|
