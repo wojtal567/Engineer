@@ -205,6 +205,7 @@ lv_obj_t *back_info_label;
 lv_obj_t *lcdLabelAtBar;
 lv_obj_t *info_wifi_label;
 lv_obj_t *info_wifi_address_label;
+lv_obj_t *config_label;
 // ? --------------------------------------------------settings gui
 lv_obj_t *settings_scr;
 lv_obj_t *contBarAtMainSettings;

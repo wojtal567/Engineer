@@ -397,6 +397,10 @@ void info_screen()
     info_wifi_address_label = lv_label_create(info_scr, NULL);
     lv_obj_set_pos(info_wifi_address_label, 115, 53);
     lv_obj_set_style_local_text_color(info_wifi_address_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
+    config_label = lv_label_create(info_scr, NULL);
+    lv_obj_set_pos(config_label, 5, 70);
+    lv_obj_set_style_local_text_color(config_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
 
 void main_screen()

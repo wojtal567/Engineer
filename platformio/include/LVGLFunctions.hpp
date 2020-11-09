@@ -683,3 +683,17 @@ static void av_period_decrement(lv_obj_t *btn, lv_event_t event)
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
         lv_spinbox_decrement(measure_av_period);
 }
+
+void display_current_config()
+{
+    String current_config= (String)"SSID: " + config.ssid.c_str();
+    if(config.lcdLockTime==-1)
+    {
+        current_config+= (String)"\nCount of Samples: " + (String)config.countOfSamples + "\nLCD lock time: Never"  + 
+        + "\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: " + config.timeBetweenSavingSample/1000 + " sec"☺;
+    }
+    else
+        current_config+= (String)"\nCount of Samples: " + (String)config.countOfSamples + "\nLCD lock time: " + config.lcdLockTime/1000 + 
+        + " sec\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: " + config.timeBetweenSavingSample/1000 + " sec" ;
+    lv_label_set_text(config_label, current_config.c_str());
+}

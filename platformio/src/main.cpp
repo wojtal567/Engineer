@@ -305,6 +305,7 @@ void setup()
             server.begin();
         }
     }
+    display_current_config();
     delay(500);
     lv_task_ready(syn_rtc);
 }
