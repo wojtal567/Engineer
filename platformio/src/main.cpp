@@ -265,6 +265,8 @@ void setup()
     wifiList_screen();
     lv_disp_load_scr(main_scr);
 
+    mySDCard.loadConfig(config, configFilePath);
+    
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
     date = lv_task_create(dateTimeStatusFunc, 800, LV_TASK_PRIO_MID, NULL);
@@ -284,7 +286,6 @@ void setup()
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, 300);
-    mySDCard.loadConfig(config, configFilePath);
     if (config.ssid != "")
     {
         mySDCard.printConfig(configFilePath);

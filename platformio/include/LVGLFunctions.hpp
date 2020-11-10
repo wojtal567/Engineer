@@ -1,5 +1,29 @@
 #include <GlobalVariables.hpp>
 
+
+void display_current_config()
+{
+    String current_config= (String)"SSID: " + config.ssid.c_str();
+    current_config+= (String)"\nCount of Samples: " + (String)config.countOfSamples ;
+    if(config.lcdLockTime==-1)
+    {
+        current_config+= "\nLCD lock time: Never" + (String)"\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: "; 
+    }
+    else
+    {
+        current_config+= "\nLCD lock time: " + config.lcdLockTime/1000 + (String)" sec\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: ";
+    }
+    if(config.timeBetweenSavingSample>=3600000)
+    {
+        current_config+= config.timeBetweenSavingSample/ 60000 / 60 + (String)"h " + (config.timeBetweenSavingSample/60000 )%60 + (String)"min";
+    }
+    else
+    {
+        current_config+= (config.timeBetweenSavingSample/60000 )%60 + (String)"min";
+    }
+    lv_label_set_text(config_label, current_config.c_str());
+}
+
 //Function that turns fan on
 void turnFanOnFunc(lv_task_t *task)
 {
@@ -336,6 +360,9 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
     {
         switch (config.lcdLockTime)
         {
+        case -1:
+            lv_dropdown_set_selected(lockScreenDDlist, 7);
+            break;
         case 30000:
             lv_dropdown_set_selected(lockScreenDDlist, 0);
             break;
@@ -356,6 +383,9 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
             break;
         case 3600000:
             lv_dropdown_set_selected(lockScreenDDlist, 6);
+            break;
+        default:
+            lv_dropdown_set_selected(lockScreenDDlist, 1);
             break;
         }
         lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
@@ -414,6 +444,9 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
             case 7:
                 config.lcdLockTime = -1;
                 break;
+            default:
+                config.lcdLockTime = 60000;
+                break;
             }
             mySDCard.saveConfig(config, configFilePath);
             mySDCard.printConfig(configFilePath);
@@ -437,6 +470,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
             in_time_settings = false;
             time_changed = false;
             date_changed = false;
+            display_current_config();
         }
     }
 }
@@ -682,18 +716,4 @@ static void av_period_decrement(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
         lv_spinbox_decrement(measure_av_period);
-}
-
-void display_current_config()
-{
-    String current_config= (String)"SSID: " + config.ssid.c_str();
-    if(config.lcdLockTime==-1)
-    {
-        current_config+= (String)"\nCount of Samples: " + (String)config.countOfSamples + "\nLCD lock time: Never"  + 
-        + "\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: " + config.timeBetweenSavingSample/1000 + " sec"☺;
-    }
-    else
-        current_config+= (String)"\nCount of Samples: " + (String)config.countOfSamples + "\nLCD lock time: " + config.lcdLockTime/1000 + 
-        + " sec\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: " + config.timeBetweenSavingSample/1000 + " sec" ;
-    lv_label_set_text(config_label, current_config.c_str());
 }
