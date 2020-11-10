@@ -138,6 +138,15 @@ void dateTimeStatusFunc(lv_task_t *task)
     {
         lv_obj_set_hidden(sdStatusAtLockWarning, true);
         lv_obj_set_hidden(sdStatusAtMainWarning, true);
+        if(config.ssid=="" && config.password=="")
+        {            
+            mySDCard.loadWiFi(config, configFilePath);
+            mySDCard.saveConfig(config, configFilePath);
+        }
+        if(config.ssid!="" && config.password!="")
+        {            
+            WiFi.begin(config.ssid.c_str(), config.password.c_str());
+        }
     }
     else
     {

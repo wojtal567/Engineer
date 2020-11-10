@@ -6,22 +6,16 @@ void display_current_config()
     String current_config= (String)"SSID: " + config.ssid.c_str();
     current_config+= (String)"\nCount of Samples: " + (String)config.countOfSamples ;
     if(config.lcdLockTime==-1)
-    {
         current_config+= "\nLCD lock time: Never" ; 
-    }
-    else
-    {
-        current_config+= "\nLCD lock time: " + (String)(config.lcdLockTime/1000);
-    }
-    current_config += (String)" secs\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: ";
+    if(config.lcdLockTime==30000)
+        current_config+= "\nLCD lock time: 30 secs";
+    if(config.lcdLockTime>30000)
+        current_config += "\nLCD lock time: " + (String)(config.lcdLockTime/60000) + " mins";
+    current_config += (String)"\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: ";
     if(config.timeBetweenSavingSample>=3600000)
-    {
         current_config+= config.timeBetweenSavingSample/ 60000 / 60 + (String)"h " + (config.timeBetweenSavingSample/60000 )%60 + (String)"min";
-    }
     else
-    {
         current_config+= (config.timeBetweenSavingSample/60000 )%60 + (String)"min";
-    }
     lv_label_set_text(config_label, current_config.c_str());
 }
 

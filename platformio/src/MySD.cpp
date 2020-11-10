@@ -202,3 +202,36 @@ void MySD::printConfig(std::string filePath)
     }
     end();
 }
+
+void MySD::loadWiFi(Config &config, std::string filePath)
+{
+    if (begin())
+    {
+        File configurationFile = SD.open(filePath.c_str(), FILE_READ);
+        if (!configurationFile)
+        {
+            Serial.print("Failed to read configuration file. Creating file...");
+            configurationFile.close();
+            end();
+            saveConfig(config, filePath);
+            return;
+        }
+
+        StaticJsonDocument<512> doc;
+        DeserializationError error = deserializeJson(doc, configurationFile);
+
+        if (error)
+        {
+            Serial.println("Failed to read file, using default Configuration");
+            return;
+        }
+
+        char tmp[64];
+        strlcpy(tmp, doc["ssid"], sizeof(tmp));
+        config.ssid = tmp;
+        strlcpy(tmp, doc["password"], sizeof(tmp));
+        config.password = tmp;
+        configurationFile.close();
+    }
+    end();
+}

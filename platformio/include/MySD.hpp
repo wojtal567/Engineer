@@ -28,4 +28,5 @@ public:
     void saveConfig(Config config, std::string filePath);
     void loadConfig(Config &config, std::string filePath);
     void printConfig(std::string filePath);
+    void loadWiFi(Config &config, std::string filePath);
 };
