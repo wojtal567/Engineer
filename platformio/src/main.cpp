@@ -254,6 +254,8 @@ void setup()
     lv_obj_set_style_local_bg_color(wifilist_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lock_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    sampling_settings_scr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(sampling_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     //Screens initialization function
     main_screen();
@@ -263,6 +265,7 @@ void setup()
     info_screen();
     timesettings_screen();
     wifiList_screen();
+    samplingSettings_screen();
     lv_disp_load_scr(main_scr);
 
     mySDCard.loadConfig(config, configFilePath);
@@ -309,6 +312,8 @@ void setup()
     display_current_config();
     delay(500);
     lv_task_ready(syn_rtc);
+    
+    Serial.println(lv_obj_get_height(measure_number));
 }
 
 void loop()

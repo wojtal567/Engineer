@@ -383,8 +383,6 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
             lv_dropdown_set_selected(lockScreenDDlist, 1);
             break;
         }
-        lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
-        lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
         lv_scr_load(settings_scr);
         in_time_settings = false;
         time_changed = false;
@@ -396,24 +394,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000;
-        if (get_value < 300000)
-        {
-            alertBox = lv_msgbox_create(time_settings_scr, NULL);
-            lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
-            lv_msgbox_set_text(alertBox, "The minimum required sampling time is 5 mins.");
-            lv_msgbox_set_anim_time(alertBox, 0);
-            lv_msgbox_start_auto_close(alertBox, 5000);
-            lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
-        }
-        else
-        {
-            config.timeBetweenSavingSample = get_value;
-            config.countOfSamples = lv_spinbox_get_value(measure_number);
-            config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
-            getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
-            turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - 299999, LV_TASK_PRIO_HIGHEST, NULL);
-            switch (lv_dropdown_get_selected(lockScreenDDlist))
+        switch (lv_dropdown_get_selected(lockScreenDDlist))
             {
             case 0:
                 config.lcdLockTime = 30000;
@@ -466,7 +447,6 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
             time_changed = false;
             date_changed = false;
             display_current_config();
-        }
     }
 }
 
@@ -540,6 +520,12 @@ static void minute_decrement(lv_obj_t *btn, lv_event_t e)
             lv_spinbox_decrement(time_minute);
         time_changed = true;
     }
+}
+
+static void temp_settings_btn(lv_obj_t *obj, lv_event_t event)
+{
+    if(event == LV_EVENT_CLICKED)
+        lv_scr_load(sampling_settings_scr);
 }
 
 static void sampling_hour_increment(lv_obj_t *btn, lv_event_t e)
@@ -711,4 +697,42 @@ static void av_period_decrement(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
         lv_spinbox_decrement(measure_av_period);
+}
+
+static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
+{
+    if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+    {
+        int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000;
+        if (get_value < 300000)
+        {
+            alertBox = lv_msgbox_create(sampling_settings_scr, NULL);
+            lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
+            lv_msgbox_set_text(alertBox, "The minimum required sampling time is 5 mins.");
+            lv_msgbox_set_anim_time(alertBox, 0);
+            lv_msgbox_start_auto_close(alertBox, 5000);
+            lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
+        }
+        else
+        {
+            config.timeBetweenSavingSample = get_value;
+            config.countOfSamples = lv_spinbox_get_value(measure_number);
+            config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
+            getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
+            turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - 299999, LV_TASK_PRIO_HIGHEST, NULL);
+            mySDCard.saveConfig(config, configFilePath);
+            mySDCard.printConfig(configFilePath);
+            lv_scr_load(main_scr);
+        }
+    }
+}
+
+static void sampling_settings_back_btn(lv_obj_t *btn, lv_event_t event)
+{
+    if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+    {
+        lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
+        lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
+        lv_scr_load(settings_scr);
+    }
 }

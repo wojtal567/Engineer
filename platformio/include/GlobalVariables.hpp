@@ -215,6 +215,7 @@ lv_obj_t *settingsLabelAtBar;
 lv_obj_t *WiFiBtn;
 lv_obj_t *infoBtn;
 lv_obj_t *timeBtn;
+lv_obj_t *tempBtn;
 // ? --------------------------------------------------time settings gui
 lv_obj_t *time_settings_scr;
 lv_obj_t *contBarAtTimeSettings;
@@ -240,6 +241,21 @@ lv_obj_t *date_btn_label;
 
 lv_obj_t *calendar;
 
+lv_obj_t *lockScreenLabel;
+lv_obj_t *lockScreenDDlist;
+
+lv_obj_t *timeSettings_btn;
+lv_obj_t *timeSettings_label;
+lv_obj_t *sync_rtc_btn;
+lv_obj_t *sync_rtc_label;
+lv_obj_t *alertBox;
+// ? -------------------------------------------------- second settings gui
+lv_obj_t *sampling_settings_scr;
+lv_obj_t *contBarAtSampling;
+lv_obj_t *back_sampling_settings_btn;
+lv_obj_t *back_sampling_settings_label;
+lv_obj_t *SamplingSettingsLabelAtBar;
+
 lv_obj_t *measure_period_label;
 
 lv_obj_t *measure_period_hour;
@@ -262,14 +278,9 @@ lv_obj_t *measure_av_period;
 lv_obj_t *measure_av_period_increment;
 lv_obj_t *measure_av_period_decrement;
 
-lv_obj_t *lockScreenLabel;
-lv_obj_t *lockScreenDDlist;
+lv_obj_t *sampling_save_btn;
+lv_obj_t *sampling_save_label;
 
-lv_obj_t *timeSettings_btn;
-lv_obj_t *timeSettings_label;
-lv_obj_t *sync_rtc_btn;
-lv_obj_t *sync_rtc_label;
-lv_obj_t *alertBox;
 // ? --------------------------------------------------lockscreen gui
 lv_obj_t *lock_scr;
 lv_obj_t *contDateTimeAtLock;
