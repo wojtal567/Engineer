@@ -26,7 +26,7 @@ Config config =
         5,
         0};
 
-uint turnFanTime = 20000; //ms
+uint turnFanTime = 59999; //ms
 int ntpTimeOffset = 3600; //poland, winter - 3600, summer (DST) - 7200 
 
 #define LVGL_TICK_PERIOD 60

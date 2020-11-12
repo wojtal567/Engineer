@@ -71,13 +71,13 @@ void getSampleFunc(lv_task_t *task)
     }
     if (config.currentSampleNumber == 0)
     {
+        lv_task_set_period(getSample, config.measurePeriod);
         if (pmsSensor->readData())
         {
             std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
             pmsSensor->dumpSamples();
             data = tmpData;
             config.currentSampleNumber++;
-            lv_task_set_period(getSample, config.measurePeriod);
             temp = sht30.cTemp;
             humi = sht30.humidity;
         }
@@ -553,7 +553,18 @@ static void sampling_minute_increment(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        lv_spinbox_increment(measure_period_minute);
+        if(lv_spinbox_get_value(measure_period_minute)==59)
+        {
+            if(lv_spinbox_get_value(measure_period_hour)!=24)
+            {
+                lv_spinbox_set_value(measure_period_minute, 0);
+                lv_spinbox_increment(measure_period_hour);
+            }
+        }
+        else
+        {
+            lv_spinbox_increment(measure_period_minute);
+        }        
     }
 }
 
@@ -561,7 +572,15 @@ static void sampling_minute_decrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        lv_spinbox_decrement(measure_period_minute);
+        if(lv_spinbox_get_value(measure_period_minute)==0)
+        {
+            lv_spinbox_set_value(measure_period_minute, 59);
+            lv_spinbox_decrement(measure_period_hour);
+        }
+        if(!(lv_spinbox_get_value(measure_period_minute)==5 && lv_spinbox_get_value(measure_period_hour)==0))
+        {
+            lv_spinbox_decrement(measure_period_minute);
+        }            
     }
 }
 
@@ -709,26 +728,14 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
         int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000;
-        if (get_value < 300000)
-        {
-            alertBox = lv_msgbox_create(sampling_settings_scr, NULL);
-            lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
-            lv_msgbox_set_text(alertBox, "The minimum required sampling time is 5 mins.");
-            lv_msgbox_set_anim_time(alertBox, 0);
-            lv_msgbox_start_auto_close(alertBox, 5000);
-            lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
-        }
-        else
-        {
-            config.timeBetweenSavingSample = get_value;
-            config.countOfSamples = lv_spinbox_get_value(measure_number);
-            config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
-            getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
-            turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
-            mySDCard.saveConfig(config, configFilePath);
-            mySDCard.printConfig(configFilePath);
-            lv_scr_load(main_scr);
-        }
+        config.timeBetweenSavingSample = get_value;
+        config.countOfSamples = lv_spinbox_get_value(measure_number);
+        config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
+        getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
+        turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
+        mySDCard.saveConfig(config, configFilePath);
+        mySDCard.printConfig(configFilePath);
+        lv_scr_load(main_scr);
     }
 }
 
