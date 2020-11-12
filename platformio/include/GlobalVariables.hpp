@@ -26,6 +26,9 @@ Config config =
         5,
         0};
 
+uint turnFanTime = 20000; //ms
+int ntpTimeOffset = 3600; //poland, winter - 3600, summer (DST) - 7200 
+
 #define LVGL_TICK_PERIOD 60
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
@@ -62,7 +65,7 @@ const char *labels[15] = {
 //NTPClient declarations
 static const char ntpServerName[] = "europe.pool.ntp.org";
 WiFiUDP ntpUDP;
-NTPClient dateTimeClient(ntpUDP, ntpServerName, 7200);
+NTPClient dateTimeClient(ntpUDP, ntpServerName, ntpTimeOffset);
 bool wasUpdated = false;
 
 //Webserver
