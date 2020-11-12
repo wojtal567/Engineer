@@ -69,6 +69,18 @@ void getSampleFunc(lv_task_t *task)
         lv_task_ready(syn_rtc);
         wasUpdated = true;
     }
+    if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.countOfSamples)
+    {
+        std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
+        pmsSensor->dumpSamples();
+        for (uint8_t i = 0; i < 15; i++)
+        {
+            data[labels[i]] += tmpData[labels[i]];
+        }
+        config.currentSampleNumber++;
+        temp += sht30.cTemp;
+        humi += sht30.humidity;
+    }
     if (config.currentSampleNumber == 0)
     {
         lv_task_set_period(getSample, config.measurePeriod);
@@ -81,18 +93,6 @@ void getSampleFunc(lv_task_t *task)
             temp = sht30.cTemp;
             humi = sht30.humidity;
         }
-    }
-    if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.countOfSamples)
-    {
-        std::map<std::string, uint16_t> tmpData = pmsSensor->returnData();
-        pmsSensor->dumpSamples();
-        for (uint8_t i = 0; i < 15; i++)
-        {
-            data[labels[i]] += tmpData[labels[i]];
-        }
-        config.currentSampleNumber++;
-        temp += sht30.cTemp;
-        humi += sht30.humidity;
     }
     if (config.currentSampleNumber == config.countOfSamples)
     {
@@ -577,7 +577,7 @@ static void sampling_minute_decrement(lv_obj_t *btn, lv_event_t e)
             lv_spinbox_set_value(measure_period_minute, 59);
             lv_spinbox_decrement(measure_period_hour);
         }
-        if(!(lv_spinbox_get_value(measure_period_minute)==5 && lv_spinbox_get_value(measure_period_hour)==0))
+        if(!(lv_spinbox_get_value(measure_period_minute)==1 && lv_spinbox_get_value(measure_period_hour)==0))
         {
             lv_spinbox_decrement(measure_period_minute);
         }            
