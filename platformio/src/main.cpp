@@ -239,7 +239,7 @@ void setup()
     tinySymbolStyleInit();
     lineStyleInit();
     toastListStyleInit();
-
+    hugeTransparentButtonStyleInit();
     main_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     settings_scr = lv_cont_create(NULL, NULL);
@@ -266,6 +266,7 @@ void setup()
     timesettings_screen();
     wifiList_screen();
     samplingSettings_screen();
+    
     lv_disp_load_scr(main_scr);
 
     mySDCard.loadConfig(config, configFilePath);

@@ -39,6 +39,12 @@ extern lv_font_t monte16lock;
 #define MY_LOCK_SYMBOL "\xEF\x80\xA3"
 #define MY_UNLOCK_SYMBOL "\xEF\x82\x9C"
 
+extern lv_font_t hugeSymbolsFont48;
+#define MY_INFO_SYMBOL "\xEF\x81\x9A"
+#define MY_CLOCK_SYMBOL "\xEF\x80\x97"
+#define MY_WIFI_SYMBOL "\xEF\x87\xAB"
+#define MY_COGS_SYMBOL "\xEF\x82\x85"
+
 //RTC, PMS5003 and SHT30 objects declaration
 RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
@@ -115,6 +121,7 @@ static lv_style_t font22Style;
 //Additional styles with initalization functions
 static lv_style_t tinySymbolStyle;
 static lv_style_t transparentButtonStyle;
+static lv_style_t hugeTransparentButtonStyle;
 static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
 static lv_style_t toastListStyle;
@@ -215,10 +222,19 @@ lv_obj_t *contBarAtMainSettings;
 lv_obj_t *back_settings_btn;
 lv_obj_t *back_settings_label;
 lv_obj_t *settingsLabelAtBar;
-lv_obj_t *WiFiBtn;
+lv_obj_t *wifiBtn;
 lv_obj_t *infoBtn;
 lv_obj_t *timeBtn;
+lv_obj_t *wifiBtnLabel;
+lv_obj_t *infoBtnLabel;
+lv_obj_t *timeBtnLabel;
 lv_obj_t *tempBtn;
+lv_obj_t *tempBtnLabel;
+lv_obj_t *wifiBtnName;
+lv_obj_t *infoBtnName;
+lv_obj_t *timeBtnName;
+lv_obj_t *tempBtnName;
+
 // ? --------------------------------------------------time settings gui
 lv_obj_t *time_settings_scr;
 lv_obj_t *contBarAtTimeSettings;

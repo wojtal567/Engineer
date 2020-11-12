@@ -68,6 +68,18 @@ void whiteButtonStyleInit(void)
     lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 }
 
+
+void hugeTransparentButtonStyleInit(void)
+{
+    lv_style_init(&hugeTransparentButtonStyle);
+    lv_style_set_bg_opa(&hugeTransparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
+    lv_style_set_border_width(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_outline_width(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_radius(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_text_color(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_font(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, &hugeSymbolsFont48);
+}
+
 void lineStyleInit(void)
 {
     lv_style_init(&lineStyle);
@@ -227,36 +239,57 @@ void settings_screen()
     settingsLabelAtBar = lv_label_create(contBarAtMainSettings, NULL);
     lv_label_set_text(settingsLabelAtBar, "Settings");
 
-    WiFiBtn = lv_imgbtn_create(settings_scr, NULL);
-    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_RELEASED, &wifi);
-    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_PRESSED, &wifi);
-    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_RELEASED, &wifi);
-    lv_imgbtn_set_src(WiFiBtn, LV_BTN_STATE_CHECKED_PRESSED, &wifi);
+    wifiBtn = lv_btn_create(settings_scr, NULL);
+    wifiBtnLabel = lv_label_create(wifiBtn, NULL);
+    lv_obj_set_size(wifiBtn, 60, 60);
+    lv_obj_set_pos(wifiBtn, 70, 45);
+    lv_label_set_text(wifiBtnLabel, MY_WIFI_SYMBOL);
+    lv_obj_set_event_cb(wifiBtn, WiFi_btn);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
 
-    lv_obj_set_pos(WiFiBtn, 10, 55);
-    lv_obj_set_event_cb(WiFiBtn, WiFi_btn);
+    wifiBtnName = lv_label_create(settings_scr, NULL);
+    lv_label_set_text(wifiBtnName, "WiFi");
+    lv_obj_set_pos(wifiBtnName, 73, 110);
+    lv_obj_add_style(wifiBtnName, LV_OBJ_PART_MAIN, &font20Style);
 
-    infoBtn = lv_imgbtn_create(settings_scr, NULL);
-    lv_imgbtn_set_src(infoBtn, LV_STATE_DEFAULT, &info);
-    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_PRESSED, &info);
-    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_CHECKED_RELEASED, &info);
-    lv_imgbtn_set_src(infoBtn, LV_BTN_STATE_CHECKED_PRESSED, &info);
-
-    lv_obj_set_pos(infoBtn, 110, 55);
+    infoBtn = lv_btn_create(settings_scr, NULL);
+    infoBtnLabel = lv_label_create(infoBtn, NULL);
+    lv_obj_set_size(infoBtn, 60, 60);
+    lv_obj_set_pos(infoBtn, 190, 45);
+    lv_label_set_text(infoBtnLabel, MY_INFO_SYMBOL);
     lv_obj_set_event_cb(infoBtn, info_btn);
+    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+    
+    infoBtnName = lv_label_create(settings_scr, NULL);
+    lv_label_set_text(infoBtnName, "Info");
+    lv_obj_set_pos(infoBtnName, 197, 110);
+    lv_obj_add_style(infoBtnName, LV_OBJ_PART_MAIN, &font20Style);
 
-    timeBtn = lv_imgbtn_create(settings_scr, NULL);
-    lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_RELEASED, &set_time);
-    lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_PRESSED, &set_time);
-    lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_RELEASED, &set_time);
-    lv_imgbtn_set_src(timeBtn, LV_BTN_STATE_CHECKED_PRESSED, &set_time);
-    //  lv_imgbtn_set_checkable(timeBtn, true);
-    lv_obj_set_pos(timeBtn, 210, 55);
+    timeBtn = lv_btn_create(settings_scr, NULL);
+    timeBtnLabel = lv_label_create(timeBtn, NULL);
+    lv_obj_set_size(timeBtn, 60, 60);
+    lv_obj_set_pos(timeBtn, 70, 140);
+    lv_label_set_text(timeBtnLabel, MY_CLOCK_SYMBOL);
     lv_obj_set_event_cb(timeBtn, time_settings_btn);
+    lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+
+    timeBtnName = lv_label_create(settings_scr, NULL);
+    lv_label_set_text(timeBtnName, "Time");
+    lv_obj_set_pos(timeBtnName, 75, 200);
+    lv_obj_add_style(timeBtnName, LV_OBJ_PART_MAIN, &font20Style);
 
     tempBtn = lv_btn_create(settings_scr, NULL);
-    lv_obj_set_pos(tempBtn, 100, 20);
+    tempBtnLabel = lv_label_create(tempBtn, NULL);
+    lv_obj_set_size(tempBtn, 60, 60);
+    lv_obj_set_pos(tempBtn, 190, 140);
+    lv_label_set_text(tempBtnLabel, MY_COGS_SYMBOL);
     lv_obj_set_event_cb(tempBtn, temp_settings_btn);
+    lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+    
+    tempBtnName = lv_label_create(settings_scr, NULL);
+    lv_label_set_text(tempBtnName, "Sampling");
+    lv_obj_set_pos(tempBtnName, 170, 200);
+    lv_obj_add_style(tempBtnName, LV_OBJ_PART_MAIN, &font20Style);
 }
 
 void info_screen()
