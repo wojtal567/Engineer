@@ -303,15 +303,17 @@ void main_screen()
     lv_obj_add_style(contBarAtMain, LV_OBJ_PART_MAIN, &containerStyle);
     lv_obj_set_style_local_border_opa(contBarAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
     lv_obj_set_click(contBarAtMain, false);
-    /*
+ 
 	lockButton = lv_btn_create(main_scr, NULL);
-	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &lockButtonStyle);
+	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
 	labelLockButton = lv_label_create(lockButton, NULL);
-	lv_obj_align(lockButton, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 40, -55);
+    lv_obj_align(lockButton, NULL, LV_ALIGN_IN_TOP_LEFT, 37, -5);
 	lv_label_set_text(labelLockButton, MY_LOCK_SYMBOL);
 	lv_btn_set_fit(lockButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(lockButton, lockButton_task);
-*/
+    
+
     wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
     lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
     lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 52, 0);
@@ -323,12 +325,11 @@ void main_screen()
     setButton = lv_btn_create(main_scr, NULL);
     labelSetButton = lv_label_create(setButton, NULL);
     lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
-    //lv_obj_set_pos(labelSetButton, 0, 0);
     lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -25, -5);
     lv_btn_set_fit(setButton, LV_FIT_TIGHT);
     lv_obj_set_event_cb(setButton, setButton_task);
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-    //lv_btn_set_layout(setButton, LV_LAYOUT_COLUMN_LEFT);
+
 
     wifiStatusAtMainWarning = lv_label_create(wifiStatusAtMain, NULL);
     lv_label_set_text(wifiStatusAtMainWarning, LV_SYMBOL_CLOSE);
