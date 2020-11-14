@@ -685,7 +685,7 @@ void samplingSettings_screen()
     lv_obj_add_style(back_sampling_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
     SamplingSettingsLabelAtBar = lv_label_create(contBarAtSampling, NULL);
-    lv_label_set_text(SamplingSettingsLabelAtBar, "WIP");
+    lv_label_set_text(SamplingSettingsLabelAtBar, "Sampling settings");
 
     measure_period_label = lv_label_create(sampling_settings_scr, NULL);
     lv_obj_set_pos(measure_period_label, 5, 61);
