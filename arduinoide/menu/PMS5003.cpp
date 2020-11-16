@@ -16,6 +16,7 @@ bool PMS5003::readData()
         _reader->println("Debugger unavailable");
         return false;
     }*/
+    _debugger->println("ELO");
     if (_reader->peek() != 0x42) 
     {
         _reader->read();

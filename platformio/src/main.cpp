@@ -137,58 +137,6 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 
-int getDDListIndexBasedOnLcdLockTime(int lcdLockTime)
-{
-    switch (lcdLockTime)
-    {
-    case -1:
-    {
-        return 7;
-        break;
-    }
-
-    case 30000:
-    {
-        return 0;
-        break;
-    }
-    case 60000:
-    {
-        return 1;
-        break;
-    }
-    case 120000:
-    {
-        return 2;
-        break;
-    }
-    case 300000:
-    {
-        return 3;
-        break;
-    }
-    case 600000:
-    {
-        return 4;
-        break;
-    }
-    case 1800000:
-    {
-        return 5;
-        break;
-    }
-    case 3600000:
-    {
-        return 6;
-        break;
-    }
-    default:
-    {
-        return 1;
-    }
-    }
-}
-
 void setup()
 {
     pinMode(FAN_PIN, OUTPUT);

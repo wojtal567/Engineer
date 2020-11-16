@@ -770,7 +770,7 @@ void samplingSettings_screen()
 
     measure_av_period_label = lv_label_create(sampling_settings_scr, NULL);
     lv_obj_set_pos(measure_av_period_label, 5, 170);
-    lv_label_set_text(measure_av_period_label, "Czas usredniania?");
+    lv_label_set_text(measure_av_period_label, "Measure period:");
     lv_obj_set_style_local_text_color(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measure_av_period = lv_spinbox_create(sampling_settings_scr, NULL);
