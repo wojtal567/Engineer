@@ -93,7 +93,7 @@ void list_networks(lv_task_t *task)
 }
 
 
-void dateTimeStatusFunc(lv_task_t *task)
+void dateTimeFunc(lv_task_t *task)
 {
 
     if (Rtc.GetIsRunning())
@@ -114,6 +114,10 @@ void dateTimeStatusFunc(lv_task_t *task)
             lv_label_set_text(date_btn_label, "01.01.2020");
     }
 
+}
+
+void statusFunc(lv_task_t *task)
+{
     if (WiFi.status() == WL_CONNECTED)
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, true);

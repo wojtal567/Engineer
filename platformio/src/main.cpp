@@ -221,7 +221,8 @@ void setup()
     
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
-    date = lv_task_create(dateTimeStatusFunc, 800, LV_TASK_PRIO_MID, NULL);
+    date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
+    status = lv_task_create(statusFunc, 10000, LV_TASK_PRIO_LOW, NULL);
     syn_rtc = lv_task_create_basic();
     lv_task_set_cb(syn_rtc, config_time);
     lv_task_set_period(syn_rtc, 3600000);
