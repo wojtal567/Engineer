@@ -640,36 +640,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
     if (event == LV_EVENT_CLICKED)
     {
         if (WiFi.status() == WL_CONNECTED)
-        {
-            if (Ping.ping(ntpServerName, 1))
-            {
-                alertBox = lv_msgbox_create(time_settings_scr, NULL);
-                lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
-                lv_msgbox_set_text(alertBox, "Time synchronized");
-                lv_msgbox_set_anim_time(alertBox, 0);
-                lv_msgbox_start_auto_close(alertBox, 5000);
-                lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
-                lv_task_ready(syn_rtc);
-            }
-            else
-            {
-                alertBox = lv_msgbox_create(time_settings_scr, NULL);
-                lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
-                lv_msgbox_set_text(alertBox, "No internet connection.");
-                lv_msgbox_set_anim_time(alertBox, 0);
-                lv_msgbox_start_auto_close(alertBox, 5000);
-                lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
-            }
-        }
-        else
-        {
-            alertBox = lv_msgbox_create(time_settings_scr, NULL);
-            lv_obj_add_style(alertBox, LV_STATE_DEFAULT, &toastListStyle);
-            lv_msgbox_set_text(alertBox, "No WiFi connection.");
-            lv_msgbox_set_anim_time(alertBox, 0);
-            lv_msgbox_start_auto_close(alertBox, 5000);
-            lv_obj_align(alertBox, NULL, LV_ALIGN_CENTER, 0, 0);
-        }
+            lv_task_ready(syn_rtc);
     }
 }
 

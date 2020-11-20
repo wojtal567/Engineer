@@ -68,17 +68,10 @@ void config_time(lv_task_t *task)
 {
     if (WiFi.status() == WL_CONNECTED)
     {
-        if (Ping.ping(ntpServerName, 1))
-        {
-            for (int i = 0; i < 500; i++)
-                dateTimeClient.update();
-            configTime(Rtc, dateTimeClient);
-            wasUpdated = true;
-        }
-        else
-        {
-            wasUpdated = false;
-        }
+        for (int i = 0; i < 500; i++)
+            dateTimeClient.update();
+        configTime(Rtc, dateTimeClient);
+        wasUpdated = true;
     }
     else
     {

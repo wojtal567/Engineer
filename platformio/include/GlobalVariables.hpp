@@ -8,7 +8,6 @@
 #include <NTPClient.h>
 #include <WebServer.h>
 #include <TFT_eSPI.h>
-#include <ESP32Ping.h>
 
 #define FAN_PIN 33        // * number of PIN which controls the PMS fan
 #define MY_SD_CARD_PIN 27 // * pin of SD_CS
