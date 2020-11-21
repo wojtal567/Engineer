@@ -68,7 +68,6 @@ void whiteButtonStyleInit(void)
     lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 }
 
-
 void hugeTransparentButtonStyleInit(void)
 {
     lv_style_init(&hugeTransparentButtonStyle);
@@ -576,6 +575,7 @@ void wifi_screen()
     lv_textarea_set_one_line(ssid_ta, true);
     lv_textarea_set_cursor_hidden(ssid_ta, true);
     lv_obj_set_width(ssid_ta, LV_HOR_RES / 2 - 20);
+    lv_obj_set_event_cb(ssid_ta, ta_event_cb);
     lv_obj_set_pos(ssid_ta, 100, 45);
 
     pwd_label = lv_label_create(wifi_scr, NULL);

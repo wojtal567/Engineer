@@ -265,26 +265,21 @@ static void WiFi_SSID(lv_obj_t *obj, lv_event_t event)
     }
 }
 
-static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
+static void ta_event_cb(lv_obj_t * ta, lv_event_t event)
 {
-    if (event == LV_EVENT_CLICKED)
-    {
-        if (keyboard == NULL)
+    if(event == LV_EVENT_CLICKED) {
+        if(keyboard==NULL)
         {
-            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
-            lv_keyboard_set_textarea(keyboard, ta);
+          keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+          lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES/2);
+          lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+          lv_keyboard_set_textarea(keyboard, ta);
         }
-        else
-        {
-            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+         if(keyboard != NULL)
             lv_keyboard_set_textarea(keyboard, ta);
-        }
     }
 }
+
 
 static void btn_connect(lv_obj_t *obj, lv_event_t event)
 {
@@ -346,7 +341,7 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_disp_load_scr(wifilist_scr);
+        lv_disp_load_scr(main_scr);
         lv_textarea_set_text(ssid_ta, "");
         lv_textarea_set_text(pwd_ta, "");
     }
@@ -371,10 +366,10 @@ static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_list_clean(wifiList);
-        lv_scr_load(wifilist_scr);
-        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
-        lv_task_reset(listNetwork_task);
+        //lv_list_clean(wifiList);
+        lv_scr_load(wifi_scr);
+        //lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
+        //lv_task_reset(listNetwork_task);
         startbar();
     }
 }
