@@ -573,7 +573,6 @@ void wifi_screen()
     lv_textarea_set_text(ssid_ta, "");
     lv_textarea_set_pwd_mode(ssid_ta, false);
     lv_textarea_set_one_line(ssid_ta, true);
-    lv_textarea_set_cursor_hidden(ssid_ta, true);
     lv_obj_set_width(ssid_ta, LV_HOR_RES / 2 - 20);
     lv_obj_set_event_cb(ssid_ta, ta_event_cb);
     lv_obj_set_pos(ssid_ta, 100, 45);
@@ -588,7 +587,6 @@ void wifi_screen()
     lv_textarea_set_pwd_mode(pwd_ta, true);
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_event_cb(pwd_ta, ta_event_cb);
-    lv_textarea_set_cursor_hidden(pwd_ta, true);
     lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
     lv_obj_set_pos(pwd_ta, 100, 85);
     show_hide_btn = lv_btn_create(wifi_scr, NULL);
