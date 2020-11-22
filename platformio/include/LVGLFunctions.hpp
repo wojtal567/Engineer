@@ -265,20 +265,27 @@ static void WiFi_SSID(lv_obj_t *obj, lv_event_t event)
     }
 }
 
-static void ta_event_cb(lv_obj_t * ta, lv_event_t event)
+static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 {
-    if(event == LV_EVENT_CLICKED) {
-        if(keyboard==NULL)
+    if (event == LV_EVENT_CLICKED)
+    {
+        if (keyboard == NULL)
         {
-          keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-          lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES/2);
-          lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
-          lv_keyboard_set_textarea(keyboard, ta);
-        }
-         if(keyboard != NULL)
+            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
+            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
             lv_keyboard_set_textarea(keyboard, ta);
+        }
+        else
+        {
+            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
+            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+            lv_keyboard_set_textarea(keyboard, ta);
+        }
     }
 }
+
 
 
 static void btn_connect(lv_obj_t *obj, lv_event_t event)
@@ -362,15 +369,26 @@ void startbar()
     lv_bar_set_value(loading_bar, 100, LV_ANIM_ON);
 }
 
+void list_networks()
+{
+    int SSID_number = WiFi.scanNetworks();
+    lv_obj_t *listbtn;
+    for (int thisNet = 0; thisNet < SSID_number; thisNet++)
+    {
+        listbtn = lv_list_add_btn(wifiList, NULL, WiFi.SSID(thisNet).c_str());
+        lv_obj_set_event_cb(listbtn, WiFi_SSID);
+        lv_obj_add_style(listbtn, LV_STATE_DEFAULT, &toastListStyle);
+    }
+}
+
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        //lv_list_clean(wifiList);
-        lv_scr_load(wifi_scr);
-        //lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
-        //lv_task_reset(listNetwork_task);
-        startbar();
+        lv_list_clean(wifiList);
+        lv_scr_load(wifilist_scr);
+        list_networks();
+        //startbar();
     }
 }
 
@@ -379,9 +397,8 @@ static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
     if (event == LV_EVENT_CLICKED)
     {
         lv_list_clean(wifiList);
-        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
-        lv_task_reset(listNetwork_task);
-        startbar();
+        list_networks();
+        //startbar();
     }
 }
 

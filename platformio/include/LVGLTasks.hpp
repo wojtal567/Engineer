@@ -79,20 +79,6 @@ void config_time(lv_task_t *task)
     }
 }
 
-void list_networks(lv_task_t *task)
-{
-    int SSID_number = WiFi.scanNetworks();
-    lv_obj_t *listbtn;
-    for (int thisNet = 0; thisNet < SSID_number; thisNet++)
-    {
-        listbtn = lv_list_add_btn(wifiList, NULL, WiFi.SSID(thisNet).c_str());
-        lv_obj_set_event_cb(listbtn, WiFi_SSID);
-        lv_obj_add_style(listbtn, LV_STATE_DEFAULT, &toastListStyle);
-    }
-    lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_OFF);
-}
-
-
 void dateTimeFunc(lv_task_t *task)
 {
 
