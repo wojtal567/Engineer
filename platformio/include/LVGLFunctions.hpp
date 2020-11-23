@@ -256,35 +256,35 @@ void drawParticlesIndicator()
     lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
 }
 
-static void WiFi_SSID(lv_obj_t *obj, lv_event_t event)
-{
-    if (event == LV_EVENT_CLICKED)
-    {
-        lv_textarea_set_text(ssid_ta, lv_list_get_btn_text(obj));
-        lv_scr_load(wifi_scr);
-    }
-}
-
 static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 {
-    if (event == LV_EVENT_CLICKED)
-    {
-        if (keyboard == NULL)
+	if (event == LV_EVENT_CLICKED)
+	{
+        if(ta==ssid_ta)
         {
-            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
-            lv_keyboard_set_textarea(keyboard, ta);
+            lv_textarea_set_cursor_hidden(ssid_ta, false);
+            lv_textarea_set_cursor_hidden(pwd_ta, true);
         }
-        else
+        if(ta==pwd_ta)
         {
-            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
-            lv_keyboard_set_textarea(keyboard, ta);
+            lv_textarea_set_cursor_hidden(pwd_ta, false);
+            lv_textarea_set_cursor_hidden(ssid_ta, true);
         }
-    }
+        
+		if (keyboard == NULL)
+		{
+			keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+			lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
+			lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+			lv_keyboard_set_textarea(keyboard, ta);
+		}
+		else
+		{
+			lv_keyboard_set_textarea(keyboard, ta);
+		}
+	}
 }
+
 
 static void btn_connect(lv_obj_t *obj, lv_event_t event)
 {
@@ -346,7 +346,7 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_disp_load_scr(wifilist_scr);
+        lv_disp_load_scr(settings_scr);
         lv_textarea_set_text(ssid_ta, "");
         lv_textarea_set_text(pwd_ta, "");
     }
@@ -358,41 +358,11 @@ static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
         lv_disp_load_scr(main_scr);
 }
 
-void startbar()
-{
-    loading_bar = lv_bar_create(wifilist_scr, NULL);
-    lv_obj_set_size(loading_bar, 175, 20);
-    lv_obj_set_pos(loading_bar, 5, 205);
-    lv_bar_set_anim_time(loading_bar, 10500);
-    lv_bar_set_value(loading_bar, 100, LV_ANIM_ON);
-}
-
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        for(int index = lv_list_get_size(wifiList); index>0; index--)
-        {
-            lv_list_remove(wifiList, index-1);
-        }
-        lv_scr_load(wifilist_scr);
-        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_LOWEST);
-        lv_task_reset(listNetwork_task);
-        startbar();
-    }
-}
-
-static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
-{
-    if (event == LV_EVENT_CLICKED)
-    {
-        for(int index = lv_list_get_size(wifiList); index>0; index--)
-        {
-            lv_list_remove(wifiList, index-1);
-        }
-        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_LOWEST);
-        lv_task_reset(listNetwork_task);
-        startbar();
+        lv_scr_load(wifi_scr);
     }
 }
 

@@ -196,19 +196,6 @@ lv_obj_t *cancel_btn;
 lv_obj_t *cancel_label;
 lv_obj_t *show_hide_btn;
 lv_obj_t *show_hide_btn_label;
-// ? -------------------------------------------------- wifilist gui
-lv_obj_t *wifilist_scr;
-lv_obj_t *contBarWiFiList;
-lv_obj_t *wifilistLabelAtBar;
-lv_obj_t *wifiList;
-lv_obj_t *back_wifilist_btn;
-lv_obj_t *back_wifilist_label;
-lv_obj_t *loading_bar;
-lv_obj_t *refresh_btn;
-lv_obj_t *refresh_label;
-
-
-lv_obj_t *listbtn;
 // ? -------------------------------------------------- info gui
 lv_obj_t *info_scr;
 lv_obj_t *contBarAtMaininfo;
@@ -322,4 +309,3 @@ lv_task_t *getAppLastRecordAndSynchronize;
 lv_task_t *inactive_time;
 lv_task_t *date;
 lv_task_t *status;
-lv_task_t *listNetwork_task;

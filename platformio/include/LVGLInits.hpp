@@ -508,41 +508,6 @@ void main_screen()
     drawParticlesIndicator();
 }
 
-void wifiList_screen()
-{
-    contBarWiFiList = lv_cont_create(wifilist_scr, NULL);
-    lv_obj_set_auto_realign(contBarWiFiList, true);
-    lv_obj_align(contBarWiFiList, NULL, LV_ALIGN_IN_TOP_MID, 0, -5);
-    lv_cont_set_fit4(contBarWiFiList, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarWiFiList, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarWiFiList, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarWiFiList, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarWiFiList, false);
-
-    back_wifilist_btn = lv_btn_create(contBarWiFiList, NULL);
-    back_wifilist_label = lv_label_create(back_wifilist_btn, NULL);
-    lv_label_set_text(back_wifilist_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_wifilist_btn, 30, 15);
-    lv_obj_set_event_cb(back_wifilist_btn, setButton_task);
-    lv_obj_add_style(back_wifilist_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-
-    wifilistLabelAtBar = lv_label_create(contBarWiFiList, NULL);
-    lv_label_set_text(wifilistLabelAtBar, "WiFi list");
-
-    wifiList = lv_list_create(wifilist_scr, NULL);
-    lv_obj_set_size(wifiList, SCREEN_WIDTH, 128);
-    lv_obj_align(wifiList, NULL, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_local_bg_color(wifiList, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
-    lv_obj_set_style_local_border_color(wifiList, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
-
-    refresh_btn = lv_btn_create(wifilist_scr, NULL);
-    refresh_label = lv_label_create(refresh_btn, NULL);
-    lv_label_set_text(refresh_label, "Refresh");
-    lv_obj_add_style(refresh_btn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
-    lv_obj_set_pos(refresh_btn, 185, 192);
-    lv_obj_set_event_cb(refresh_btn, refresh_btn_task);
-}
-
 void wifi_screen()
 {
     contBarAtMainWiFi = lv_cont_create(wifi_scr, NULL);
@@ -572,8 +537,9 @@ void wifi_screen()
     ssid_ta = lv_textarea_create(wifi_scr, NULL);
     lv_textarea_set_text(ssid_ta, "");
     lv_textarea_set_pwd_mode(ssid_ta, false);
-    lv_textarea_set_one_line(ssid_ta, true);
-    //lv_textarea_set_cursor_hidden(ssid_ta, true);
+    lv_textarea_set_one_line(ssid_ta, true);    
+    lv_obj_set_event_cb(ssid_ta, ta_event_cb);
+    lv_textarea_set_cursor_hidden(ssid_ta, true);
     lv_obj_set_width(ssid_ta, LV_HOR_RES / 2 - 20);
     lv_obj_set_pos(ssid_ta, 100, 45);
 
@@ -587,7 +553,7 @@ void wifi_screen()
     lv_textarea_set_pwd_mode(pwd_ta, true);
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_event_cb(pwd_ta, ta_event_cb);
-    //lv_textarea_set_cursor_hidden(pwd_ta, true);
+    lv_textarea_set_cursor_hidden(pwd_ta, true);
     lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
     lv_obj_set_pos(pwd_ta, 100, 85);
 
