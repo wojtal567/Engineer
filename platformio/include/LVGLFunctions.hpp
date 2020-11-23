@@ -371,7 +371,10 @@ static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_list_clean(wifiList);
+        for(int index = lv_list_get_size(wifiList); index>0; index--)
+        {
+            lv_list_remove(wifiList, index-1);
+        }
         lv_scr_load(wifilist_scr);
         lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_LOWEST);
         lv_task_reset(listNetwork_task);
@@ -383,7 +386,10 @@ static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_list_clean(wifiList);
+        for(int index = lv_list_get_size(wifiList); index>0; index--)
+        {
+            lv_list_remove(wifiList, index-1);
+        }
         lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_LOWEST);
         lv_task_reset(listNetwork_task);
         startbar();
