@@ -286,8 +286,6 @@ static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
     }
 }
 
-
-
 static void btn_connect(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED and ((lv_textarea_get_text(ssid_ta) != NULL and lv_textarea_get_text(ssid_ta) != '\0') or (lv_textarea_get_text(pwd_ta) != NULL and lv_textarea_get_text(pwd_ta) != '\0')))
@@ -348,7 +346,7 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_disp_load_scr(main_scr);
+        lv_disp_load_scr(wifilist_scr);
         lv_textarea_set_text(ssid_ta, "");
         lv_textarea_set_text(pwd_ta, "");
     }
@@ -369,26 +367,15 @@ void startbar()
     lv_bar_set_value(loading_bar, 100, LV_ANIM_ON);
 }
 
-void list_networks()
-{
-    int SSID_number = WiFi.scanNetworks();
-    lv_obj_t *listbtn;
-    for (int thisNet = 0; thisNet < SSID_number; thisNet++)
-    {
-        listbtn = lv_list_add_btn(wifiList, NULL, WiFi.SSID(thisNet).c_str());
-        lv_obj_set_event_cb(listbtn, WiFi_SSID);
-        lv_obj_add_style(listbtn, LV_STATE_DEFAULT, &toastListStyle);
-    }
-}
-
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
         lv_list_clean(wifiList);
         lv_scr_load(wifilist_scr);
-        list_networks();
-        //startbar();
+        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
+        lv_task_reset(listNetwork_task);
+        startbar();
     }
 }
 
@@ -397,8 +384,9 @@ static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
     if (event == LV_EVENT_CLICKED)
     {
         lv_list_clean(wifiList);
-        list_networks();
-        //startbar();
+        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
+        lv_task_reset(listNetwork_task);
+        startbar();
     }
 }
 

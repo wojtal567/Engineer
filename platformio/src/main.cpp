@@ -234,6 +234,7 @@ void setup()
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
     inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
+    listNetwork_task = lv_task_create(list_networks, 10000, LV_TASK_PRIO_OFF, NULL);
 
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);

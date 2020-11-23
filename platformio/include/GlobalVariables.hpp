@@ -319,3 +319,4 @@ lv_task_t *getAppLastRecordAndSynchronize;
 lv_task_t *inactive_time;
 lv_task_t *date;
 lv_task_t *status;
+lv_task_t *listNetwork_task;
