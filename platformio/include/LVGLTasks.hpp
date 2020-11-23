@@ -92,7 +92,6 @@ void list_networks(lv_task_t *task)
     lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_OFF);
 }
 
-
 void dateTimeFunc(lv_task_t *task)
 {
 

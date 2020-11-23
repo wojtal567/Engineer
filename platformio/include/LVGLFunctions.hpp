@@ -373,7 +373,7 @@ static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
     {
         lv_list_clean(wifiList);
         lv_scr_load(wifilist_scr);
-        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
+        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_LOWEST);
         lv_task_reset(listNetwork_task);
         startbar();
     }
@@ -384,7 +384,7 @@ static void refresh_btn_task(lv_obj_t *obj, lv_event_t event)
     if (event == LV_EVENT_CLICKED)
     {
         lv_list_clean(wifiList);
-        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_MID);
+        lv_task_set_prio(listNetwork_task, LV_TASK_PRIO_LOWEST);
         lv_task_reset(listNetwork_task);
         startbar();
     }
