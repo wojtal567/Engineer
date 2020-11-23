@@ -196,8 +196,6 @@ void setup()
     lv_obj_set_style_local_bg_color(time_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     wifi_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(wifi_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    wifilist_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(wifilist_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lock_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     sampling_settings_scr = lv_cont_create(NULL, NULL);
@@ -210,7 +208,6 @@ void setup()
     settings_screen();
     info_screen();
     timesettings_screen();
-    wifiList_screen();
     samplingSettings_screen();
     
     lv_disp_load_scr(main_scr);
@@ -219,7 +216,8 @@ void setup()
     
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
-    date = lv_task_create(dateTimeStatusFunc, 800, LV_TASK_PRIO_MID, NULL);
+    date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
+    status = lv_task_create(statusFunc, 10000, LV_TASK_PRIO_LOW, NULL);
     syn_rtc = lv_task_create_basic();
     lv_task_set_cb(syn_rtc, config_time);
     lv_task_set_period(syn_rtc, 3600000);
@@ -231,8 +229,6 @@ void setup()
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
     inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
-    listNetwork_task = lv_task_create(list_networks, 10000, LV_TASK_PRIO_OFF, NULL);
-
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, 300);
