@@ -464,7 +464,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
                 Serial.println(datet);
                 RtcDateTime *dt = new RtcDateTime(atoi(datet.substring(6, 10).c_str()), atoi(datet.substring(3, 6).c_str()), atoi(datet.substring(0, 2).c_str()), datet.substring(10, 12).toDouble(), datet.substring(13, 15).toDouble(), 0);
                 Rtc.SetDateTime(*dt);
-                Rtc.SetMemory(1, 1);
+                Rtc.SetIsRunning(true);
             }
             if (date_changed == true)
             {
@@ -472,7 +472,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
                 String date = lv_label_get_text(date_btn_label);
                 RtcDateTime *dt = new RtcDateTime(atoi(date.substring(6).c_str()), atoi(date.substring(3, 6).c_str()), atoi(date.substring(0, 2).c_str()), ori.Hour(), ori.Minute(), ori.Second());
                 Rtc.SetDateTime(*dt);
-                Rtc.SetMemory(1, 1);
+                Rtc.SetIsRunning(true);
             }
             lv_disp_load_scr(main_scr);
             in_time_settings = false;
