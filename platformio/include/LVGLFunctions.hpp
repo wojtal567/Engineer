@@ -734,6 +734,7 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);
         lv_scr_load(main_scr);
+        display_current_config();
     }
 }
 
