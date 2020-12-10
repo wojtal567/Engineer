@@ -234,6 +234,7 @@ void setup()
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, 300);
+    lv_task_handler();
     if (config.ssid != "")
     {
         mySDCard.printConfig(configFilePath);
@@ -257,8 +258,6 @@ void setup()
     display_current_config();
     delay(500);
     lv_task_ready(syn_rtc);
-    
-    Serial.println(lv_obj_get_height(measure_number));
 }
 
 void loop()
