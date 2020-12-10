@@ -117,6 +117,7 @@ void MySD::saveConfig(Config config, std::string filePath)
         doc["measurePeriod"] = config.measurePeriod;
         doc["countOfSamples"] = config.countOfSamples;
         doc["currentSampleNumber"] = config.currentSampleNumber;
+        doc["turnFanTime"] = config.turnFanTime;
         if (serializeJson(doc, configurationFile) == 0)
         {
             Serial.println("Failed to write to file.");
@@ -159,6 +160,7 @@ void MySD::loadConfig(Config &config, std::string filePath)
         config.measurePeriod = doc["measurePeriod"];
         config.countOfSamples = doc["countOfSamples"];
         config.currentSampleNumber = doc["currentSampleNumber"];
+        config.turnFanTime = doc["turnFanTime"];
         configurationFile.close();
     }
     end();

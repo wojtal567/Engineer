@@ -219,7 +219,7 @@ void setup()
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
-    status = lv_task_create(statusFunc, 10000, LV_TASK_PRIO_LOW, NULL);
+    status = lv_task_create(statusFunc, 700, LV_TASK_PRIO_LOW, NULL);
     syn_rtc = lv_task_create_basic();
     lv_task_set_cb(syn_rtc, config_time);
     lv_task_set_period(syn_rtc, 3600000);
@@ -229,7 +229,7 @@ void setup()
     lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
 
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
-    turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
+    turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
     inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);

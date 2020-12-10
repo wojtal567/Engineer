@@ -23,9 +23,9 @@ Config config =
         3600000,
         5000,
         5,
-        0};
+        0,
+        20000};
 
-uint turnFanTime = 20000; //ms
 int ntpTimeOffset = 3600; //poland, winter - 3600, summer (DST) - 7200 
 
 #define LVGL_TICK_PERIOD 60
@@ -285,6 +285,12 @@ lv_obj_t *measure_av_period_label;
 lv_obj_t *measure_av_period;
 lv_obj_t *measure_av_period_increment;
 lv_obj_t *measure_av_period_decrement;
+
+lv_obj_t *turn_fan_on_time_label;
+lv_obj_t *turn_fan_on_time;
+lv_obj_t *turn_fan_on_time_increment;
+lv_obj_t *turn_fan_on_time_decrement;
+
 
 lv_obj_t *sampling_save_btn;
 lv_obj_t *sampling_save_label;

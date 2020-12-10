@@ -709,6 +709,18 @@ static void measure_number_decrement_func(lv_obj_t *btn, lv_event_t event)
         lv_spinbox_decrement(measure_number);
 }
 
+static void turn_fan_on_time_increment_func(lv_obj_t *btn, lv_event_t event)
+{
+    if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+        lv_spinbox_increment(turn_fan_on_time);
+}
+
+static void turn_fan_on_time_decrement_func(lv_obj_t *btn, lv_event_t event)
+{
+    if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+        lv_spinbox_decrement(turn_fan_on_time);
+}
+
 static void av_period_increment(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
@@ -730,7 +742,7 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
         config.countOfSamples = lv_spinbox_get_value(measure_number);
         config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
         getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
-        turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
+        turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);
         lv_scr_load(main_scr);

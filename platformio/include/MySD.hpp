@@ -10,6 +10,7 @@ struct Config
     int measurePeriod;           // * time of taking samples to calculate average
     uint countOfSamples;         // * count of samples used to calculate average sample
     uint currentSampleNumber;    // * number of currently taken sample
+    int turnFanTime;             // * time of turning fan on
 };
 
 class MySD
