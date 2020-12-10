@@ -5,7 +5,7 @@ PMS5003::PMS5003(HardwareSerial *reader, HardwareSerial *debugger)
     _reader = reader;
     _debugger = debugger;
     for(uint16_t i = 0; i < VALUES; i++)
-        data.insert(std::pair<std::string, uint16_t>(std::string (labels[i]), i));
+        data.insert(std::pair<std::string, int16_t>(std::string (labels[i]), i));
 }
 
 bool PMS5003::readData()
@@ -16,7 +16,6 @@ bool PMS5003::readData()
         _reader->println("Debugger unavailable");
         return false;
     }*/
-    _debugger->println("ELO");
     if (_reader->peek() != 0x42) 
     {
         _reader->read();
@@ -32,7 +31,7 @@ bool PMS5003::readData()
         
     
     uint8_t buffer[BUFFERSIZE];    
-    uint16_t checkSum {0};
+    int16_t checkSum {0};
 
     _reader->readBytes(buffer, BUFFERSIZE);
 
@@ -62,7 +61,7 @@ bool PMS5003::readData()
     return true;
 }
 
-std::map<std::string, uint16_t> PMS5003::returnData()
+std::map<std::string, int16_t> PMS5003::returnData()
 {
     return data;
 }

@@ -9,7 +9,7 @@
 #include <WebServer.h>
 #include <TFT_eSPI.h>
 
-#define FAN_PIN 33        // * number of PIN which controls the PMS fan
+#define FAN_PIN 4        // * number of PIN which controls the PMS fan
 #define MY_SD_CARD_PIN 27 // * pin of SD_CS
 
 // ! CONFIG ============================================|
@@ -49,7 +49,7 @@ RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
 SHT3X sht30(0x45);
 
-std::map<std::string, uint16_t> data;
+std::map<std::string, int16_t> data;
 const char *labels[15] = {
     "framelen",
     "pm10_standard",
