@@ -118,7 +118,7 @@ void timesettings_screen()
 
     time_label = lv_label_create(time_settings_scr, NULL);
     lv_obj_set_pos(time_label, 5, 70);
-    lv_label_set_text(time_label, "Time (Hrs:Min)");
+    lv_label_set_text(time_label, "Time [HH:MM]");
     lv_obj_set_style_local_text_color(time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     time_hour = lv_spinbox_create(time_settings_scr, NULL);
@@ -172,7 +172,7 @@ void timesettings_screen()
 
     date_label = lv_label_create(time_settings_scr, NULL);
     lv_obj_set_pos(date_label, 5, 129);
-    lv_label_set_text(date_label, "Date: ");
+    lv_label_set_text(date_label, "Date ");
     lv_obj_set_style_local_text_color(date_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     date_btn = lv_btn_create(time_settings_scr, NULL);
@@ -746,7 +746,7 @@ void samplingSettings_screen()
     measure_number_label = lv_label_create(sampling_settings_scr, NULL);
     lv_obj_set_pos(measure_number_label, 5, 127);
     lv_obj_set_style_local_text_font(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measure_number_label, "Number of samples:");
+    lv_label_set_text(measure_number_label, "Number of samples");
     lv_obj_set_style_local_text_color(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measure_number = lv_spinbox_create(sampling_settings_scr, NULL);
@@ -774,7 +774,7 @@ void samplingSettings_screen()
     measure_av_period_label = lv_label_create(sampling_settings_scr, NULL);
     lv_obj_set_pos(measure_av_period_label, 5, 165);
     lv_obj_set_style_local_text_font(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measure_av_period_label, "Time between \nmeasurments [s]:");
+    lv_label_set_text(measure_av_period_label, "Time between \nmeasurments [SS]");
     lv_obj_set_style_local_text_color(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measure_av_period = lv_spinbox_create(sampling_settings_scr, NULL);
@@ -802,7 +802,7 @@ void samplingSettings_screen()
     turn_fan_on_time_label = lv_label_create(sampling_settings_scr, NULL);
     lv_obj_set_pos(turn_fan_on_time_label, 5, 210);
     lv_obj_set_style_local_text_font(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(turn_fan_on_time_label, "Turn fan on time [s]:");
+    lv_label_set_text(turn_fan_on_time_label, "Turn fan on time [SS]");
     lv_obj_set_style_local_text_color(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     turn_fan_on_time = lv_spinbox_create(sampling_settings_scr, NULL);
