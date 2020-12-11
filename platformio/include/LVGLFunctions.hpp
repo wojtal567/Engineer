@@ -167,20 +167,23 @@ void getSampleFunc(lv_task_t *task)
         itoa(data["pm100_standard"], buffer, 10);
         lv_label_set_text(labelPM100Data, buffer);
 
-        itoa(data["particles_05um"], buffer, 10);
+        itoa(data["particles_03um"], buffer, 10);
         lv_label_set_text(labelParticlesNumber[0], buffer);
 
-        itoa(data["particles_10um"], buffer, 10);
+        itoa(data["particles_05um"], buffer, 10);
         lv_label_set_text(labelParticlesNumber[1], buffer);
 
-        itoa(data["particles_25um"], buffer, 10);
+        itoa(data["particles_10um"], buffer, 10);
         lv_label_set_text(labelParticlesNumber[2], buffer);
 
-        itoa(data["particles_50um"], buffer, 10);
+        itoa(data["particles_25um"], buffer, 10);
         lv_label_set_text(labelParticlesNumber[3], buffer);
 
-        itoa(data["particles_100um"], buffer, 10);
+        itoa(data["particles_50um"], buffer, 10);
         lv_label_set_text(labelParticlesNumber[4], buffer);
+
+        itoa(data["particles_100um"], buffer, 10);
+        lv_label_set_text(labelParticlesNumber[5], buffer);
 
         dtostrf(temp, 10, 2, buffer);
         lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
@@ -213,28 +216,28 @@ void getSampleFunc(lv_task_t *task)
 //Draw a line-like thing
 void drawParticlesIndicator()
 {
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
     {
         dividingLines[i] = lv_line_create(main_scr, NULL);
         lv_line_set_points(dividingLines[i], dividingLinesPoints[i], 2);
         lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &lineStyle);
-        labelParticleSizeum[i] = lv_label_create(main_scr, NULL);
-        lv_label_set_text(labelParticleSizeum[i], particlesSize[i].c_str());
-        lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &font12Style);
-        //lv_obj_set_auto_realign(labelParticleSizeum[i], true);
-        //lv_obj_align_origo(labelParticleSizeum[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
-        lv_obj_set_pos(labelParticleSizeum[i], labelParticleSizePosX[i], 190); //12
     }
 
-    for (int j = 0; j < 5; j++)
+    for (int j = 0; j < 6; j++)
     {
+        labelParticleSizeum[j] = lv_label_create(main_scr, NULL);
+        lv_label_set_text(labelParticleSizeum[j], particlesSize[j].c_str());
+        lv_obj_add_style(labelParticleSizeum[j], LV_LABEL_PART_MAIN, &font12Style);
+        //lv_obj_set_auto_realign(labelParticleSizeum[i], true);
+        //lv_obj_align_origo(labelParticleSizeum[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
+        lv_obj_set_pos(labelParticleSizeum[j], labelParticleSizePosX[j], 190); //12
         contParticlesNumber[j] = lv_cont_create(main_scr, NULL);
         lv_obj_add_style(contParticlesNumber[j], LV_OBJ_PART_MAIN, &containerStyle);
         lv_obj_set_style_local_border_opa(contParticlesNumber[j], LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
         lv_obj_set_click(contParticlesNumber[j], false);
         lv_obj_set_size(contParticlesNumber[j], 47, 14);
         labelParticlesNumber[j] = lv_label_create(contParticlesNumber[j], NULL);
-        lv_obj_set_pos(contParticlesNumber[j], 65 + j * 46, 215); //20
+        lv_obj_set_pos(contParticlesNumber[j], contParticleNumberPosX[j], 215); //20
         lv_label_set_align(labelParticlesNumber[j], LV_LABEL_ALIGN_CENTER);
         lv_obj_set_auto_realign(labelParticlesNumber[j], true);
         lv_label_set_text(labelParticlesNumber[j], "-");
@@ -248,12 +251,12 @@ void drawParticlesIndicator()
 
     labelSizeTitle = lv_label_create(main_scr, NULL);
     lv_obj_set_pos(labelSizeTitle, 10, 190);
-    lv_label_set_text(labelSizeTitle, "Size");
+    lv_label_set_text(labelSizeTitle, "S");
     lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &font12Style);
 
     labelNumberTitle = lv_label_create(main_scr, NULL);
     lv_obj_set_pos(labelNumberTitle, 10, 215);
-    lv_label_set_text(labelNumberTitle, "Number");
+    lv_label_set_text(labelNumberTitle, "N");
     lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
 }
 
