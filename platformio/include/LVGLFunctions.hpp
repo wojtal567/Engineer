@@ -62,7 +62,8 @@ void display_current_config()
         current_config+= "\nLCD lock time: 30 secs";
     if(config.lcdLockTime>30000)
         current_config += "\nLCD lock time: " + (String)(config.lcdLockTime/60000) + " mins";
-    current_config += (String)"\nMeasure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: ";
+    current_config += (String)"\nTurn fan on time: " + config.turnFanTime/1000 + " sec\n";
+    current_config += (String)"Measure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: ";
     if(config.timeBetweenSavingSample>=3600000)
         current_config+= config.timeBetweenSavingSample/ 60000 / 60 + (String)"h " + (config.timeBetweenSavingSample/60000 )%60 + (String)"min\nTime offset: ";
     else
@@ -741,6 +742,7 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
         config.timeBetweenSavingSample = get_value;
         config.countOfSamples = lv_spinbox_get_value(measure_number);
         config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
+        config.turnFanTime = lv_spinbox_get_value(turn_fan_on_time)*1000;
         getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
         turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);

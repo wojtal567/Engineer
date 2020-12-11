@@ -215,7 +215,8 @@ void setup()
     lv_disp_load_scr(main_scr);
 
     mySDCard.loadConfig(config, configFilePath);
-    
+    delay(1000);
+
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
@@ -227,6 +228,7 @@ void setup()
     lv_spinbox_set_value(measure_av_period, (config.measurePeriod / 1000));
     lv_spinbox_set_value(measure_number, config.countOfSamples);
     lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
+    lv_spinbox_set_value(turn_fan_on_time, (config.turnFanTime/1000));
 
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);

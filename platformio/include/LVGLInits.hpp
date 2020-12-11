@@ -725,18 +725,18 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_number, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(measure_number, 2, 0);
     lv_spinbox_set_range(measure_number, 1, 20);
-    lv_obj_set_width(measure_number, 50);
-    lv_obj_set_pos(measure_number, 216, 119);
+    lv_obj_set_width(measure_number, 40);
+    lv_obj_set_pos(measure_number, 206, 119);
 
     measure_number_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_number_increment, 50, 34);
-    lv_obj_set_pos(measure_number_increment, 267, 119);
+    lv_obj_set_size(measure_number_increment, 40, 34);
+    lv_obj_set_pos(measure_number_increment, 247, 119);
     lv_theme_apply(measure_number_increment, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(measure_number_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
     lv_obj_set_event_cb(measure_number_increment, measure_number_increment_func);
 
     measure_number_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_number_decrement, 50, 34);
+    lv_obj_set_size(measure_number_decrement, 40, 34);
     lv_obj_set_pos(measure_number_decrement, 165, 119);
     lv_theme_apply(measure_number_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(measure_number_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
@@ -752,18 +752,18 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_av_period, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(measure_av_period, 2, 0);
     lv_spinbox_set_range(measure_av_period, 5, 30);
-    lv_obj_set_width(measure_av_period, 50);
-    lv_obj_set_pos(measure_av_period, 216, 160);
+    lv_obj_set_width(measure_av_period, 40);
+    lv_obj_set_pos(measure_av_period, 206, 160);
 
     measure_av_period_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_av_period_increment, 50, 34);
-    lv_obj_set_pos(measure_av_period_increment, 267, 160);
+    lv_obj_set_size(measure_av_period_increment, 40, 34);
+    lv_obj_set_pos(measure_av_period_increment, 247, 160);
     lv_theme_apply(measure_av_period_increment, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(measure_av_period_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
     lv_obj_set_event_cb(measure_av_period_increment, av_period_increment);
 
     measure_av_period_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_av_period_decrement, 50, 34);
+    lv_obj_set_size(measure_av_period_decrement, 40, 34);
     lv_obj_set_pos(measure_av_period_decrement, 165, 160);
     lv_theme_apply(measure_av_period_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(measure_av_period_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
@@ -777,23 +777,22 @@ void samplingSettings_screen()
     turn_fan_on_time = lv_spinbox_create(sampling_settings_scr, NULL);
     lv_textarea_set_cursor_hidden(turn_fan_on_time, true);
     lv_textarea_set_text_align(turn_fan_on_time, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_digit_format(turn_fan_on_time, 3, 0);
-    lv_spinbox_set_range(turn_fan_on_time, 1, 999);
-    lv_obj_set_width(turn_fan_on_time, 50);
-    lv_obj_set_pos(turn_fan_on_time, 216, 200);
+    lv_spinbox_set_digit_format(turn_fan_on_time, 2, 0);
+    lv_spinbox_set_range(turn_fan_on_time, 1, 60);
+    lv_obj_set_width(turn_fan_on_time, 40);
+    lv_obj_set_pos(turn_fan_on_time, 206, 200);
 
     turn_fan_on_time_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(turn_fan_on_time_increment, 50, 34);
-    lv_obj_set_pos(turn_fan_on_time_increment, 267, 200);
+    lv_obj_set_size(turn_fan_on_time_increment, 40, 34);
+    lv_obj_set_pos(turn_fan_on_time_increment, 247, 200);
     lv_theme_apply(turn_fan_on_time_increment, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(turn_fan_on_time_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
     lv_obj_set_event_cb(turn_fan_on_time_increment, turn_fan_on_time_increment_func);
 
     turn_fan_on_time_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(turn_fan_on_time_decrement, 50, 34);
+    lv_obj_set_size(turn_fan_on_time_decrement, 40, 34);
     lv_obj_set_pos(turn_fan_on_time_decrement, 165, 200);
     lv_theme_apply(turn_fan_on_time_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(turn_fan_on_time_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(turn_fan_on_time_decrement, turn_fan_on_time_decrement_func);
-    
+    lv_obj_set_event_cb(turn_fan_on_time_decrement, turn_fan_on_time_decrement_func);    
 }
