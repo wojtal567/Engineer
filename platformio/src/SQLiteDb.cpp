@@ -55,7 +55,7 @@ void SQLiteDb::createTable(Stream *serial)
     close();
 }
 
-int SQLiteDb::save(std::map<std::string, int16_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
+int SQLiteDb::save(std::map<std::string, int32_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
 {
     if (object == NULL)
     {

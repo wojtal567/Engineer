@@ -49,7 +49,7 @@ RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
 SHT3X sht30(0x45);
 
-std::map<std::string, int16_t> data;
+std::map<std::string, int32_t> data;
 const char *labels[15] = {
     "framelen",
     "pm10_standard",

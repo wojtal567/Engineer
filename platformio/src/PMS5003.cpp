@@ -5,7 +5,7 @@ PMS5003::PMS5003(HardwareSerial *reader, HardwareSerial *debugger)
     _reader = reader;
     _debugger = debugger;
     for(uint16_t i = 0; i < VALUES; i++)
-        data.insert(std::pair<std::string, int16_t>(std::string (labels[i]), i));
+        data.insert(std::pair<std::string, int32_t>(std::string (labels[i]), i));
 }
 
 bool PMS5003::readData()
@@ -31,7 +31,7 @@ bool PMS5003::readData()
         
     
     uint8_t buffer[BUFFERSIZE];    
-    int16_t checkSum {0};
+    int32_t checkSum {0};
 
     _reader->readBytes(buffer, BUFFERSIZE);
 
@@ -45,7 +45,7 @@ bool PMS5003::readData()
 
     _debugger->println();
 
-    uint16_t buffer_u16[15];
+    int32_t buffer_u16[15];
     for(uint8_t i = 0; i < VALUES; i++)
     {
         buffer_u16[i] = buffer[2 + i*2 + 1];
@@ -61,7 +61,7 @@ bool PMS5003::readData()
     return true;
 }
 
-std::map<std::string, int16_t> PMS5003::returnData()
+std::map<std::string, int32_t> PMS5003::returnData()
 {
     return data;
 }
