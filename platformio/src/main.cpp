@@ -227,6 +227,7 @@ void setup()
     lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
     lv_spinbox_set_value(measure_av_period, (config.measurePeriod / 1000));
     lv_spinbox_set_value(measure_number, config.countOfSamples);
+    lv_spinbox_set_value(measure_period_second, (config.timeBetweenSavingSample/1000)%60);
     lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
     lv_spinbox_set_value(turn_fan_on_time, (config.turnFanTime/1000));
 

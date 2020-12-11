@@ -662,8 +662,9 @@ void samplingSettings_screen()
     lv_obj_add_style(sampling_save_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 
     measure_period_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_period_label, 5, 61);
-    lv_label_set_text(measure_period_label, "Time between \nsaving sample");
+    lv_obj_set_pos(measure_period_label, 5, 52);
+    lv_obj_set_style_local_text_font(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_label_set_text(measure_period_label, "Measurements \nsaving time \n[HH:MM:SS]");
     lv_obj_set_style_local_text_color(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measure_period_hour = lv_spinbox_create(sampling_settings_scr, NULL);
@@ -715,9 +716,37 @@ void samplingSettings_screen()
     lv_obj_set_style_local_value_str(measure_period_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
     lv_obj_set_event_cb(measure_period_minute_decrement, sampling_minute_decrement);
 
+    measure_colon_label2 = lv_label_create(sampling_settings_scr, NULL);
+    lv_obj_set_pos(measure_colon_label2, 265, 70);
+    lv_label_set_text(measure_colon_label2, ":");
+    lv_obj_set_style_local_text_color(measure_colon_label2, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
+    measure_period_second = lv_spinbox_create(sampling_settings_scr, NULL);
+    lv_textarea_set_cursor_hidden(measure_period_second, true);
+    lv_textarea_set_text_align(measure_period_second, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_range(measure_period_second, 0, 59);
+    lv_spinbox_set_digit_format(measure_period_second, 2, 0);
+    lv_obj_set_width(measure_period_second, 40);
+    lv_obj_set_pos(measure_period_second, 274, 61);
+
+    measure_period_second_increment = lv_btn_create(sampling_settings_scr, NULL);
+    lv_obj_set_size(measure_period_second_increment, 20, 20);
+    lv_obj_set_pos(measure_period_second_increment, 284, 39);
+    lv_theme_apply(measure_period_second_increment, LV_THEME_SPINBOX_BTN);
+    lv_obj_set_style_local_value_str(measure_period_second_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+    lv_obj_set_event_cb(measure_period_second_increment, sampling_second_increment);
+
+    measure_period_second_decrement = lv_btn_create(sampling_settings_scr, NULL);
+    lv_obj_set_size(measure_period_second_decrement, 20, 20);
+    lv_obj_set_pos(measure_period_second_decrement, 284, 97);
+    lv_theme_apply(measure_period_second_decrement, LV_THEME_SPINBOX_BTN);
+    lv_obj_set_style_local_value_str(measure_period_second_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+    lv_obj_set_event_cb(measure_period_second_decrement, sampling_second_decrement);
+
     measure_number_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_number_label, 5, 129);
-    lv_label_set_text(measure_number_label, "Averaged samples");
+    lv_obj_set_pos(measure_number_label, 5, 127);
+    lv_obj_set_style_local_text_font(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_label_set_text(measure_number_label, "Number of samples:");
     lv_obj_set_style_local_text_color(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measure_number = lv_spinbox_create(sampling_settings_scr, NULL);
@@ -743,8 +772,9 @@ void samplingSettings_screen()
     lv_obj_set_event_cb(measure_number_decrement, measure_number_decrement_func);
 
     measure_av_period_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_av_period_label, 5, 170);
-    lv_label_set_text(measure_av_period_label, "Measure period:");
+    lv_obj_set_pos(measure_av_period_label, 5, 165);
+    lv_obj_set_style_local_text_font(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_label_set_text(measure_av_period_label, "Time between \nmeasurments [s]:");
     lv_obj_set_style_local_text_color(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measure_av_period = lv_spinbox_create(sampling_settings_scr, NULL);
@@ -771,6 +801,7 @@ void samplingSettings_screen()
 
     turn_fan_on_time_label = lv_label_create(sampling_settings_scr, NULL);
     lv_obj_set_pos(turn_fan_on_time_label, 5, 210);
+    lv_obj_set_style_local_text_font(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
     lv_label_set_text(turn_fan_on_time_label, "Turn fan on time [s]:");
     lv_obj_set_style_local_text_color(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
@@ -778,7 +809,7 @@ void samplingSettings_screen()
     lv_textarea_set_cursor_hidden(turn_fan_on_time, true);
     lv_textarea_set_text_align(turn_fan_on_time, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(turn_fan_on_time, 2, 0);
-    lv_spinbox_set_range(turn_fan_on_time, 1, 60);
+    lv_spinbox_set_range(turn_fan_on_time, 1, 59);
     lv_obj_set_width(turn_fan_on_time, 40);
     lv_obj_set_pos(turn_fan_on_time, 206, 200);
 

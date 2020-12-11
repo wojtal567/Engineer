@@ -55,7 +55,7 @@ int getDDListIndexBasedOnLcdLockTime(int lcdLockTime)
 void display_current_config()
 {
     String current_config= (String)"SSID: " + config.ssid.c_str();
-    current_config+= (String)"\nCount of Samples: " + (String)config.countOfSamples ;
+    current_config+= (String)"\nNumber of samples: " + (String)config.countOfSamples ;
     if(config.lcdLockTime==-1)
         current_config+= "\nLCD lock time: Never" ; 
     if(config.lcdLockTime==30000)
@@ -63,11 +63,17 @@ void display_current_config()
     if(config.lcdLockTime>30000)
         current_config += "\nLCD lock time: " + (String)(config.lcdLockTime/60000) + " mins";
     current_config += (String)"\nTurn fan on time: " + config.turnFanTime/1000 + " sec\n";
-    current_config += (String)"Measure period: " + config.measurePeriod/1000 + " sec\nTime between saving sample: ";
+    current_config += (String)"Time between measurments: " + config.measurePeriod/1000 + " sec\nMeasurements saving time: ";
     if(config.timeBetweenSavingSample>=3600000)
-        current_config+= config.timeBetweenSavingSample/ 60000 / 60 + (String)"h " + (config.timeBetweenSavingSample/60000 )%60 + (String)"min\nTime offset: ";
+        current_config+= config.timeBetweenSavingSample/ 60000 / 60 + (String)"h " + (config.timeBetweenSavingSample/60000 )%60 + (String)"m "+ (config.timeBetweenSavingSample/1000)%60 + "s\nTime offset: ";
     else
-        current_config+= (config.timeBetweenSavingSample/60000 )%60 + (String)"min\nTime offset: ";
+        if(config.timeBetweenSavingSample>=1000)
+        {
+            current_config+= (config.timeBetweenSavingSample/60000 )%60 + (String)"m "+ (config.timeBetweenSavingSample/1000)%60 + "s\nTime offset: ";
+        }else
+        {
+            current_config+= (config.timeBetweenSavingSample/1000) + (String)"s\nTime offset: "; 
+        }
     if(ntpTimeOffset<0)
         current_config+="-";
     if(ntpTimeOffset>0)
@@ -569,6 +575,56 @@ static void sampling_hour_increment(lv_obj_t *btn, lv_event_t e)
     }
 }
 
+static void sampling_second_increment(lv_obj_t *btn, lv_event_t e){
+    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
+    {
+        if(lv_spinbox_get_value(measure_period_second)==59)
+        {
+            if(lv_spinbox_get_value(measure_period_minute)==59)
+            {
+                if(lv_spinbox_get_value(measure_period_hour)!=24)
+                {
+                    lv_spinbox_set_value(measure_period_minute, 0);
+                    lv_spinbox_set_value(measure_period_second, 0);
+                    lv_spinbox_increment(measure_period_hour);
+                }
+            }
+            else
+            {
+                lv_spinbox_set_value(measure_period_second, 0);
+                lv_spinbox_increment(measure_period_minute);
+            }            
+        }
+        else {
+            lv_spinbox_increment(measure_period_second);
+        }
+    }
+}
+
+static void sampling_second_decrement(lv_obj_t *btn, lv_event_t e){
+    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
+    {
+        if(lv_spinbox_get_value(measure_period_second)==0 && lv_spinbox_get_value(measure_period_minute)!=0)
+        {
+            lv_spinbox_decrement(measure_period_minute);
+            lv_spinbox_set_value(measure_period_second, 59);
+        }
+        else
+        {
+            if(lv_spinbox_get_value(measure_period_second)==0 && lv_spinbox_get_value(measure_period_minute)==0)
+            {
+                if(lv_spinbox_get_value(measure_period_hour)!=0)
+                {
+                    lv_spinbox_decrement(measure_period_hour);
+                    lv_spinbox_set_value(measure_period_minute, 59);
+                    lv_spinbox_set_value(measure_period_second, 59);
+                }
+            }else
+            lv_spinbox_decrement(measure_period_second);
+        }        
+    }
+}
+
 static void sampling_hour_decrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
@@ -738,7 +794,7 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000;
+        int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000 + lv_spinbox_get_value(measure_period_second)*1000;
         config.timeBetweenSavingSample = get_value;
         config.countOfSamples = lv_spinbox_get_value(measure_number);
         config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;

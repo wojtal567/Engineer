@@ -276,6 +276,12 @@ lv_obj_t *measure_period_minute;
 lv_obj_t *measure_period_minute_increment;
 lv_obj_t *measure_period_minute_decrement;
 
+lv_obj_t *measure_colon_label2;
+
+lv_obj_t *measure_period_second;
+lv_obj_t *measure_period_second_increment;
+lv_obj_t *measure_period_second_decrement;
+
 lv_obj_t *measure_number_label;
 lv_obj_t *measure_number;
 lv_obj_t *measure_number_increment;
