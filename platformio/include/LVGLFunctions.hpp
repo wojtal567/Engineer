@@ -65,7 +65,7 @@ void display_current_config()
     current_config += (String) "\nTurn fan on time: " + config.turnFanTime / 1000 + " sec\n";
     current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + " sec\nMeasurements saving time: ";
     if (config.timeBetweenSavingSample >= 3600000)
-        current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h " + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
+        current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
     else if (config.timeBetweenSavingSample >= 1000)
     {
         current_config += (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
