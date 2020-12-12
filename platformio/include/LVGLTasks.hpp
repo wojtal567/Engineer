@@ -74,7 +74,7 @@ void config_time(lv_task_t *task)
             dateTimeClient.update();
         configTime(Rtc, dateTimeClient);
         wasUpdated = true;
-        Serial.println("Succesfully updated data on RTC.");
+        Serial.println("Succesfully updated time on RTC.");
     }
     else
     {
