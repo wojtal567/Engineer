@@ -32,7 +32,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
                 StaticJsonDocument<600> response, doc1;
 
                 DeserializationError err = deserializeJson(response, getHttp.getString());
-
+                Serial.println("Deserialization error: " + (String)err.c_str());
                 JsonArray lastRecord = doc1.to<JsonArray>();
 
                 mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecord);

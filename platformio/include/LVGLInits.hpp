@@ -650,14 +650,10 @@ void samplingSettings_screen()
     lv_obj_set_event_cb(back_sampling_settings_btn, sampling_settings_back_btn);
     lv_obj_add_style(back_sampling_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-    //SamplingSettingsLabelAtBar = lv_label_create(contBarAtSampling, NULL);
-    //lv_label_set_text(SamplingSettingsLabelAtBar, "Sampling settings");
-
     sampling_save_btn = lv_btn_create(contBarAtSampling, NULL);
     sampling_save_label = lv_label_create(sampling_save_btn, NULL);
     lv_label_set_text(sampling_save_label, "Save");
     lv_obj_set_size(sampling_save_btn, 75, 25);
-    //lv_obj_set_pos(sampling_save_btn, 240, 200);
     lv_obj_set_event_cb(sampling_save_btn, sampling_settings_save_btn);
     lv_obj_add_style(sampling_save_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 

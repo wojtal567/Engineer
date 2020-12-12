@@ -54,7 +54,7 @@ void SQLiteDb::createTable(Stream *serial)
     }
     else if (rc == SQLITE_OK)
     {
-        Serial.println("SQLITE_OK: Successfully created table " + _tableName);
+        Serial.println("SQLITE_OK");
     }
     close();
 }

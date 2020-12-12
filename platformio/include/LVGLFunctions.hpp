@@ -620,8 +620,13 @@ static void sampling_second_decrement(lv_obj_t *btn, lv_event_t e)
     {
         if (lv_spinbox_get_value(measure_period_second) == 0 && lv_spinbox_get_value(measure_period_minute) != 0)
         {
-            lv_spinbox_decrement(measure_period_minute);
-            lv_spinbox_set_value(measure_period_second, 59);
+            if(lv_spinbox_get_value(measure_period_second)==0 && lv_spinbox_get_value(measure_period_minute)==1 && lv_spinbox_get_value(measure_period_hour)==0){}
+            else
+            {
+                lv_spinbox_decrement(measure_period_minute);
+                lv_spinbox_set_value(measure_period_second, 59);
+            }
+            
         }
         else
         {
