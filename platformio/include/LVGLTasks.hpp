@@ -16,7 +16,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
 
     if (WiFi.status() == WL_CONNECTED && appIpAddress != "")
     {
-
+        Serial.println("Starting synchronizing process...");
         HTTPClient getHttp;
         String url = "http://" + appIpAddress + "/fetch/last";
         Serial.print(url);
@@ -27,7 +27,8 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
 
             if (responseCode >= 200 and responseCode < 300)
             {
-                //Serial.println("HTTP RESPONSE CODE: " + (String)responseCode);
+                Serial.println("GET /last succesful.");
+                Serial.println("HTTP RESPONSE CODE: " + (String)responseCode);
                 StaticJsonDocument<600> response, doc1;
 
                 DeserializationError err = deserializeJson(response, getHttp.getString());
@@ -38,6 +39,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
                 DynamicJsonDocument doc(33000);
                 if ((response[0]["timestamp"].as<String>() != lastRecord[0]["timestamp"].as<String>()) || (response[0]["timestamp"].as<String>() == "null"))
                 {
+                    Serial.println("Got last record that looks good. Parsing and sending data to Server App...");
                     JsonArray records = doc.to<JsonArray>();
                     mySDCard.select(&sampleDB, &Serial, response[0]["timestamp"].as<String>(), &records);
                     String json = "";
@@ -53,7 +55,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
             }
             else
             {
-                Serial.println("ERROR FETCHING DATA CODE: " + (String)responseCode);
+                Serial.println("ERROR FETCHING DATA. CODE: " + (String)responseCode);
             }
         }
         else
@@ -72,6 +74,7 @@ void config_time(lv_task_t *task)
             dateTimeClient.update();
         configTime(Rtc, dateTimeClient);
         wasUpdated = true;
+        Serial.println("Succesfully updated data on RTC.");
     }
     else
     {
@@ -99,7 +102,6 @@ void dateTimeFunc(lv_task_t *task)
         if (in_time_settings == false)
             lv_label_set_text(date_btn_label, "01.01.2020");
     }
-
 }
 
 void statusFunc(lv_task_t *task)
@@ -121,13 +123,13 @@ void statusFunc(lv_task_t *task)
     {
         lv_obj_set_hidden(sdStatusAtLockWarning, true);
         lv_obj_set_hidden(sdStatusAtMainWarning, true);
-        if(config.ssid=="" && config.password=="")
-        {            
+        if (config.ssid == "" && config.password == "")
+        {
             mySDCard.loadWiFi(config, configFilePath);
             mySDCard.saveConfig(config, configFilePath);
         }
-        if(config.ssid!="" && config.password!="")
-        {            
+        if (config.ssid != "" && config.password != "")
+        {
             WiFi.begin(config.ssid.c_str(), config.password.c_str());
         }
     }

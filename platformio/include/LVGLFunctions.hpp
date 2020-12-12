@@ -54,31 +54,31 @@ int getDDListIndexBasedOnLcdLockTime(int lcdLockTime)
 
 void display_current_config()
 {
-    String current_config= (String)"SSID: " + config.ssid.c_str();
-    current_config+= (String)"\nNumber of samples: " + (String)config.countOfSamples ;
-    if(config.lcdLockTime==-1)
-        current_config+= "\nLCD lock time: Never" ; 
-    if(config.lcdLockTime==30000)
-        current_config+= "\nLCD lock time: 30 secs";
-    if(config.lcdLockTime>30000)
-        current_config += "\nLCD lock time: " + (String)(config.lcdLockTime/60000) + " mins";
-    current_config += (String)"\nTurn fan on time: " + config.turnFanTime/1000 + " sec\n";
-    current_config += (String)"Time between measurments: " + config.measurePeriod/1000 + " sec\nMeasurements saving time: ";
-    if(config.timeBetweenSavingSample>=3600000)
-        current_config+= config.timeBetweenSavingSample/ 60000 / 60 + (String)"h " + (config.timeBetweenSavingSample/60000 )%60 + (String)"m "+ (config.timeBetweenSavingSample/1000)%60 + "s\nTime offset: ";
+    String current_config = (String) "SSID: " + config.ssid.c_str();
+    current_config += (String) "\nNumber of samples: " + (String)config.countOfSamples;
+    if (config.lcdLockTime == -1)
+        current_config += "\nLCD lock time: Never";
+    if (config.lcdLockTime == 30000)
+        current_config += "\nLCD lock time: 30 secs";
+    if (config.lcdLockTime > 30000)
+        current_config += "\nLCD lock time: " + (String)(config.lcdLockTime / 60000) + " mins";
+    current_config += (String) "\nTurn fan on time: " + config.turnFanTime / 1000 + " sec\n";
+    current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + " sec\nMeasurements saving time: ";
+    if (config.timeBetweenSavingSample >= 3600000)
+        current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h " + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
+    else if (config.timeBetweenSavingSample >= 1000)
+    {
+        current_config += (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
+    }
     else
-        if(config.timeBetweenSavingSample>=1000)
-        {
-            current_config+= (config.timeBetweenSavingSample/60000 )%60 + (String)"m "+ (config.timeBetweenSavingSample/1000)%60 + "s\nTime offset: ";
-        }else
-        {
-            current_config+= (config.timeBetweenSavingSample/1000) + (String)"s\nTime offset: "; 
-        }
-    if(ntpTimeOffset<0)
-        current_config+="-";
-    if(ntpTimeOffset>0)
-        current_config+="+";   
-    current_config += ntpTimeOffset/3600;
+    {
+        current_config += (config.timeBetweenSavingSample / 1000) + (String) "s\nTime offset: ";
+    }
+    if (ntpTimeOffset < 0)
+        current_config += "-";
+    if (ntpTimeOffset > 0)
+        current_config += "+";
+    current_config += ntpTimeOffset / 3600;
     lv_label_set_text(config_label, current_config.c_str());
 }
 
@@ -99,12 +99,17 @@ bool isLastSampleSaved()
     Serial.print(" Baza: ");
     Serial.print(lastRecordToCheck[0]["timestamp"].as<String>());
     if (lastSampleTimestamp == lastRecordToCheck[0]["timestamp"].as<String>())
+    {
+        Serial.println("Last sample has been saved correctly. True.");
         return true;
+    }
     else
+    {
+        Serial.println("Something went wrong saving last sample. False.");
         return false;
+    }
 }
 
-//Check pm2,5ug/m3 value and set status (text and color at main screen)
 void setAqiStateNColor()
 {
     for (int i = 0; i < 6; i++)
@@ -144,6 +149,7 @@ void getSampleFunc(lv_task_t *task)
         lv_task_set_period(getSample, config.measurePeriod);
         if (pmsSensor->readData())
         {
+            Serial.println("Succesfully read data from dust sensor.");
             std::map<std::string, int32_t> tmpData = pmsSensor->returnData();
             pmsSensor->dumpSamples();
             data = tmpData;
@@ -268,33 +274,32 @@ void drawParticlesIndicator()
 
 static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 {
-	if (event == LV_EVENT_CLICKED)
-	{
-        if(ta==ssid_ta)
+    if (event == LV_EVENT_CLICKED)
+    {
+        if (ta == ssid_ta)
         {
             lv_textarea_set_cursor_hidden(ssid_ta, false);
             lv_textarea_set_cursor_hidden(pwd_ta, true);
         }
-        if(ta==pwd_ta)
+        if (ta == pwd_ta)
         {
             lv_textarea_set_cursor_hidden(pwd_ta, false);
             lv_textarea_set_cursor_hidden(ssid_ta, true);
         }
-        
-		if (keyboard == NULL)
-		{
-			keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-			lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-			lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
-			lv_keyboard_set_textarea(keyboard, ta);
-		}
-		else
-		{
-			lv_keyboard_set_textarea(keyboard, ta);
-		}
-	}
-}
 
+        if (keyboard == NULL)
+        {
+            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
+            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
+            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+            lv_keyboard_set_textarea(keyboard, ta);
+        }
+        else
+        {
+            lv_keyboard_set_textarea(keyboard, ta);
+        }
+    }
+}
 
 static void btn_connect(lv_obj_t *obj, lv_event_t event)
 {
@@ -317,12 +322,15 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 
         if (WiFi.status() == WL_CONNECTED)
         {
+            Serial.println("btn_connect -> connected to Wi-Fi! IP: " + WiFi.localIP().toString());
             Rtc.SetIsRunning(true);
             dateTimeClient.begin();
             for (int i = 0; i < 3; i++)
                 dateTimeClient.update();
             lv_task_ready(syn_rtc);
         }
+        else if (WiFi.status() == WL_DISCONNECTED)
+            Serial.println("btn_connect -> can't connect. Probably you have entered wrong credentials.");
         lv_disp_load_scr(main_scr);
         lv_textarea_set_text(ssid_ta, "");
         lv_textarea_set_text(pwd_ta, "");
@@ -437,58 +445,58 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
     if (event == LV_EVENT_CLICKED)
     {
         switch (lv_dropdown_get_selected(lockScreenDDlist))
-            {
-            case 0:
-                config.lcdLockTime = 30000;
-                break;
-            case 1:
-                config.lcdLockTime = 60000;
-                break;
-            case 2:
-                config.lcdLockTime = 120000;
-                break;
-            case 3:
-                config.lcdLockTime = 300000;
-                break;
-            case 4:
-                config.lcdLockTime = 600000;
-                break;
-            case 5:
-                config.lcdLockTime = 1800000;
-                break;
-            case 6:
-                config.lcdLockTime = 3600000;
-                break;
-            case 7:
-                config.lcdLockTime = -1;
-                break;
-            default:
-                config.lcdLockTime = 60000;
-                break;
-            }
-            mySDCard.saveConfig(config, configFilePath);
-            mySDCard.printConfig(configFilePath);
-            if (time_changed == true)
-            {
-                String datet = lv_label_get_text(date_btn_label) + (String)lv_textarea_get_text(time_hour) + ":" + (String)lv_textarea_get_text(time_minute);
-                Serial.println(datet);
-                RtcDateTime *dt = new RtcDateTime(atoi(datet.substring(6, 10).c_str()), atoi(datet.substring(3, 6).c_str()), atoi(datet.substring(0, 2).c_str()), datet.substring(10, 12).toDouble(), datet.substring(13, 15).toDouble(), 0);
-                Rtc.SetDateTime(*dt);
-                Rtc.SetIsRunning(true);
-            }
-            if (date_changed == true)
-            {
-                RtcDateTime ori = Rtc.GetDateTime();
-                String date = lv_label_get_text(date_btn_label);
-                RtcDateTime *dt = new RtcDateTime(atoi(date.substring(6).c_str()), atoi(date.substring(3, 6).c_str()), atoi(date.substring(0, 2).c_str()), ori.Hour(), ori.Minute(), ori.Second());
-                Rtc.SetDateTime(*dt);
-                Rtc.SetIsRunning(true);
-            }
-            lv_disp_load_scr(main_scr);
-            in_time_settings = false;
-            time_changed = false;
-            date_changed = false;
-            display_current_config();
+        {
+        case 0:
+            config.lcdLockTime = 30000;
+            break;
+        case 1:
+            config.lcdLockTime = 60000;
+            break;
+        case 2:
+            config.lcdLockTime = 120000;
+            break;
+        case 3:
+            config.lcdLockTime = 300000;
+            break;
+        case 4:
+            config.lcdLockTime = 600000;
+            break;
+        case 5:
+            config.lcdLockTime = 1800000;
+            break;
+        case 6:
+            config.lcdLockTime = 3600000;
+            break;
+        case 7:
+            config.lcdLockTime = -1;
+            break;
+        default:
+            config.lcdLockTime = 60000;
+            break;
+        }
+        mySDCard.saveConfig(config, configFilePath);
+        mySDCard.printConfig(configFilePath);
+        if (time_changed == true)
+        {
+            String datet = lv_label_get_text(date_btn_label) + (String)lv_textarea_get_text(time_hour) + ":" + (String)lv_textarea_get_text(time_minute);
+            Serial.println(datet);
+            RtcDateTime *dt = new RtcDateTime(atoi(datet.substring(6, 10).c_str()), atoi(datet.substring(3, 6).c_str()), atoi(datet.substring(0, 2).c_str()), datet.substring(10, 12).toDouble(), datet.substring(13, 15).toDouble(), 0);
+            Rtc.SetDateTime(*dt);
+            Rtc.SetIsRunning(true);
+        }
+        if (date_changed == true)
+        {
+            RtcDateTime ori = Rtc.GetDateTime();
+            String date = lv_label_get_text(date_btn_label);
+            RtcDateTime *dt = new RtcDateTime(atoi(date.substring(6).c_str()), atoi(date.substring(3, 6).c_str()), atoi(date.substring(0, 2).c_str()), ori.Hour(), ori.Minute(), ori.Second());
+            Rtc.SetDateTime(*dt);
+            Rtc.SetIsRunning(true);
+        }
+        lv_disp_load_scr(main_scr);
+        in_time_settings = false;
+        time_changed = false;
+        date_changed = false;
+        display_current_config();
     }
 }
 
@@ -566,7 +574,7 @@ static void minute_decrement(lv_obj_t *btn, lv_event_t e)
 
 static void temp_settings_btn(lv_obj_t *obj, lv_event_t event)
 {
-    if(event == LV_EVENT_CLICKED)
+    if (event == LV_EVENT_CLICKED)
         lv_scr_load(sampling_settings_scr);
 }
 
@@ -578,14 +586,15 @@ static void sampling_hour_increment(lv_obj_t *btn, lv_event_t e)
     }
 }
 
-static void sampling_second_increment(lv_obj_t *btn, lv_event_t e){
-    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
+static void sampling_second_increment(lv_obj_t *btn, lv_event_t e)
+{
+    if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if(lv_spinbox_get_value(measure_period_second)==59)
+        if (lv_spinbox_get_value(measure_period_second) == 59)
         {
-            if(lv_spinbox_get_value(measure_period_minute)==59)
+            if (lv_spinbox_get_value(measure_period_minute) == 59)
             {
-                if(lv_spinbox_get_value(measure_period_hour)!=24)
+                if (lv_spinbox_get_value(measure_period_hour) != 24)
                 {
                     lv_spinbox_set_value(measure_period_minute, 0);
                     lv_spinbox_set_value(measure_period_second, 0);
@@ -596,35 +605,38 @@ static void sampling_second_increment(lv_obj_t *btn, lv_event_t e){
             {
                 lv_spinbox_set_value(measure_period_second, 0);
                 lv_spinbox_increment(measure_period_minute);
-            }            
+            }
         }
-        else {
+        else
+        {
             lv_spinbox_increment(measure_period_second);
         }
     }
 }
 
-static void sampling_second_decrement(lv_obj_t *btn, lv_event_t e){
-    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
+static void sampling_second_decrement(lv_obj_t *btn, lv_event_t e)
+{
+    if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if(lv_spinbox_get_value(measure_period_second)==0 && lv_spinbox_get_value(measure_period_minute)!=0)
+        if (lv_spinbox_get_value(measure_period_second) == 0 && lv_spinbox_get_value(measure_period_minute) != 0)
         {
             lv_spinbox_decrement(measure_period_minute);
             lv_spinbox_set_value(measure_period_second, 59);
         }
         else
         {
-            if(lv_spinbox_get_value(measure_period_second)==0 && lv_spinbox_get_value(measure_period_minute)==0)
+            if (lv_spinbox_get_value(measure_period_second) == 0 && lv_spinbox_get_value(measure_period_minute) == 0)
             {
-                if(lv_spinbox_get_value(measure_period_hour)!=0)
+                if (lv_spinbox_get_value(measure_period_hour) != 0)
                 {
                     lv_spinbox_decrement(measure_period_hour);
                     lv_spinbox_set_value(measure_period_minute, 59);
                     lv_spinbox_set_value(measure_period_second, 59);
                 }
-            }else
-            lv_spinbox_decrement(measure_period_second);
-        }        
+            }
+            else
+                lv_spinbox_decrement(measure_period_second);
+        }
     }
 }
 
@@ -640,9 +652,9 @@ static void sampling_minute_increment(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if(lv_spinbox_get_value(measure_period_minute)==59)
+        if (lv_spinbox_get_value(measure_period_minute) == 59)
         {
-            if(lv_spinbox_get_value(measure_period_hour)!=24)
+            if (lv_spinbox_get_value(measure_period_hour) != 24)
             {
                 lv_spinbox_set_value(measure_period_minute, 0);
                 lv_spinbox_increment(measure_period_hour);
@@ -651,7 +663,7 @@ static void sampling_minute_increment(lv_obj_t *btn, lv_event_t e)
         else
         {
             lv_spinbox_increment(measure_period_minute);
-        }        
+        }
     }
 }
 
@@ -659,15 +671,15 @@ static void sampling_minute_decrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if(lv_spinbox_get_value(measure_period_minute)==0)
+        if (lv_spinbox_get_value(measure_period_minute) == 0)
         {
             lv_spinbox_set_value(measure_period_minute, 59);
             lv_spinbox_decrement(measure_period_hour);
         }
-        if(!(lv_spinbox_get_value(measure_period_minute)==1 && lv_spinbox_get_value(measure_period_hour)==0))
+        if (!(lv_spinbox_get_value(measure_period_minute) == 1 && lv_spinbox_get_value(measure_period_hour) == 0))
         {
             lv_spinbox_decrement(measure_period_minute);
-        }            
+        }
     }
 }
 
@@ -797,11 +809,11 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000 + lv_spinbox_get_value(measure_period_second)*1000;
+        int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000 + lv_spinbox_get_value(measure_period_second) * 1000;
         config.timeBetweenSavingSample = get_value;
         config.countOfSamples = lv_spinbox_get_value(measure_number);
         config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
-        config.turnFanTime = lv_spinbox_get_value(turn_fan_on_time)*1000;
+        config.turnFanTime = lv_spinbox_get_value(turn_fan_on_time) * 1000;
         getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
         turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);

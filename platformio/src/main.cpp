@@ -211,7 +211,7 @@ void setup()
     info_screen();
     timesettings_screen();
     samplingSettings_screen();
-    
+
     lv_disp_load_scr(main_scr);
 
     mySDCard.loadConfig(config, configFilePath);
@@ -227,9 +227,9 @@ void setup()
     lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
     lv_spinbox_set_value(measure_av_period, (config.measurePeriod / 1000));
     lv_spinbox_set_value(measure_number, config.countOfSamples);
-    lv_spinbox_set_value(measure_period_second, (config.timeBetweenSavingSample/1000)%60);
+    lv_spinbox_set_value(measure_period_second, (config.timeBetweenSavingSample / 1000) % 60);
     lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
-    lv_spinbox_set_value(turn_fan_on_time, (config.turnFanTime/1000));
+    lv_spinbox_set_value(turn_fan_on_time, (config.turnFanTime / 1000));
 
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
@@ -252,11 +252,14 @@ void setup()
         }
         if (WiFi.status() == WL_CONNECTED)
         {
+            Serial.println("setup -> connected to Wi-Fi provided by data from configuration file! IP: " + WiFi.localIP().toString());
             Rtc.SetIsRunning(true);
             restServerRouting();
             server.onNotFound(handleNotFound);
             server.begin();
         }
+        else if (WiFi.status() == WL_DISCONNECTED)
+            Serial.println("setup -> can't connect to Wi-Fi - probably no data or corrupted or wrong!");
     }
     display_current_config();
     delay(500);
