@@ -9,7 +9,7 @@
 #include <WebServer.h>
 #include <TFT_eSPI.h>
 
-#define FAN_PIN 33        // * number of PIN which controls the PMS fan
+#define FAN_PIN 4        // * number of PIN which controls the PMS fan
 #define MY_SD_CARD_PIN 27 // * pin of SD_CS
 
 // ! CONFIG ============================================|
@@ -23,9 +23,9 @@ Config config =
         3600000,
         5000,
         5,
-        0};
+        0,
+        20000};
 
-uint turnFanTime = 20000; //ms
 int ntpTimeOffset = 3600; //poland, winter - 3600, summer (DST) - 7200 
 
 #define LVGL_TICK_PERIOD 60
@@ -49,7 +49,7 @@ RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
 SHT3X sht30(0x45);
 
-std::map<std::string, uint16_t> data;
+std::map<std::string, int32_t> data;
 const char *labels[15] = {
     "framelen",
     "pm10_standard",
@@ -101,11 +101,6 @@ float temp, humi, pm25Aqi;
 LV_IMG_DECLARE(wifi);
 LV_IMG_DECLARE(info);
 LV_IMG_DECLARE(set_time);
-
-String airQualityStates[6] = {"Excellent", "Good", "Moderate", "Unhealthy", "Bad", "Hazardous"};
-String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
-float aqiStandards[5] = {21, 61, 101, 141, 201};
-int labelParticleSizePosX[6] = {56, 103, 153, 198, 245, 288};
 
 // ? --------------------------------------------------styles
 //Basic container with white border and transparent background
@@ -163,12 +158,20 @@ lv_obj_t *labelAQIColorBar;
 lv_obj_t *labelSizeTitle;
 lv_obj_t *labelNumberTitle;
 lv_obj_t *labelParticleSizeum[6];
-lv_obj_t *labelParticlesNumber[5];
-lv_obj_t *contParticlesNumber[5];
+lv_obj_t *labelParticlesNumber[6];
+lv_obj_t *contParticlesNumber[6];
 lv_obj_t *ledAtMain;
-static lv_point_t mainLinePoints[] = {{65, 210}, {300, 210}};
+
+String airQualityStates[6] = {"Excellent", "Good", "Moderate", "Unhealthy", "Bad", "Hazardous"};
+String particlesSize[6] = {"0.3", "0.5", "1.0", "2.5", "5.0", "10.0"};
+float aqiStandards[5] = {21, 61, 101, 141, 201};
+int labelParticleSizePosX[6] = {56, 103, 153, 198, 245, 288};
+int contParticleNumberPosX[6] = {18, 65, 112, 159, 206, 253};
+static lv_point_t mainLinePoints[] = {{18, 210}, {300, 210}};
+
 //An array of points pairs instead of multiple names and declarations
-static lv_point_t dividingLinesPoints[][6] = {{{65, 205}, {65, 215}},
+static lv_point_t dividingLinesPoints[][7] = {{{18, 205} , {18, 215}}, 
+                                              {{65, 205} , {65, 215}},
                                               {{112, 205}, {112, 215}},
                                               {{159, 205}, {159, 215}},
                                               {{206, 205}, {206, 215}},
@@ -177,7 +180,7 @@ static lv_point_t dividingLinesPoints[][6] = {{{65, 205}, {65, 215}},
 //Main line at the bottom declaration
 lv_obj_t *mainLine;
 //An array of lines dividing main one
-lv_obj_t *dividingLines[6];
+lv_obj_t *dividingLines[7];
 //An array of colors used depending on actual pm2.5 value
 lv_color_t airQualityColors[6] = {LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
 
@@ -276,6 +279,12 @@ lv_obj_t *measure_period_minute;
 lv_obj_t *measure_period_minute_increment;
 lv_obj_t *measure_period_minute_decrement;
 
+lv_obj_t *measure_colon_label2;
+
+lv_obj_t *measure_period_second;
+lv_obj_t *measure_period_second_increment;
+lv_obj_t *measure_period_second_decrement;
+
 lv_obj_t *measure_number_label;
 lv_obj_t *measure_number;
 lv_obj_t *measure_number_increment;
@@ -285,6 +294,12 @@ lv_obj_t *measure_av_period_label;
 lv_obj_t *measure_av_period;
 lv_obj_t *measure_av_period_increment;
 lv_obj_t *measure_av_period_decrement;
+
+lv_obj_t *turn_fan_on_time_label;
+lv_obj_t *turn_fan_on_time;
+lv_obj_t *turn_fan_on_time_increment;
+lv_obj_t *turn_fan_on_time_decrement;
+
 
 lv_obj_t *sampling_save_btn;
 lv_obj_t *sampling_save_label;

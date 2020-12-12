@@ -52,10 +52,14 @@ void SQLiteDb::createTable(Stream *serial)
         serial->println(zErrorMessage);
         sqlite3_free(zErrorMessage);
     }
+    else if (rc == SQLITE_OK)
+    {
+        Serial.println("SQLITE_OK");
+    }
     close();
 }
 
-int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
+int SQLiteDb::save(std::map<std::string, int32_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
 {
     if (object == NULL)
     {
@@ -72,11 +76,6 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
 
     int rc = sqlite3_exec(object, sql.c_str(), 0, (void *)"Output:", &zErrorMessage);
 
-    Serial.printf("\nHeap size: %d\n", ESP.getHeapSize());
-    Serial.printf("Free Heap: %d\n", esp_get_free_heap_size());
-    Serial.printf("Min Free Heap: %d\n", esp_get_minimum_free_heap_size());
-    Serial.printf("Max Alloc Heap: %d\n", ESP.getMaxAllocHeap());
-
     if (rc != SQLITE_OK)
     {
         debugger->println(F("SQL error: "));
@@ -86,6 +85,10 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
         sqlite3_free(zErrorMessage);
         close();
         return 1;
+    }
+    else if (rc == SQLITE_OK)
+    {
+        Serial.println("SQLITE_OK: Successfully inserted record into table " + _tableName);
     }
     close();
     return rc;
@@ -118,11 +121,6 @@ int SQLiteDb::select(Stream *debugger, String datetime, JsonArray *array)
     debugger->println("Executing: " + sql);
     open();
     int rc = sqlite3_exec(object, sql.c_str(), selectCallback, array, &zErrorMessage);
-
-    Serial.printf("\nHeap size: %d\n", ESP.getHeapSize());
-    Serial.printf("Free Heap: %d\n", esp_get_free_heap_size());
-    Serial.printf("Min Free Heap: %d\n", esp_get_minimum_free_heap_size());
-    Serial.printf("Max Alloc Heap: %d\n", ESP.getMaxAllocHeap());
 
     if (rc != SQLITE_OK)
     {
