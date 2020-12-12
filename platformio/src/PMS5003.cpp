@@ -19,13 +19,13 @@ bool PMS5003::readData()
     if (_reader->peek() != 0x42)
     {
         _reader->read();
-        _debugger->println("Reader done his job");
+        _debugger->println("PMS5003 -> Reading bytes...");
         return false;
     }
 
     if (_reader->available() < 32)
     {
-        _debugger->println("Reader unavailable");
+        _debugger->println("PMS5003 -> Can't read all bytes from PMS. Exiting. False.");
         return false;
     }
 
@@ -54,7 +54,7 @@ bool PMS5003::readData()
 
     if (checkSum != data["checksum"])
     {
-        _debugger->println("Checksum failure. False.");
+        _debugger->println("PMS5003 -> Checksum failure. False.");
         return false;
     }
     return true;

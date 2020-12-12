@@ -76,7 +76,7 @@ Więcej publikacji szukać i coś z nich wrzucić
 # dopisać o dostępie - powymyślać daty od września do grudnia, np. 20.11.2020
 
 
-do apki na urządzeniu: niech wali na serial ile może
+# do apki na urządzeniu: niech wali na serial ile może
 # do apki na desktopie: pakowanie aplikacji powoli i dorobienie plusik dodaje dataset
 
 
