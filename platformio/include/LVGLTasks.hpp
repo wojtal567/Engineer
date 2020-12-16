@@ -130,7 +130,8 @@ void statusFunc(lv_task_t *task)
         }
         if (config.ssid != "" && config.password != "")
         {
-            WiFi.begin(config.ssid.c_str(), config.password.c_str());
+            if(!(WiFi.status() == WL_CONNECTED))
+                WiFi.begin(config.ssid.c_str(), config.password.c_str());
         }
     }
     else
