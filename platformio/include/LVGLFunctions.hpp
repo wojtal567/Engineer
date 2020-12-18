@@ -609,6 +609,8 @@ static void sampling_second_decrement(lv_obj_t *btn, lv_event_t e)
             {
                 lv_spinbox_decrement(measure_period_minute);
                 lv_spinbox_set_value(measure_period_second, 59);
+                if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
+                    lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
             }
             
         }
@@ -621,10 +623,14 @@ static void sampling_second_decrement(lv_obj_t *btn, lv_event_t e)
                     lv_spinbox_decrement(measure_period_hour);
                     lv_spinbox_set_value(measure_period_minute, 59);
                     lv_spinbox_set_value(measure_period_second, 59);
+                    if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
+                        lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
                 }
             }
             else
                 lv_spinbox_decrement(measure_period_second);
+                if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
+                    lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
         }
     }
 }
@@ -633,7 +639,13 @@ static void sampling_hour_decrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        lv_spinbox_decrement(measure_period_hour);
+        if(!((lv_spinbox_get_value(measure_period_second)==0)&&(lv_spinbox_get_value(measure_period_minute)==0)))
+        {
+            lv_spinbox_decrement(measure_period_hour);
+            if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
+                lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
+    
+        }
     }
 }
 
@@ -664,10 +676,15 @@ static void sampling_minute_decrement(lv_obj_t *btn, lv_event_t e)
         {
             lv_spinbox_set_value(measure_period_minute, 59);
             lv_spinbox_decrement(measure_period_hour);
+            if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
+                lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
+    
         }
         if (!(lv_spinbox_get_value(measure_period_minute) == 1 && lv_spinbox_get_value(measure_period_hour) == 0))
         {
             lv_spinbox_decrement(measure_period_minute);
+            if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
+                lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
         }
     }
 }
@@ -773,7 +790,10 @@ static void measure_number_decrement_func(lv_obj_t *btn, lv_event_t event)
 static void turn_fan_on_time_increment_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
-        lv_spinbox_increment(turn_fan_on_time);
+    {
+        if((lv_spinbox_get_value(turn_fan_on_time)+1)<((lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)))
+            lv_spinbox_increment(turn_fan_on_time);
+    }        
 }
 
 static void turn_fan_on_time_decrement_func(lv_obj_t *btn, lv_event_t event)
