@@ -37,9 +37,6 @@ bool PMS5003::readData()
     for (uint8_t i = 0; i < 30; i++)
     {
         checkSum += buffer[i];
-        _debugger->print("0x");
-        _debugger->print(buffer[i + 2], HEX);
-        _debugger->print("\n");
     }
 
     _debugger->println();
