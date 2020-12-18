@@ -189,12 +189,9 @@ void timesettings_screen()
     lv_label_set_text(lockScreenLabel, "Lock screen after ");
     lv_obj_set_style_local_text_color(lockScreenLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lockScreenDDlist = lv_dropdown_create(time_settings_scr, NULL);
-    lv_dropdown_set_options(lockScreenDDlist, "30 sec\n"
-                                              "1 min\n"
-                                              "2 min\n"
+    lv_dropdown_set_options(lockScreenDDlist, "1 min\n"
                                               "5 min\n"
                                               "10 min\n"
-                                              "30 min\n"
                                               "60 min\n"
                                               "Never");
     lv_obj_set_width(lockScreenDDlist, 120);

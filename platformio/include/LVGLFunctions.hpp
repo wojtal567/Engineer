@@ -408,31 +408,22 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
         switch (config.lcdLockTime)
         {
         case -1:
-            lv_dropdown_set_selected(lockScreenDDlist, 7);
-            break;
-        case 30000:
-            lv_dropdown_set_selected(lockScreenDDlist, 0);
-            break;
-        case 60000:
-            lv_dropdown_set_selected(lockScreenDDlist, 1);
-            break;
-        case 120000:
-            lv_dropdown_set_selected(lockScreenDDlist, 2);
-            break;
-        case 300000:
-            lv_dropdown_set_selected(lockScreenDDlist, 3);
-            break;
-        case 600000:
             lv_dropdown_set_selected(lockScreenDDlist, 4);
             break;
-        case 1800000:
-            lv_dropdown_set_selected(lockScreenDDlist, 5);
+        case 60000:
+            lv_dropdown_set_selected(lockScreenDDlist, 0);
+            break;
+        case 300000:
+            lv_dropdown_set_selected(lockScreenDDlist, 1);
+            break;
+        case 600000:
+            lv_dropdown_set_selected(lockScreenDDlist, 2);
             break;
         case 3600000:
-            lv_dropdown_set_selected(lockScreenDDlist, 6);
+            lv_dropdown_set_selected(lockScreenDDlist, 3);
             break;
         default:
-            lv_dropdown_set_selected(lockScreenDDlist, 1);
+            lv_dropdown_set_selected(lockScreenDDlist, 0);
             break;
         }
         lv_scr_load(settings_scr);
@@ -449,27 +440,18 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
         switch (lv_dropdown_get_selected(lockScreenDDlist))
         {
         case 0:
-            config.lcdLockTime = 30000;
-            break;
-        case 1:
             config.lcdLockTime = 60000;
             break;
-        case 2:
-            config.lcdLockTime = 120000;
-            break;
-        case 3:
+        case 1:
             config.lcdLockTime = 300000;
             break;
-        case 4:
+        case 2:
             config.lcdLockTime = 600000;
             break;
-        case 5:
-            config.lcdLockTime = 1800000;
-            break;
-        case 6:
+        case 3:
             config.lcdLockTime = 3600000;
             break;
-        case 7:
+        case 4:
             config.lcdLockTime = -1;
             break;
         default:
