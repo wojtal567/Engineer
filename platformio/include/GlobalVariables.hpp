@@ -24,7 +24,7 @@ Config config =
         5000,
         5,
         0,
-        20000};
+        30000};
 
 int ntpTimeOffset = 3600; //poland, winter - 3600, summer (DST) - 7200 
 

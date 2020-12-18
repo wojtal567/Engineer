@@ -62,7 +62,7 @@ void display_current_config()
         current_config += "\nLCD lock time: 30 secs";
     if (config.lcdLockTime > 30000)
         current_config += "\nLCD lock time: " + (String)(config.lcdLockTime / 60000) + " mins";
-    current_config += (String) "\nTurn fan on time: " + config.turnFanTime / 1000 + " sec\n";
+    current_config += (String) "\nFan running time before measure: " + config.turnFanTime / 1000 + " sec\n";
     current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + " sec\nMeasurements saving time: ";
     if (config.timeBetweenSavingSample >= 3600000)
         current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
@@ -79,7 +79,9 @@ void display_current_config()
     if (ntpTimeOffset > 0)
         current_config += "+";
     current_config += ntpTimeOffset / 3600;
+    lv_obj_set_style_local_text_font(config_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
     lv_label_set_text(config_label, current_config.c_str());
+
 }
 
 //Function that turns fan on
