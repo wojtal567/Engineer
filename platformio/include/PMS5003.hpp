@@ -13,7 +13,7 @@ class PMS5003
 {
     private:
         HardwareSerial *_reader, *_debugger;
-        std::map<std::string, int32_t> data;
+        std::map<std::string, float> data;
         const char* labels[15] = { 
             "framelen",
             "pm10_standard",
@@ -34,6 +34,6 @@ class PMS5003
     public:
         PMS5003(HardwareSerial *reader, HardwareSerial *debugger);
         bool readData();
-        std::map<std::string, int32_t> returnData();
+        std::map<std::string, float> returnData();
         void dumpSamples();
 };

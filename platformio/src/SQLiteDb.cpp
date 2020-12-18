@@ -36,7 +36,7 @@ void SQLiteDb::createTable(Stream *serial)
         serial->println("No database open");
 
     open();
-    String sql = "CREATE table if not exists " + _tableName + " (timestamp datetime NOT NULL PRIMARY KEY, temperature float, humidity FLOAT, pm10standard FLOAT, pm25standard FLOAT, pm100standard float, pm10env FLOAT, pm25env FLOAT, pm100env FLOAT, particles03 INTEGER, particles05 INTEGER, particles10 INTEGER, particles25 INTEGER, particles50 INTEGER, particles100 INTEGER)";
+    String sql = "CREATE table if not exists " + _tableName + " (timestamp datetime NOT NULL PRIMARY KEY, temperature float, humidity FLOAT, pm10standard FLOAT, pm25standard FLOAT, pm100standard float, pm10env FLOAT, pm25env FLOAT, pm100env FLOAT, particles03 FLOAT, particles05 FLOAT, particles10 FLOAT, particles25 FLOAT, particles50 FLOAT, particles100 FLOAT)";
     int rc = sqlite3_exec(
         object,
         sql.c_str(),
@@ -59,7 +59,7 @@ void SQLiteDb::createTable(Stream *serial)
     close();
 }
 
-int SQLiteDb::save(std::map<std::string, int32_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
+int SQLiteDb::save(std::map<std::string, float> data, float temperature, float humidity, String timestamp, Stream *debugger)
 {
     if (object == NULL)
     {

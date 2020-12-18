@@ -57,7 +57,7 @@ bool PMS5003::readData()
     return true;
 }
 
-std::map<std::string, int32_t> PMS5003::returnData()
+std::map<std::string, float> PMS5003::returnData()
 {
     return data;
 }

@@ -134,7 +134,7 @@ void getSampleFunc(lv_task_t *task)
     }
     if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.countOfSamples)
     {
-        std::map<std::string, int32_t> tmpData = pmsSensor->returnData();
+        std::map<std::string, float> tmpData = pmsSensor->returnData();
         pmsSensor->dumpSamples();
         for (uint8_t i = 0; i < 15; i++)
         {
@@ -150,7 +150,7 @@ void getSampleFunc(lv_task_t *task)
         if (pmsSensor->readData())
         {
             Serial.println("Succesfully read data from dust sensor.");
-            std::map<std::string, int32_t> tmpData = pmsSensor->returnData();
+            std::map<std::string, float> tmpData = pmsSensor->returnData();
             pmsSensor->dumpSamples();
             data = tmpData;
             config.currentSampleNumber++;
