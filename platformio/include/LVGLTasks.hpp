@@ -100,7 +100,7 @@ void dateTimeFunc(lv_task_t *task)
     else
     {
         if (in_time_settings == false)
-            lv_label_set_text(date_btn_label, "01.01.2020");
+            lv_label_set_text(date_btn_label, "01.01.2021");
     }
 }
 
