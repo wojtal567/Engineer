@@ -93,7 +93,7 @@ bool date_synchronized = false;
 bool in_time_settings = false;
 bool time_changed = false;
 bool date_changed = false;
-
+bool is_default_time_on_display=false;
 //Temperature, relative humidity and pm2.5 per ug/m3 variables
 float temp, humi, pm25Aqi;
 

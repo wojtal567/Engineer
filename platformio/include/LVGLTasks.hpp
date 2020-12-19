@@ -101,7 +101,16 @@ void dateTimeFunc(lv_task_t *task)
     {
         if (in_time_settings == false)
             lv_label_set_text(date_btn_label, "01.01.2021");
+        if(is_default_time_on_display)
+            lv_label_set_text(dateAndTimeAtBar, "");
+        else{
+            lv_label_set_text(dateAndTimeAtBar, "01.01.2020 00:00:00");
+        }
+        is_default_time_on_display=!is_default_time_on_display;
+
+
     }
+
 }
 
 void statusFunc(lv_task_t *task)
