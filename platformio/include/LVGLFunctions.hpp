@@ -677,14 +677,13 @@ static void sampling_minute_decrement(lv_obj_t *btn, lv_event_t e)
             lv_spinbox_set_value(measure_period_minute, 59);
             lv_spinbox_decrement(measure_period_hour);
             if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
-    
+                lv_spinbox_set_value(turn_fan_on_time, (((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1)%20*10);    
         }
         if (!(lv_spinbox_get_value(measure_period_minute) == 1 && lv_spinbox_get_value(measure_period_hour) == 0))
         {
             lv_spinbox_decrement(measure_period_minute);
             if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
+                lv_spinbox_set_value(turn_fan_on_time, (((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1)%20*10);
         }
     }
 }
