@@ -372,7 +372,8 @@ void main_screen()
 
     dateAndTimeAtBar = lv_label_create(contBarAtMain, NULL);
     lv_label_set_text(dateAndTimeAtBar, "");
-    lv_obj_align(dateAndTimeAtBar, NULL, LV_ALIGN_IN_RIGHT_MID, -120, 0);
+    lv_obj_set_pos(dateAndTimeAtBar, 157, 13);
+    //lv_obj_align(dateAndTimeAtBar, NULL, LV_ALIGN_IN_RIGHT_MID, -120, 0);
 
     contTemp = lv_cont_create(main_scr, NULL);
     lv_obj_set_click(contTemp, false);
