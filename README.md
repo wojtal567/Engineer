@@ -49,3 +49,4 @@
 |2(GND)|GND|
 |4(RX)|TX2|
 |5(TX)|RX2|
+|SET|D4|
