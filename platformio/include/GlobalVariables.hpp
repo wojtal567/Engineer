@@ -71,7 +71,6 @@ const char *labels[15] = {
 static const char ntpServerName[] = "europe.pool.ntp.org";
 WiFiUDP ntpUDP;
 NTPClient dateTimeClient(ntpUDP, ntpServerName, ntpTimeOffset);
-bool wasUpdated = false;
 
 //Webserver
 WebServer server(80);
@@ -88,8 +87,6 @@ SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
 String lastSampleTimestamp;
 
-//Is data synchronized variable
-bool date_synchronized = false;
 bool in_time_settings = false;
 bool time_changed = false;
 bool date_changed = false;
@@ -319,7 +316,6 @@ lv_obj_t *ledAtLock;
 // ? --------------------------------------------------tasks
 lv_task_t *turnFanOn;
 lv_task_t *getSample;
-lv_task_t *syn_rtc;
 lv_task_t *getAppLastRecordAndSynchronize;
 lv_task_t *inactive_time;
 lv_task_t *date;

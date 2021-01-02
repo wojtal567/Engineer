@@ -221,9 +221,6 @@ void setup()
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
     status = lv_task_create(statusFunc, 700, LV_TASK_PRIO_LOW, NULL);
-    syn_rtc = lv_task_create_basic();
-    lv_task_set_cb(syn_rtc, config_time);
-    lv_task_set_period(syn_rtc, 3600000);
     lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
     lv_spinbox_set_value(measure_av_period, (config.measurePeriod / 1000));
     lv_spinbox_set_value(measure_number, config.countOfSamples);
@@ -253,7 +250,7 @@ void setup()
         if (WiFi.status() == WL_CONNECTED)
         {
             Serial.println("setup -> connected to Wi-Fi provided by data from configuration file! IP: " + WiFi.localIP().toString());
-            Rtc.SetIsRunning(true);
+            config_time();
             restServerRouting();
             server.onNotFound(handleNotFound);
             server.begin();
@@ -263,7 +260,6 @@ void setup()
     }
     display_current_config();
     delay(500);
-    lv_task_ready(syn_rtc);
 }
 
 void loop()

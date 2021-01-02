@@ -86,6 +86,17 @@ void turnFanOnFunc(lv_task_t *task)
     lv_task_set_prio(turnFanOn, LV_TASK_PRIO_OFF);
 }
 
+void config_time()
+{
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        for (int i = 0; i < 500; i++)
+            dateTimeClient.update();
+        configTime(Rtc, dateTimeClient);
+        Serial.println("Succesfully updated time on RTC.");
+    }
+}
+
 bool isLastSampleSaved()
 {
     StaticJsonDocument<600> docA;
@@ -124,11 +135,6 @@ void setAqiStateNColor()
 void getSampleFunc(lv_task_t *task)
 {
     sht30.get();
-    if (wasUpdated != true)
-    {
-        lv_task_ready(syn_rtc);
-        wasUpdated = true;
-    }
     if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.countOfSamples)
     {
         std::map<std::string, float> tmpData = pmsSensor->returnData();
@@ -329,7 +335,7 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
             dateTimeClient.begin();
             for (int i = 0; i < 3; i++)
                 dateTimeClient.update();
-            lv_task_ready(syn_rtc);
+            config_time();
         }
         else if (WiFi.status() == WL_DISCONNECTED)
             Serial.println("btn_connect -> can't connect. Probably you have entered wrong credentials.");
@@ -693,7 +699,7 @@ static void sync_rtc_func(lv_obj_t *btn, lv_event_t event)
     if (event == LV_EVENT_CLICKED)
     {
         if (WiFi.status() == WL_CONNECTED)
-            lv_task_ready(syn_rtc);
+            config_time();
     }
 }
 

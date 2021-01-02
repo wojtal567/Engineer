@@ -66,22 +66,6 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
     }
 }
 
-void config_time(lv_task_t *task)
-{
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        for (int i = 0; i < 500; i++)
-            dateTimeClient.update();
-        configTime(Rtc, dateTimeClient);
-        wasUpdated = true;
-        Serial.println("Succesfully updated time on RTC.");
-    }
-    else
-    {
-        wasUpdated = false;
-    }
-}
-
 void dateTimeFunc(lv_task_t *task)
 {
 
