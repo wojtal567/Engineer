@@ -23,7 +23,7 @@ class SQLiteDb
         int open();
         void close();
         void createTable(Stream *serial);
-        int save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger);
+        int save(std::map<std::string, int32_t> data, int temperature, int humidity, String timestamp, Stream *debugger);
         int select(Stream *debugger, String datetime, JsonArray* array);
         int getLastRecord(Stream *debugger, JsonArray* array);
         String getLocalPath();

@@ -52,10 +52,14 @@ void SQLiteDb::createTable(Stream *serial)
         serial->println(zErrorMessage);
         sqlite3_free(zErrorMessage);
     }
+    else if (rc == SQLITE_OK)
+    {
+        Serial.println("SQLITE_OK");
+    }
     close();
 }
 
-int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
+int SQLiteDb::save(std::map<std::string, int32_t> data, int temperature, int humidity, String timestamp, Stream *debugger)
 {
     if (object == NULL)
     {
@@ -72,12 +76,6 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
 
     int rc = sqlite3_exec(object, sql.c_str(), 0, (void *)"Output:", &zErrorMessage);
 
-
-    Serial.printf("\nHeap size: %d\n", ESP.getHeapSize());
-    Serial.printf("Free Heap: %d\n", esp_get_free_heap_size());
-    Serial.printf("Min Free Heap: %d\n", esp_get_minimum_free_heap_size());
-    Serial.printf("Max Alloc Heap: %d\n", ESP.getMaxAllocHeap());
-
     if (rc != SQLITE_OK)
     {
         debugger->println(F("SQL error: "));
@@ -88,6 +86,10 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
         close();
         return 1;
     }
+    else if (rc == SQLITE_OK)
+    {
+        Serial.println("SQLITE_OK: Successfully inserted record into table " + _tableName);
+    }
     close();
     return rc;
 }
@@ -95,32 +97,30 @@ int SQLiteDb::save(std::map<std::string, uint16_t> data, int temperature, int hu
 static int selectCallback(void *data, int argc, char **argv, char **azColName)
 {
 
-    JsonArray *records = static_cast<JsonArray*>(data);
+    JsonArray *records = static_cast<JsonArray *>(data);
     StaticJsonDocument<600> doc;
     for (int i = 0; i < argc; i++)
         doc[azColName[i]] = argv[i];
-    
+
     records->add(doc);
     return 0;
 }
 
-int SQLiteDb::select(Stream *debugger, String datetime, JsonArray* array)
+int SQLiteDb::select(Stream *debugger, String datetime, JsonArray *array)
 {
     if (object == NULL)
     {
         debugger->println("Database does not exist. NULL");
         return 0;
     }
-
-    String sql = "select * from " + _tableName + " where timestamp > '" + datetime.c_str() + "' limit 50;";
+    String sql = "";
+    if (datetime != "null")
+        sql = "select * from " + _tableName + " where timestamp > '" + datetime.c_str() + "' limit 50;";
+    else
+        sql = "select * from " + _tableName + " order by timestamp limit 50;";
     debugger->println("Executing: " + sql);
     open();
     int rc = sqlite3_exec(object, sql.c_str(), selectCallback, array, &zErrorMessage);
-
-    Serial.printf("\nHeap size: %d\n", ESP.getHeapSize());
-    Serial.printf("Free Heap: %d\n", esp_get_free_heap_size());
-    Serial.printf("Min Free Heap: %d\n", esp_get_minimum_free_heap_size());
-    Serial.printf("Max Alloc Heap: %d\n", ESP.getMaxAllocHeap());
 
     if (rc != SQLITE_OK)
     {
@@ -139,15 +139,15 @@ int SQLiteDb::select(Stream *debugger, String datetime, JsonArray* array)
     return rc;
 }
 
-int SQLiteDb::getLastRecord(Stream *debugger, JsonArray* array)
+int SQLiteDb::getLastRecord(Stream *debugger, JsonArray *array)
 {
     if (object == NULL)
     {
         debugger->println("Database does not exist. NULL");
         return 0;
     }
-    
-    String sql = "SELECT * FROM " + _tableName+  " order by timestamp desc limit 1";
+
+    String sql = "SELECT * FROM " + _tableName + " order by timestamp desc limit 1";
     debugger->println("Executing: " + sql);
     int rc = sqlite3_exec(object, sql.c_str(), selectCallback, array, &zErrorMessage);
     if (rc != SQLITE_OK)

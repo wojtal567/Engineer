@@ -23,7 +23,7 @@ void configTime(RtcDS1307<TwoWire> &Rtc, NTPClient &ntp)
 
     RtcDateTime date = RtcDateTime(year, month, day, hours, minutes, seconds);
     Rtc.SetDateTime(date);
-    Rtc.SetMemory(1, 1);
+    Rtc.SetIsRunning(true);
 }
 
 void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password)

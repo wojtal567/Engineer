@@ -47,6 +47,7 @@
 |:-:|:-:|
 |1(VCC)|VIN|
 |2(GND)|GND|
+|3(SET)|D4|
 |4(RX)|TX2|
 |5(TX)|RX2|
 |SET|D4|

@@ -21,17 +21,20 @@ bool MySD::start(SQLiteDb *object, Stream *debugger)
 
     if (result)
     {
+        Serial.println("MySD::start -> Initializing.");
         object->init();
         object->open();
         object->createTable(debugger);
         object->close();
         object->kill();
     }
+    else
+        Serial.println("MySD::start -> Can't initilize - no access to SD card.");
     end();
     return result;
 }
 
-void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humidity, String timestamp, SQLiteDb *object, Stream *debugger)
+void MySD::save(std::map<std::string, int32_t> data, int temperature, int humidity, String timestamp, SQLiteDb *object, Stream *debugger)
 {
     debugger->println("MySD::save");
     if (begin())
@@ -39,6 +42,7 @@ void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humid
         debugger->println("SD Card detected");
         if (SD.exists(object->getRelativePath()))
         {
+            Serial.println("MySD::save -> File exists. Trying to save data.");
             debugger->println("Database " + object->getLocalPath() + " exists. Saving data...");
             object->init();
             object->open();
@@ -48,6 +52,7 @@ void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humid
         }
         else
         {
+            Serial.println("MySD::save -> No database file. Trying to create one and saving data.");
             debugger->println("Database " + object->getLocalPath() + " don't exist. Saving data...");
             object->init();
             object->open();
@@ -57,6 +62,8 @@ void MySD::save(std::map<std::string, uint16_t> data, int temperature, int humid
             object->kill();
         }
     }
+    else
+        Serial.println("MySD::save -> Cannot access SD card.");
     end();
 }
 
@@ -68,6 +75,7 @@ void MySD::select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray
         debugger->println("SD Card detected");
         if (SD.exists(object->getRelativePath()))
         {
+            Serial.println("MySD::select -> File exists. Trying to select data.");
             debugger->println("Database " + object->getLocalPath() + " exists.");
             object->init();
             object->open();
@@ -75,7 +83,11 @@ void MySD::select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray
             object->close();
             object->kill();
         }
+        else
+            Serial.println("MySD::select -> File don't exist.");
     }
+    else
+        Serial.println("MySD::select -> Cannot access SD card.");
     end();
 }
 
@@ -87,6 +99,7 @@ void MySD::getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray *array)
         debugger->println("SD Card detected");
         if (SD.exists(object->getRelativePath()))
         {
+            Serial.println("MySD::getLastRecord -> File exists. Trying to sget last saved sample record.");
             debugger->println("Database " + object->getLocalPath() + " exists.");
             object->init();
             object->open();
@@ -94,122 +107,140 @@ void MySD::getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray *array)
             object->close();
             object->kill();
         }
-    }
-    end();
-}
-
-void MySD::saveConfig(SQLiteDb *object, int measurePeriod, int lockTime, int samplesNumber, int avgTime)
-{
-
-    if (begin())
-    {
-        File settings = SD.open("/settings.csv", FILE_WRITE);
-        std::string temp = "";
-        char buffer[10];
-        itoa(measurePeriod, buffer, 10);
-        temp += std::string(buffer);
-        temp += "%";
-        itoa(lockTime, buffer, 10);
-        temp += std::string(buffer);
-        temp += "%";
-        itoa(samplesNumber, buffer, 10);
-        temp += std::string(buffer);
-        temp += "%";
-        itoa(avgTime, buffer, 10);
-        temp += std::string(buffer);
-        settings.print(temp.c_str());
-        settings.close();
-    }
-    end();
-}
-
-int MySD::loadConfig(int &measure_period, int &lcd_lock_time, uint &samplesNumber, int &averageTime)
-{
-    if (begin())
-    {
-        String stn = "";
-        File settings = SD.open("/settings.csv", FILE_READ);
-        if (SD.exists("/settings.csv") && settings)
-        {
-            while (settings.available())
-            {
-                stn += (char)settings.read();
-            }
-            int pos = stn.indexOf("%");
-            measure_period = stn.substring(0, stn.indexOf("%")).toInt();
-            stn[pos] = '0';
-            lcd_lock_time = stn.substring(pos + 1, stn.indexOf("%")).toInt();
-            pos = stn.indexOf("%");
-            stn[pos] = '0';
-            samplesNumber = stn.substring(pos + 1, stn.indexOf("%")).toInt();
-            averageTime = stn.substring(stn.indexOf("%") + 1).toInt();
-            settings.close();
-            switch (lcd_lock_time)
-            {
-            case -1:
-            {
-                return 7;
-                break;
-            }
-
-            case 30000:
-            {
-                return 0;
-                break;
-            }
-            case 60000:
-            {
-                return 1;
-                break;
-            }
-            case 120000:
-            {
-                return 2;
-                break;
-            }
-            case 300000:
-            {
-                return 3;
-                break;
-            }
-            case 600000:
-            {
-                return 4;
-                break;
-            }
-            case 1800000:
-            {
-                return 5;
-                break;
-            }
-            case 3600000:
-            {
-                return 6;
-                break;
-            }
-            default:
-            {
-                return 1;
-            }
-            }
-        }
         else
-        {
-            settings = SD.open("/settings.csv", FILE_WRITE);
-            settings.print("3600000%60000%5%5000");
-            settings.close();
-            measure_period = 3600000;
-            lcd_lock_time = 60000;
-            samplesNumber = 5;
-            averageTime = 5000;
-        }
+            Serial.println("MySD::getLastRecord -> File don't exist.");
     }
     else
+        Serial.println("MySD::getLastRecord -> Cannot access SD card.");
+    end();
+}
+
+void MySD::saveConfig(Config config, std::string filePath)
+{
+    if (begin())
     {
-        measure_period = 3600000;
-        lcd_lock_time = 60000;
-        samplesNumber = 5;
-        averageTime = 5000;
+        SD.remove(filePath.c_str());
+        File configurationFile = SD.open(filePath.c_str(), FILE_WRITE);
+        if (!configurationFile)
+        {
+            Serial.println("Failed to create configuration file.");
+            return;
+        }
+        else
+            Serial.println("Configuration file exists. Trying to save...");
+        StaticJsonDocument<512> doc;
+        doc["ssid"] = config.ssid.c_str();
+        doc["password"] = config.password.c_str();
+        doc["lcdLockTime"] = config.lcdLockTime;
+        doc["timeBetweenSavingSample"] = config.timeBetweenSavingSample;
+        doc["measurePeriod"] = config.measurePeriod;
+        doc["countOfSamples"] = config.countOfSamples;
+        doc["currentSampleNumber"] = config.currentSampleNumber;
+        doc["turnFanTime"] = config.turnFanTime;
+        if (serializeJson(doc, configurationFile) == 0)
+        {
+            Serial.println("Failed to write to file.");
+        }
+        configurationFile.close();
     }
-    return 1;
+    end();
+}
+
+void MySD::loadConfig(Config &config, std::string filePath)
+{
+    if (begin())
+    {
+        File configurationFile = SD.open(filePath.c_str(), FILE_READ);
+        if (!configurationFile)
+        {
+            Serial.print("Failed to read configuration file. Creating file...");
+            configurationFile.close();
+            end();
+            saveConfig(config, filePath);
+            return;
+        }
+        else
+            Serial.println("Configuration file exists. Reading...");
+
+        StaticJsonDocument<512> doc;
+        DeserializationError error = deserializeJson(doc, configurationFile);
+
+        if (error)
+        {
+            Serial.println("Failed to read file, using default Configuration");
+            return;
+        }
+
+        char tmp[64];
+        strlcpy(tmp, doc["ssid"], sizeof(tmp));
+        config.ssid = tmp;
+        strlcpy(tmp, doc["password"], sizeof(tmp));
+        config.password = tmp;
+        config.lcdLockTime = doc["lcdLockTime"];
+        config.timeBetweenSavingSample = doc["timeBetweenSavingSample"];
+        config.measurePeriod = doc["measurePeriod"];
+        config.countOfSamples = doc["countOfSamples"];
+        config.currentSampleNumber = doc["currentSampleNumber"];
+        config.turnFanTime = doc["turnFanTime"];
+        configurationFile.close();
+        Serial.println("Reading config and making changes.");
+    }
+    end();
+}
+
+void MySD::printConfig(std::string filePath)
+{
+    if (begin())
+    {
+        File configurationFile = SD.open(filePath.c_str(), FILE_READ);
+        if (!configurationFile)
+        {
+            Serial.print("Failed to read configuration file.");
+            return;
+        }
+        else
+            Serial.println("Configuration file exists. Reading...");
+        Serial.println("Current config.json file:");
+        while (configurationFile.available())
+            Serial.print((char)configurationFile.read());
+        Serial.println();
+        configurationFile.close();
+    }
+    end();
+}
+
+void MySD::loadWiFi(Config &config, std::string filePath)
+{
+    if (begin())
+    {
+        File configurationFile = SD.open(filePath.c_str(), FILE_READ);
+        if (!configurationFile)
+        {
+            Serial.print("Failed to read configuration file. Creating file...");
+            configurationFile.close();
+            end();
+            saveConfig(config, filePath);
+            return;
+        }
+        else
+            Serial.println("Configuration file exists. Reading...");
+
+        StaticJsonDocument<512> doc;
+        DeserializationError error = deserializeJson(doc, configurationFile);
+
+        if (error)
+        {
+            Serial.println("Failed to read file, using default Configuration");
+            return;
+        }
+
+        char tmp[64];
+        strlcpy(tmp, doc["ssid"], sizeof(tmp));
+        config.ssid = tmp;
+        strlcpy(tmp, doc["password"], sizeof(tmp));
+        config.password = tmp;
+        configurationFile.close();
+        Serial.println("Succesfully loaded Wi-Fi credentials.");
+    }
+    end();
 }
