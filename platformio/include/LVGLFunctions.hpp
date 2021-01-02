@@ -199,9 +199,14 @@ void getSampleFunc(lv_task_t *task)
 
         dtostrf(humi, 10, 2, buffer);
         lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
-        lastSampleTimestamp = getMainTimestamp(Rtc);
-        Serial.print("lastSampleTimestamp przed wrzuceniem do bazy: " + lastSampleTimestamp);
-        mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
+        if(Rtc.GetIsRunning())
+        {
+            lastSampleTimestamp = getMainTimestamp(Rtc);
+            Serial.print("lastSampleTimestamp przed wrzuceniem do bazy: " + lastSampleTimestamp);
+            mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
+        }
+        else
+            Serial.println("RTC is not running, not saving");        
         lv_task_reset(turnFanOn);
         lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
         digitalWrite(FAN_PIN, LOW);
