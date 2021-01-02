@@ -65,20 +65,15 @@ void display_current_config()
     current_config += (String) "\nFan running time before measure: " + config.turnFanTime / 1000 + " sec\n";
     current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + " sec\nMeasurements saving time: ";
     if (config.timeBetweenSavingSample >= 3600000)
-        current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
+        current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSample / 1000) % 60 + "s";
     else if (config.timeBetweenSavingSample >= 1000)
     {
-        current_config += (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s\nTime offset: ";
+        current_config += (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s";
     }
     else
     {
-        current_config += (config.timeBetweenSavingSample / 1000) + (String) "s\nTime offset: ";
+        current_config += (config.timeBetweenSavingSample / 1000) + (String) "s";
     }
-    if (ntpTimeOffset < 0)
-        current_config += "-";
-    if (ntpTimeOffset > 0)
-        current_config += "+";
-    current_config += ntpTimeOffset / 3600;
     lv_obj_set_style_local_text_font(config_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
     lv_label_set_text(config_label, current_config.c_str());
 
