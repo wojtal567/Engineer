@@ -655,6 +655,8 @@ static void sampling_hour_decrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
+        if(((lv_spinbox_get_value(measure_period_hour)-1)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<60)
+            return;
         if(!((lv_spinbox_get_value(measure_period_second)==0)&&(lv_spinbox_get_value(measure_period_minute)==0)))
         {
             lv_spinbox_decrement(measure_period_hour);
