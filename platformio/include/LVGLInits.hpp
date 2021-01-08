@@ -87,13 +87,6 @@ void lineStyleInit(void)
     lv_style_set_line_rounded(&lineStyle, LV_STATE_DEFAULT, false);
 }
 
-void toastListStyleInit(void)
-{
-    lv_style_init(&toastListStyle);
-    lv_style_set_bg_color(&toastListStyle, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
-    lv_style_set_text_color(&toastListStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_radius(&toastListStyle, LV_STATE_DEFAULT, 0);
-}
 
 void timesettings_screen()
 {

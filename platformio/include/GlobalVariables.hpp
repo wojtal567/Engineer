@@ -115,7 +115,6 @@ static lv_style_t transparentButtonStyle;
 static lv_style_t hugeTransparentButtonStyle;
 static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
-static lv_style_t toastListStyle;
 
 // ? --------------------------------------------------main gui
 //Main screen objects declaration
