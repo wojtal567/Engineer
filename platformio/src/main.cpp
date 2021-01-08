@@ -178,6 +178,7 @@ void setup()
 
     //Styles initialization functions
     containerStyleInit();
+    whiteFontStyleInit();
     font12StyleInit();
     font16StyleInit();
     font20StyleInit();
@@ -186,7 +187,6 @@ void setup()
     whiteButtonStyleInit();
     tinySymbolStyleInit();
     lineStyleInit();
-    toastListStyleInit();
     hugeTransparentButtonStyleInit();
     main_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);

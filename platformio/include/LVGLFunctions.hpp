@@ -259,6 +259,7 @@ void drawParticlesIndicator()
         lv_label_set_text(labelParticleSizeum[j], particlesSize[j].c_str());
         lv_obj_add_style(labelParticleSizeum[j], LV_LABEL_PART_MAIN, &font12Style);
         //lv_obj_set_auto_realign(labelParticleSizeum[i], true);
+        lv_obj_add_style(labelParticleSizeum[j], LV_LABEL_PART_MAIN, &whiteFontStyle);
         //lv_obj_align_origo(labelParticleSizeum[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
         lv_obj_set_pos(labelParticleSizeum[j], labelParticleSizePosX[j], 190); //12
         contParticlesNumber[j] = lv_cont_create(main_scr, NULL);
@@ -272,6 +273,7 @@ void drawParticlesIndicator()
         lv_obj_set_auto_realign(labelParticlesNumber[j], true);
         lv_label_set_text(labelParticlesNumber[j], "-");
         lv_obj_add_style(labelParticlesNumber[j], LV_LABEL_PART_MAIN, &font12Style);
+        lv_obj_add_style(labelParticlesNumber[j], LV_LABEL_PART_MAIN, &whiteFontStyle);
     }
 
     mainLine = lv_line_create(main_scr, NULL);
@@ -283,11 +285,13 @@ void drawParticlesIndicator()
     lv_obj_set_pos(labelSizeTitle, 10, 190);
     lv_label_set_text(labelSizeTitle, "S");
     lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &font12Style);
+    lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     labelNumberTitle = lv_label_create(main_scr, NULL);
     lv_obj_set_pos(labelNumberTitle, 10, 215);
     lv_label_set_text(labelNumberTitle, "N");
     lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
+    lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &whiteFontStyle);
 }
 
 static void ta_event_cb(lv_obj_t *ta, lv_event_t event)

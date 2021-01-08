@@ -11,30 +11,33 @@ void containerStyleInit(void)
 }
 
 //Style initialization functions
-void font20StyleInit(void)
+void whiteFontStyleInit(void)
 {
-    lv_style_init(&font20Style);
-    lv_style_set_text_font(&font20Style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
-    lv_style_set_text_color(&font20Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_color(&whiteFontStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
+
 
 void font12StyleInit(void)
 {
     lv_style_init(&font12Style);
     lv_style_set_text_font(&font12Style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-    lv_style_set_text_color(&font12Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
 void font16StyleInit(void)
 {
     lv_style_init(&font16Style);
     lv_style_set_text_font(&font16Style, LV_STATE_DEFAULT, &lv_font_montserrat_16);
-    lv_style_set_text_color(&font16Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
+
+void font20StyleInit(void)
+{
+    lv_style_init(&font20Style);
+    lv_style_set_text_font(&font20Style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
+}
+
 void font22StyleInit(void)
 {
     lv_style_init(&font22Style);
     lv_style_set_text_font(&font22Style, LV_STATE_DEFAULT, &lv_font_montserrat_22);
-    lv_style_set_text_color(&font22Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 }
 
 //Tiny symbols to signalize wifi and sd card status
