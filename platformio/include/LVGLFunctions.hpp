@@ -1,5 +1,23 @@
 #include <GlobalVariables.hpp>
 
+lv_obj_t * my_lv_btn_create(lv_obj_t * par, const lv_obj_t * copy, lv_coord_t width, lv_coord_t height, lv_coord_t x_position, lv_coord_t y_position, lv_event_cb_t event_cb)
+{
+    lv_obj_t * btn = lv_btn_create(par, copy);
+    lv_obj_set_size(btn, width, height);
+    lv_obj_set_pos(btn, x_position, y_position);
+    lv_obj_set_event_cb(btn, event_cb);
+    return btn;
+}
+
+lv_obj_t * my_lv_cont_create(lv_obj_t * par, const lv_obj_t * copy, lv_coord_t width, lv_coord_t height, lv_coord_t x_position, lv_coord_t y_position)
+{
+    lv_obj_t * cont = lv_cont_create(par, copy);
+    lv_obj_set_size(cont, width, height);
+    lv_obj_set_pos(cont, x_position, y_position);
+    return cont;
+}
+
+
 int getDDListIndexBasedOnLcdLockTime(int lcdLockTime)
 {
     switch (lcdLockTime)

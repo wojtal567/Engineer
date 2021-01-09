@@ -178,11 +178,7 @@ void setup()
 
     //Styles initialization functions
     containerStyleInit();
-    whiteFontStyleInit();
-    font12StyleInit();
-    font16StyleInit();
-    font20StyleInit();
-    font22StyleInit();
+    stylesInits();
     transparentButtonStyleInit();
     whiteButtonStyleInit();
     tinySymbolStyleInit();
