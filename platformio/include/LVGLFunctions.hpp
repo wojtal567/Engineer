@@ -142,16 +142,13 @@ void getSampleFunc(lv_task_t *task)
             Serial.println("Succesfully read data from dust sensor.");
             std::map<std::string, float> tmpData = pmsSensor->returnData();
             pmsSensor->dumpSamples();
-            if(tmpData["particles_03um"]!=0)
-            {
-                for (uint8_t i = 0; i < 15; i++)
-                    {
-                        data[labels[i]] += tmpData[labels[i]];
-                    }
-                    config.currentSampleNumber++;
-                    temp += sht30.cTemp;
-                    humi += sht30.humidity;
-            }
+            for (uint8_t i = 0; i < 15; i++)
+                {
+                    data[labels[i]] += tmpData[labels[i]];
+                }
+                config.currentSampleNumber++;
+                temp += sht30.cTemp;
+                humi += sht30.humidity;
         }
     }
     if (config.currentSampleNumber == 0)
@@ -162,13 +159,10 @@ void getSampleFunc(lv_task_t *task)
             Serial.println("Succesfully read data from dust sensor.");
             std::map<std::string, float> tmpData = pmsSensor->returnData();
             pmsSensor->dumpSamples();
-            if(tmpData["particles_03um"]!=0)
-            {
-                data = tmpData;
-                config.currentSampleNumber++;
-                temp = sht30.cTemp;
-                humi = sht30.humidity;
-            }
+            data = tmpData;
+            config.currentSampleNumber++;
+            temp = sht30.cTemp;
+            humi = sht30.humidity;
         }
     }
     if (config.currentSampleNumber == config.countOfSamples)
