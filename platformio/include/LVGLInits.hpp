@@ -122,7 +122,7 @@ void timesettings_screen()
     lv_textarea_set_text_align(time_hour, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(time_hour, 0, 23);
     lv_spinbox_set_digit_format(time_hour, 2, 0);
-    lv_obj_set_width(time_hour, 40);
+    lv_obj_set_size(time_hour, 40, 34); //TODO ZMIENIONED
     lv_obj_set_pos(time_hour, 165, 61);
 
     time_hour_increment = lv_btn_create(time_settings_scr, NULL);
@@ -149,7 +149,7 @@ void timesettings_screen()
     lv_textarea_set_text_align(time_minute, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(time_minute, 0, 59);
     lv_spinbox_set_digit_format(time_minute, 2, 0);
-    lv_obj_set_width(time_minute, 40);
+    lv_obj_set_size(time_minute, 40, 34); //TODO ZMIENIONED
     lv_obj_set_pos(time_minute, 219, 61);
 
     time_minute_increment = lv_btn_create(time_settings_scr, NULL);
@@ -176,7 +176,7 @@ void timesettings_screen()
     lv_label_set_text(date_btn_label, "99.99.9999");
     lv_obj_set_style_local_border_opa(date_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_obj_set_style_local_text_color(date_btn_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_obj_set_width(date_btn, 95);
+    lv_obj_set_size(date_btn, 95, 43);//TODO ZMIENIONED
     lv_obj_set_pos(date_btn, 165, 119);
     lv_obj_set_event_cb(date_btn, date_button_func);
 
@@ -190,7 +190,7 @@ void timesettings_screen()
                                               "10 min\n"
                                               "60 min\n"
                                               "Never");
-    lv_obj_set_width(lockScreenDDlist, 120);
+    lv_obj_set_size(lockScreenDDlist, 120, 34); //TODO ZMIENIONED
     lv_obj_set_pos(lockScreenDDlist, 165, 164);
 
     timeSettings_btn = lv_btn_create(time_settings_scr, NULL);
@@ -203,7 +203,7 @@ void timesettings_screen()
 
     sync_rtc_btn = lv_btn_create(time_settings_scr, NULL);
     sync_rtc_label = lv_label_create(sync_rtc_btn, NULL);
-    lv_obj_set_height(sync_rtc_btn, 33);
+    lv_obj_set_size(sync_rtc_btn, 130, 33);//TODO ZMIENIONED
     lv_label_set_text(sync_rtc_label, "Sync. Clock");
     lv_obj_add_style(sync_rtc_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
     lv_obj_set_pos(sync_rtc_btn, 5, 200);
@@ -534,7 +534,7 @@ void wifi_screen()
     lv_textarea_set_one_line(ssid_ta, true);    
     lv_obj_set_event_cb(ssid_ta, ta_event_cb);
     lv_textarea_set_cursor_hidden(ssid_ta, true);
-    lv_obj_set_width(ssid_ta, LV_HOR_RES / 2 - 20);
+    lv_obj_set_size(ssid_ta, 140, 34); //TODO ZMIENIONED
     lv_obj_set_pos(ssid_ta, 100, 45);
 
     pwd_label = lv_label_create(wifi_scr, NULL);
@@ -548,23 +548,24 @@ void wifi_screen()
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_event_cb(pwd_ta, ta_event_cb);
     lv_textarea_set_cursor_hidden(pwd_ta, true);
-    lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
+    lv_obj_set_size(pwd_ta, 140, 34); //TODO ZMIENIONED
     lv_obj_set_pos(pwd_ta, 100, 85);
 
     show_hide_btn = lv_btn_create(wifi_scr, NULL);
     show_hide_btn_label = lv_label_create(show_hide_btn, NULL);
     lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
     lv_obj_set_pos(show_hide_btn, 243, 85);
-    lv_obj_set_width(show_hide_btn, 75);
+    lv_obj_set_size(show_hide_btn, 75, 43);//TODO ZMIENIONED
     lv_obj_add_style(show_hide_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
     lv_obj_set_style_local_text_color(show_hide_btn_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_set_event_cb(show_hide_btn, show_hide_btn_func);
+
     apply_btn = lv_btn_create(wifi_scr, NULL);
     apply_label = lv_label_create(apply_btn, NULL);
     lv_label_set_text(apply_label, "Connect");
     lv_obj_add_style(apply_btn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
     lv_obj_set_event_cb(apply_btn, btn_connect);
-    lv_obj_set_width(apply_btn, 75);
+    lv_obj_set_size(apply_btn, 75, 43); //TODO ZMIENIONED
     lv_obj_set_pos(apply_btn, 243, 43);
 }
 
@@ -662,7 +663,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_period_hour, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(measure_period_hour, 0, 24);
     lv_spinbox_set_digit_format(measure_period_hour, 2, 0);
-    lv_obj_set_width(measure_period_hour, 40);
+    lv_obj_set_size(measure_period_hour, 40, 34); //TODO ZMIENIONED
     lv_obj_set_pos(measure_period_hour, 165, 61);
 
     measure_period_hour_increment = lv_btn_create(sampling_settings_scr, NULL);
@@ -689,7 +690,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_period_minute, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(measure_period_minute, 0, 59);
     lv_spinbox_set_digit_format(measure_period_minute, 2, 0);
-    lv_obj_set_width(measure_period_minute, 40);
+    lv_obj_set_size(measure_period_minute, 40, 34); //TODO ZMIENIONED
     lv_obj_set_pos(measure_period_minute, 219, 61);
 
     measure_period_minute_increment = lv_btn_create(sampling_settings_scr, NULL);
@@ -716,7 +717,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_period_second, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(measure_period_second, 0, 59);
     lv_spinbox_set_digit_format(measure_period_second, 2, 0);
-    lv_obj_set_width(measure_period_second, 40);
+    lv_obj_set_size(measure_period_second, 40, 34); //TODO ZMIENIONED
     lv_obj_set_pos(measure_period_second, 274, 61);
 
     measure_period_second_increment = lv_btn_create(sampling_settings_scr, NULL);
@@ -744,7 +745,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_number, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(measure_number, 2, 0);
     lv_spinbox_set_range(measure_number, 1, 20);
-    lv_obj_set_width(measure_number, 50);
+    lv_obj_set_size(measure_number, 50, 34); //TODO ZMIENIONED
     lv_obj_set_pos(measure_number, 206, 119);
 
     measure_number_increment = lv_btn_create(sampling_settings_scr, NULL);
@@ -772,7 +773,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_av_period, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(measure_av_period, 3, 0);
     lv_spinbox_set_range(measure_av_period, 5, 999);
-    lv_obj_set_width(measure_av_period, 50);
+    lv_obj_set_size(measure_av_period, 50, 34); //TODO ZMIENIONED
     lv_obj_set_pos(measure_av_period, 206, 160);
 
     measure_av_period_increment = lv_btn_create(sampling_settings_scr, NULL);
@@ -800,7 +801,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(turn_fan_on_time, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(turn_fan_on_time, 3, 0);
     lv_spinbox_set_range(turn_fan_on_time, 1, 999);
-    lv_obj_set_width(turn_fan_on_time, 50);
+    lv_obj_set_size(turn_fan_on_time, 50, 34); //TODO ZMIENIONED
     lv_obj_set_pos(turn_fan_on_time, 206, 200);
 
     turn_fan_on_time_increment = lv_btn_create(sampling_settings_scr, NULL);
