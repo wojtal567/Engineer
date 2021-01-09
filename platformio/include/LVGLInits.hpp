@@ -172,13 +172,10 @@ void timesettings_screen()
     lv_obj_set_event_cb(timeSettings_btn, timesettings_save_btn);
     lv_obj_add_style(timeSettings_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 
-    sync_rtc_btn = lv_btn_create(time_settings_scr, NULL);
+    sync_rtc_btn = my_lv_btn_create(time_settings_scr, NULL, 130, 33, 5, 200, sync_rtc_func);
     sync_rtc_label = lv_label_create(sync_rtc_btn, NULL);
-    lv_obj_set_size(sync_rtc_btn, 130, 33);//TODO ZMIENIONED
     lv_label_set_text(sync_rtc_label, "Sync. Clock");
     lv_obj_add_style(sync_rtc_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
-    lv_obj_set_pos(sync_rtc_btn, 5, 200);
-    lv_obj_set_event_cb(sync_rtc_btn, sync_rtc_func);
 }
 
 void settings_screen()
