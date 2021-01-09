@@ -176,14 +176,9 @@ void setup()
     lv_theme_t *th = lv_theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY, LV_THEME_DEFAULT_FLAG, LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
     lv_theme_set_act(th);
 
-    //Styles initialization functions
-    containerStyleInit();
+    //Styles initialization function
     stylesInits();
-    transparentButtonStyleInit();
-    whiteButtonStyleInit();
-    tinySymbolStyleInit();
-    lineStyleInit();
-    hugeTransparentButtonStyleInit();
+
     main_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     settings_scr = lv_cont_create(NULL, NULL);

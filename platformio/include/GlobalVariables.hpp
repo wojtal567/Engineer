@@ -117,7 +117,9 @@ static lv_style_t transparentButtonStyle;
 static lv_style_t hugeTransparentButtonStyle;
 static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
-
+static lv_style_t transparentBackgroundStyle;
+static lv_style_t borderlessStyle;
+static lv_style_t hugeFontStyle;
 // ? --------------------------------------------------main gui
 //Main screen objects declaration
 lv_obj_t *main_scr; //LVGL Object that represents main screen

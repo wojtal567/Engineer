@@ -16,63 +16,31 @@ void stylesInits(void){
     
     lv_style_init(&font22Style);
     lv_style_set_text_font(&font22Style, LV_STATE_DEFAULT, &lv_font_montserrat_22);
-}
 
-void containerStyleInit(void)
-{
+    lv_style_init(&transparentBackgroundStyle);
+    lv_style_set_bg_opa(&transparentBackgroundStyle, LV_STATE_DEFAULT, LV_OPA_0);
+
+    lv_style_init(&borderlessStyle);
+    lv_style_set_border_width(&borderlessStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_outline_width(&borderlessStyle, LV_STATE_DEFAULT, 0);
+
     lv_style_init(&containerStyle);
-    lv_style_set_text_font(&containerStyle, LV_STATE_DEFAULT, &lv_font_montserrat_16);
-    lv_style_set_text_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_bg_opa(&containerStyle, LV_STATE_DEFAULT, LV_OPA_0);
     lv_style_set_border_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_radius(&containerStyle, LV_STATE_DEFAULT, 0);
-}
+    
+    lv_style_init(&hugeFontStyle);
+    lv_style_set_text_font(&hugeFontStyle, LV_STATE_DEFAULT, &hugeSymbolsFont48);
 
-//Tiny symbols to signalize wifi and sd card status
-void tinySymbolStyleInit(void)
-{
-    lv_style_init(&tinySymbolStyle);
-    lv_style_set_bg_opa(&tinySymbolStyle, LV_STATE_DEFAULT, LV_OPA_0);
-    lv_style_set_border_opa(&tinySymbolStyle, LV_STATE_DEFAULT, LV_OPA_0);
-    lv_style_set_text_color(&tinySymbolStyle, LV_STATE_DEFAULT, LV_COLOR_RED);
-}
-
-void transparentButtonStyleInit(void)
-{
-    lv_style_init(&transparentButtonStyle);
-    lv_style_set_bg_opa(&transparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
-    lv_style_set_border_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_outline_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_text_color(&transparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-void whiteButtonStyleInit(void)
-{
-    lv_style_init(&whiteButtonStyle);
-    lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_border_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_outline_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
-    lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-}
-
-void hugeTransparentButtonStyleInit(void)
-{
-    lv_style_init(&hugeTransparentButtonStyle);
-    lv_style_set_bg_opa(&hugeTransparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
-    lv_style_set_border_width(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_outline_width(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_text_font(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, &hugeSymbolsFont48);
-}
-
-void lineStyleInit(void)
-{
     lv_style_init(&lineStyle);
     lv_style_set_line_width(&lineStyle, LV_STATE_DEFAULT, 2);
     lv_style_set_line_color(&lineStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_line_rounded(&lineStyle, LV_STATE_DEFAULT, false);
-}
 
+    lv_style_init(&whiteButtonStyle);
+    lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
+    lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+}
 
 void timesettings_screen()
 {
@@ -90,7 +58,9 @@ void timesettings_screen()
     lv_label_set_text(back_time_settings_label, LV_SYMBOL_LEFT);
     lv_obj_set_size(back_time_settings_btn, 30, 15);
     lv_obj_set_event_cb(back_time_settings_btn, timesettings_back_btn);
-    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &hugeFontStyle);
 
     timeSettingsLabelAtBar = lv_label_create(contBarAtTimeSettings, NULL);
     lv_label_set_text(timeSettingsLabelAtBar, "Time Settings");
@@ -141,7 +111,6 @@ void timesettings_screen()
     lv_obj_set_pos(date_label, 5, 129);
     lv_label_set_text(date_label, "Date ");
     lv_obj_set_style_local_text_color(date_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
 
     date_btn = my_lv_btn_create(time_settings_scr, NULL, 95, 43, 165, 19, date_button_func);
 
@@ -334,8 +303,6 @@ void main_screen()
     contTemp = my_lv_cont_create(main_scr, NULL, 122, 46, 188, 30);
     lv_obj_set_click(contTemp, false);
     lv_obj_add_style(contTemp, LV_OBJ_PART_MAIN, &containerStyle);
-   // lv_obj_set_pos(contTemp, 188, 30);
-    //lv_obj_set_size(contTemp, 122, 46);
 
     contHumi = my_lv_cont_create(main_scr, NULL, 122, 46, 188, 74);
     lv_obj_set_click(contHumi, false);
@@ -367,7 +334,6 @@ void main_screen()
     lv_obj_set_style_local_bg_opa(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_70);
     lv_obj_set_style_local_bg_color(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
 
-
     labelTemp = lv_label_create(contTemp, NULL);
     lv_obj_set_pos(labelTemp, 5, 3);
     lv_label_set_text(labelTemp, "Temp");
@@ -377,40 +343,24 @@ void main_screen()
     lv_obj_set_pos(labelTempValue, 16, 22);
     lv_label_set_text(labelTempValue, "         -");
     lv_label_set_align(labelTempValue, LV_LABEL_ALIGN_LEFT);
-    labelHumi = lv_label_create(contHumi, NULL);
-    lv_obj_set_pos(labelHumi, 5, 3);
-    lv_label_set_text(labelHumi, "RH");
 
-    labelHumiValue = lv_label_create(contHumi, NULL);
+    labelHumi = my_lv_label_create(contHumi, NULL, 5, 3, "RH");
+
+    labelHumiValue = my_lv_label_create(contHumi, NULL, 16, 22, "         -");
     lv_obj_add_style(labelHumiValue, LV_OBJ_PART_MAIN, &font20Style);
-    lv_obj_set_pos(labelHumiValue, 16, 22);
-    lv_label_set_text(labelHumiValue, "         -");
 
-    labelPM10 = lv_label_create(contPM10, NULL);
-    lv_obj_set_pos(labelPM10, 5, 5);
-    lv_label_set_text(labelPM10, "PM 1.0 ug/m");
+    labelPM10 = my_lv_label_create(contPM10, NULL, 5, 5, "PM 1.0 ug/m");
 
-    labelPM10UpperIndex = lv_label_create(contPM10, NULL);
-    lv_obj_set_pos(labelPM10UpperIndex, 80, 3);
-    lv_label_set_text(labelPM10UpperIndex, "3");
+    labelPM10UpperIndex = my_lv_label_create(contPM10, NULL, 80, 3, "3");
 
-    labelPM25 = lv_label_create(contPM25, NULL);
-    lv_obj_set_pos(labelPM25, 5, 5);
-    lv_label_set_text(labelPM25, "PM 2.5                ug/m");
+    labelPM25 = my_lv_label_create(contPM25, NULL, 5, 5, "PM 2.5                ug/m");
 
-    labelPM25UpperIndex = lv_label_create(contPM25, NULL);
-    //	lv_obj_align(labelPM25, labelPM25UpperIndex, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
-    lv_obj_set_pos(labelPM25UpperIndex, 167, 3);
-    lv_label_set_text(labelPM25UpperIndex, "3");
+    labelPM25UpperIndex = my_lv_label_create(contPM25, NULL, 167, 3 , "3");
     lv_obj_add_style(labelPM25UpperIndex, LV_OBJ_PART_MAIN, &font12Style);
 
-    labelPM100 = lv_label_create(contPM100, NULL);
-    lv_obj_set_pos(labelPM100, 5, 5);
-    lv_label_set_text(labelPM100, "PM 10 ug/m");
+    labelPM100 = my_lv_label_create(contPM100, NULL, 5, 5, "PM 10 ug/m");
 
-    labelPM100UpperIndex = lv_label_create(contPM100, NULL);
-    lv_obj_set_pos(labelPM100UpperIndex, 77, 3);
-    lv_label_set_text(labelPM100UpperIndex, "3");
+    labelPM100UpperIndex = my_lv_label_create(contPM100, NULL, 77, 3, "3");
     lv_obj_add_style(labelPM100UpperIndex, LV_OBJ_PART_MAIN, &font12Style);
 
     labelPM10Data = lv_label_create(contPM10, NULL);
@@ -551,18 +501,13 @@ void lock_screen()
     lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
     lv_obj_add_style(sdStatusAtLock, LV_OBJ_PART_MAIN, &font16Style);
 
-    wifiStatusAtLockWarning = lv_label_create(wifiStatusAtLock, NULL);
-    lv_label_set_text(wifiStatusAtLockWarning, LV_SYMBOL_CLOSE);
+    wifiStatusAtLockWarning = my_lv_label_create(wifiStatusAtLock, NULL, 5, 5, LV_SYMBOL_CLOSE);
     lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
     lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &font12Style);
 
-    lv_obj_set_pos(wifiStatusAtLockWarning, 5, 5);
-
-    sdStatusAtLockWarning = lv_label_create(sdStatusAtLock, NULL);
-    lv_label_set_text(sdStatusAtLockWarning, LV_SYMBOL_CLOSE);
+    sdStatusAtLockWarning = my_lv_label_create(sdStatusAtLock, NULL, 2, 5, LV_SYMBOL_CLOSE);
     lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
     lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
 
     ledAtLock = lv_led_create(lock_scr, NULL);
     lv_obj_set_size(ledAtLock, 13, 13);
@@ -598,11 +543,8 @@ void samplingSettings_screen()
     lv_obj_set_event_cb(sampling_save_btn, sampling_settings_save_btn);
     lv_obj_add_style(sampling_save_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 
-    measure_period_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_period_label, 5, 52);
+    measure_period_label = my_lv_label_create(sampling_settings_scr, NULL, 5, 52, "Measurements \nsaving time \n[HH:MM:SS]", LV_COLOR_WHITE);
     lv_obj_set_style_local_text_font(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measure_period_label, "Measurements \nsaving time \n[HH:MM:SS]");
-    lv_obj_set_style_local_text_color(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measure_period_hour = lv_spinbox_create(sampling_settings_scr, NULL);
     lv_textarea_set_cursor_hidden(measure_period_hour, true);
@@ -620,10 +562,7 @@ void samplingSettings_screen()
     lv_theme_apply(measure_period_hour_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(measure_period_hour_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    measure_colon_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_colon_label, 210, 70);
-    lv_label_set_text(measure_colon_label, ":");
-    lv_obj_set_style_local_text_color(measure_colon_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    measure_colon_label = my_lv_label_create(sampling_settings_scr, NULL, 210, 70, ":", LV_COLOR_WHITE);
 
     measure_period_minute = lv_spinbox_create(sampling_settings_scr, NULL);
     lv_textarea_set_cursor_hidden(measure_period_minute, true);
@@ -641,10 +580,7 @@ void samplingSettings_screen()
     lv_theme_apply(measure_period_minute_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(measure_period_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    measure_colon_label2 = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_colon_label2, 265, 70);
-    lv_label_set_text(measure_colon_label2, ":");
-    lv_obj_set_style_local_text_color(measure_colon_label2, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    measure_colon_label2 = my_lv_label_create(sampling_settings_scr, NULL, 265, 70, ":", LV_COLOR_WHITE);
 
     measure_period_second = lv_spinbox_create(sampling_settings_scr, NULL);
     lv_textarea_set_cursor_hidden(measure_period_second, true);
