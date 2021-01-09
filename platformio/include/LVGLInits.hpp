@@ -76,25 +76,17 @@ void lineStyleInit(void)
 
 void timesettings_screen()
 {
-    contBarAtTimeSettings = lv_cont_create(time_settings_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtTimeSettings, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtTimeSettings, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtTimeSettings, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtTimeSettings, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtTimeSettings, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtTimeSettings, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtTimeSettings, false);
-
-    back_time_settings_btn = lv_btn_create(contBarAtTimeSettings, NULL); //TODO BRAK POS
+    back_time_settings_btn = my_lv_btn_create(time_settings_scr, NULL, 30, 15, 14, 10, timesettings_back_btn); 
     back_time_settings_label = lv_label_create(back_time_settings_btn, NULL);
     lv_label_set_text(back_time_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_time_settings_btn, 30, 15);
-    lv_obj_set_event_cb(back_time_settings_btn, timesettings_back_btn);
     lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-    timeSettingsLabelAtBar = lv_label_create(contBarAtTimeSettings, NULL);
+    timeSettingsLabelAtBar = lv_label_create(time_settings_scr, NULL);
+    lv_obj_set_pos(timeSettingsLabelAtBar,195, 10);
     lv_label_set_text(timeSettingsLabelAtBar, "Time Settings");
+    lv_obj_set_style_local_text_color(timeSettingsLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
+    
     time_label = lv_label_create(time_settings_scr, NULL);
     lv_obj_set_pos(time_label, 5, 70);
     lv_label_set_text(time_label, "Time [HH:MM]");
@@ -105,7 +97,7 @@ void timesettings_screen()
     lv_textarea_set_text_align(time_hour, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(time_hour, 0, 23);
     lv_spinbox_set_digit_format(time_hour, 2, 0);
-    lv_obj_set_size(time_hour, 40, 34); //TODO ZMIENIONED
+    lv_obj_set_size(time_hour, 40, 34);
     lv_obj_set_pos(time_hour, 165, 61);
 
     time_hour_increment = my_lv_btn_create(time_settings_scr, NULL, 20, 20, 175, 39, hour_increment);
@@ -126,7 +118,7 @@ void timesettings_screen()
     lv_textarea_set_text_align(time_minute, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(time_minute, 0, 59);
     lv_spinbox_set_digit_format(time_minute, 2, 0);
-    lv_obj_set_size(time_minute, 40, 34); //TODO ZMIENIONED
+    lv_obj_set_size(time_minute, 40, 34); 
     lv_obj_set_pos(time_minute, 219, 61);
 
     time_minute_increment = my_lv_btn_create(time_settings_scr, NULL, 20, 20, 229, 39, minute_increment);
@@ -143,7 +135,7 @@ void timesettings_screen()
     lv_obj_set_style_local_text_color(date_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
 
-    date_btn = my_lv_btn_create(time_settings_scr, NULL, 95, 43, 165, 19, date_button_func);
+    date_btn = my_lv_btn_create(time_settings_scr, NULL, 95, 43, 165, 119, date_button_func);
 
     date_btn_label = lv_label_create(date_btn, NULL);
     lv_label_set_text(date_btn_label, "99.99.9999");
@@ -160,7 +152,7 @@ void timesettings_screen()
                                               "10 min\n"
                                               "60 min\n"
                                               "Never");
-    lv_obj_set_size(lockScreenDDlist, 120, 34); //TODO ZMIENIONED
+    lv_obj_set_size(lockScreenDDlist, 120, 34); 
     lv_obj_set_pos(lockScreenDDlist, 165, 164);
 
     timeSettings_btn = my_lv_btn_create(time_settings_scr, NULL, 75, 33, 240, 200, timesettings_save_btn);
@@ -176,24 +168,16 @@ void timesettings_screen()
 
 void settings_screen()
 {
-    contBarAtMainSettings = lv_cont_create(settings_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMainSettings, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtMainSettings, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtMainSettings, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtMainSettings, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtMainSettings, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMainSettings, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMainSettings, false);
-
-    back_settings_btn = lv_btn_create(contBarAtMainSettings, NULL); //TODO BRAK POS
+    back_settings_btn = my_lv_btn_create(settings_scr, NULL, 30, 15, 14, 10, btn_settings_back);
     back_settings_label = lv_label_create(back_settings_btn, NULL);
     lv_label_set_text(back_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_settings_btn, 30, 15);
-    lv_obj_set_event_cb(back_settings_btn, btn_settings_back);
     lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-    settingsLabelAtBar = lv_label_create(contBarAtMainSettings, NULL);
+    settingsLabelAtBar = lv_label_create(settings_scr, NULL);
+    lv_obj_set_pos(settingsLabelAtBar, 239, 10);
     lv_label_set_text(settingsLabelAtBar, "Settings");
+    lv_obj_set_style_local_text_color(settingsLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
 
     wifiBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 60, 38, WiFi_btn);
 
@@ -213,7 +197,7 @@ void settings_screen()
     lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
     lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    infoBtnName = lv_label_create(settings_scr, NULL);//TODO DUDUDUDU
+    infoBtnName = lv_label_create(settings_scr, NULL);
     lv_label_set_text(infoBtnName, "Info");
     lv_obj_set_pos(infoBtnName, 207, 103);
     lv_obj_add_style(infoBtnName, LV_OBJ_PART_MAIN, &font20Style);
@@ -244,23 +228,14 @@ void settings_screen()
 
 void info_screen()
 {
-    contBarAtMaininfo = lv_cont_create(info_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMaininfo, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtMaininfo, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtMaininfo, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtMaininfo, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtMaininfo, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMaininfo, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMaininfo, false);
-
-    back_info_btn = lv_btn_create(contBarAtMaininfo, NULL); //TODO BRAK POS
+    back_info_btn = my_lv_btn_create(info_scr, NULL, 30, 15, 14, 10, setButton_task);
     back_info_label = lv_label_create(back_info_btn, NULL);
     lv_label_set_text(back_info_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_info_btn, 30, 15);
-    lv_obj_set_event_cb(back_info_btn, setButton_task);
     lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-    lcdLabelAtBar = lv_label_create(contBarAtMaininfo, NULL);
+    lcdLabelAtBar = lv_label_create(info_scr, NULL);
+    lv_obj_set_pos(lcdLabelAtBar, 216, 10);
+    lv_obj_set_style_local_text_color(lcdLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_label_set_text(lcdLabelAtBar, "Device info");
 
     info_wifi_label = lv_label_create(info_scr, NULL);
@@ -453,24 +428,15 @@ void main_screen()
 
 void wifi_screen()
 {
-    contBarAtMainWiFi = lv_cont_create(wifi_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMainWiFi, true);
-    lv_obj_align(contBarAtMainWiFi, NULL, LV_ALIGN_IN_TOP_MID, 0, -5);
-    lv_cont_set_fit4(contBarAtMainWiFi, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtMainWiFi, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtMainWiFi, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMainWiFi, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMainWiFi, false);
-
-    cancel_btn = lv_btn_create(contBarAtMainWiFi, NULL); //TODO brak pos
+    cancel_btn = my_lv_btn_create(wifi_scr, NULL, 14, 14, 14, 10, btn_cancel);
     cancel_label = lv_label_create(cancel_btn, NULL);
     lv_label_set_text(cancel_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(cancel_btn, 30, 15);
-    lv_obj_set_event_cb(cancel_btn, btn_cancel);
     lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-    wifiLabelAtBar = lv_label_create(contBarAtMainWiFi, NULL);
+    wifiLabelAtBar = lv_label_create(wifi_scr, NULL);
+    lv_obj_set_pos(wifiLabelAtBar, 201, 10);
     lv_label_set_text(wifiLabelAtBar, "WiFi settings");
+    lv_obj_set_style_local_text_color(wifiLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     ssid_label = lv_label_create(wifi_scr, NULL);
     lv_label_set_text(ssid_label, "SSID: ");
@@ -483,7 +449,7 @@ void wifi_screen()
     lv_textarea_set_one_line(ssid_ta, true);    
     lv_obj_set_event_cb(ssid_ta, ta_event_cb);
     lv_textarea_set_cursor_hidden(ssid_ta, true);
-    lv_obj_set_size(ssid_ta, 140, 34); //TODO ZMIENIONED
+    lv_obj_set_size(ssid_ta, 140, 34);
     lv_obj_set_pos(ssid_ta, 100, 45);
 
     pwd_label = lv_label_create(wifi_scr, NULL);
@@ -497,7 +463,7 @@ void wifi_screen()
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_event_cb(pwd_ta, ta_event_cb);
     lv_textarea_set_cursor_hidden(pwd_ta, true);
-    lv_obj_set_size(pwd_ta, 140, 34); //TODO ZMIENIONED
+    lv_obj_set_size(pwd_ta, 140, 34); 
     lv_obj_set_pos(pwd_ta, 100, 85);
 
     show_hide_btn = my_lv_btn_create(wifi_scr, NULL, 75, 43, 243, 85, show_hide_btn_func);
@@ -584,18 +550,14 @@ void samplingSettings_screen()
     lv_obj_set_style_local_border_opa(contBarAtSampling, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
     lv_obj_set_click(contBarAtSampling, false);
 
-    back_sampling_settings_btn = lv_btn_create(contBarAtSampling, NULL); //TODO BRAK POS
+    back_sampling_settings_btn = my_lv_btn_create(sampling_settings_scr, NULL, 30, 15, 14, 10, sampling_settings_back_btn); 
     back_sampling_settings_label = lv_label_create(back_sampling_settings_btn, NULL);
     lv_label_set_text(back_sampling_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_sampling_settings_btn, 30, 15);
-    lv_obj_set_event_cb(back_sampling_settings_btn, sampling_settings_back_btn);
     lv_obj_add_style(back_sampling_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
 
-    sampling_save_btn = lv_btn_create(contBarAtSampling, NULL); //TODO BRAK POS
+    sampling_save_btn = my_lv_btn_create(sampling_settings_scr, NULL, 75, 25, 231, 10, sampling_settings_save_btn);
     sampling_save_label = lv_label_create(sampling_save_btn, NULL);
     lv_label_set_text(sampling_save_label, "Save");
-    lv_obj_set_size(sampling_save_btn, 75, 25);
-    lv_obj_set_event_cb(sampling_save_btn, sampling_settings_save_btn);
     lv_obj_add_style(sampling_save_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 
     measure_period_label = lv_label_create(sampling_settings_scr, NULL);
@@ -609,7 +571,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_period_hour, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(measure_period_hour, 0, 24);
     lv_spinbox_set_digit_format(measure_period_hour, 2, 0);
-    lv_obj_set_size(measure_period_hour, 40, 34); //TODO ZMIENIONED
+    lv_obj_set_size(measure_period_hour, 40, 34);
     lv_obj_set_pos(measure_period_hour, 165, 61);
 
     measure_period_hour_increment = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 175, 39, sampling_hour_increment);
@@ -630,7 +592,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_period_minute, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(measure_period_minute, 0, 59);
     lv_spinbox_set_digit_format(measure_period_minute, 2, 0);
-    lv_obj_set_size(measure_period_minute, 40, 34); //TODO ZMIENIONED
+    lv_obj_set_size(measure_period_minute, 40, 34);
     lv_obj_set_pos(measure_period_minute, 219, 61);
 
     measure_period_minute_increment = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 229, 39, sampling_minute_increment);
@@ -651,7 +613,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_period_second, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_range(measure_period_second, 0, 59);
     lv_spinbox_set_digit_format(measure_period_second, 2, 0);
-    lv_obj_set_size(measure_period_second, 40, 34); //TODO ZMIENIONED
+    lv_obj_set_size(measure_period_second, 40, 34);
     lv_obj_set_pos(measure_period_second, 274, 61);
 
     measure_period_second_increment = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 284, 39, sampling_second_increment);
@@ -673,7 +635,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_number, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(measure_number, 2, 0);
     lv_spinbox_set_range(measure_number, 1, 20);
-    lv_obj_set_size(measure_number, 50, 34); //TODO ZMIENIONED
+    lv_obj_set_size(measure_number, 50, 34);
     lv_obj_set_pos(measure_number, 206, 119);
 
     measure_number_increment = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 257, 119, measure_number_increment_func);
@@ -695,7 +657,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(measure_av_period, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(measure_av_period, 3, 0);
     lv_spinbox_set_range(measure_av_period, 5, 999);
-    lv_obj_set_size(measure_av_period, 50, 34); //TODO ZMIENIONED
+    lv_obj_set_size(measure_av_period, 50, 34);
     lv_obj_set_pos(measure_av_period, 206, 160);
 
     measure_av_period_increment = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 257, 160, av_period_increment);
@@ -717,7 +679,7 @@ void samplingSettings_screen()
     lv_textarea_set_text_align(turn_fan_on_time, LV_LABEL_ALIGN_CENTER);
     lv_spinbox_set_digit_format(turn_fan_on_time, 3, 0);
     lv_spinbox_set_range(turn_fan_on_time, 1, 999);
-    lv_obj_set_size(turn_fan_on_time, 50, 34); //TODO ZMIENIONED
+    lv_obj_set_size(turn_fan_on_time, 50, 34);
     lv_obj_set_pos(turn_fan_on_time, 206, 200);
 
     turn_fan_on_time_increment = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 257, 200, turn_fan_on_time_increment_func);

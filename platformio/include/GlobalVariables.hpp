@@ -183,7 +183,6 @@ lv_obj_t *dividingLines[7];
 lv_color_t airQualityColors[6] = {LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
 
 // ? --------------------------------------------------wifi gui
-lv_obj_t *contBarAtMainWiFi;
 lv_obj_t *wifiLabelAtBar;
 lv_obj_t *wifi_scr;
 lv_obj_t *keyboard;
@@ -199,7 +198,6 @@ lv_obj_t *show_hide_btn;
 lv_obj_t *show_hide_btn_label;
 // ? -------------------------------------------------- info gui
 lv_obj_t *info_scr;
-lv_obj_t *contBarAtMaininfo;
 lv_obj_t *back_info_btn;
 lv_obj_t *back_info_label;
 lv_obj_t *lcdLabelAtBar;
@@ -208,7 +206,6 @@ lv_obj_t *info_wifi_address_label;
 lv_obj_t *config_label;
 // ? --------------------------------------------------settings gui
 lv_obj_t *settings_scr;
-lv_obj_t *contBarAtMainSettings;
 lv_obj_t *back_settings_btn;
 lv_obj_t *back_settings_label;
 lv_obj_t *settingsLabelAtBar;
@@ -227,7 +224,7 @@ lv_obj_t *tempBtnName;
 
 // ? --------------------------------------------------time settings gui
 lv_obj_t *time_settings_scr;
-lv_obj_t *contBarAtTimeSettings;
+
 lv_obj_t *back_time_settings_btn;
 lv_obj_t *back_time_settings_label;
 lv_obj_t *timeSettingsLabelAtBar;
