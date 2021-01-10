@@ -36,7 +36,7 @@ void SQLiteDb::createTable(Stream *serial)
         serial->println("No database open");
 
     open();
-    String sql = "CREATE table if not exists " + _tableName + " (timestamp datetime NOT NULL PRIMARY KEY, temperature float, humidity FLOAT, pm10standard FLOAT, pm25standard FLOAT, pm100standard float, pm10env FLOAT, pm25env FLOAT, pm100env FLOAT, particles03 FLOAT, particles05 FLOAT, particles10 FLOAT, particles25 FLOAT, particles50 FLOAT, particles100 FLOAT)";
+        String sql = "CREATE table if not exists " + _tableName + " (timestamp datetime NOT NULL PRIMARY KEY, Temperature float, Humidity FLOAT, Pm10 FLOAT, Pm25 FLOAT, Pm100 float, Particles03 FLOAT, Particles05 FLOAT, Particles10 FLOAT, Particles25 FLOAT, Particles50 FLOAT, Particles100 FLOAT)";
     int rc = sqlite3_exec(
         object,
         sql.c_str(),
@@ -67,8 +67,8 @@ int SQLiteDb::save(std::map<std::string, float> data, float temperature, float h
         return 0;
     }
 
-    String sql = "INSERT INTO " + _tableName + " ('timestamp', 'temperature', 'humidity', 'pm10standard', 'pm25standard', 'pm100standard', 'pm10env', 'pm25env', 'pm100env', 'particles03', 'particles05', 'particles10', 'particles25', 'particles50', 'particles100') VALUES ('" +
-                 timestamp + "', " + (String)temperature + ", " + (String)humidity + ", " + (String)data["pm10_standard"] + ", " + (String)data["pm25_standard"] + ", " + (String)data["pm100_standard"] + ", " + (String)data["pm10_env"] + ", " + (String)data["pm25_env"] + ", " + (String)data["pm100_env"] + ", " + (String)data["particles_03um"] + ", " + (String)data["particles_05um"] + ", " + (String)data["particles_10um"] + ", " + (String)data["particles_25um"] + ", " + (String)data["particles_50um"] + ", " + (String)data["particles_100um"] + ")";
+    String sql = "INSERT INTO " + _tableName + " ('Timestamp', 'Temperature', 'Humidity', 'Pm10', 'Pm25', 'Pm100', 'Particles03', 'Particles05', 'Particles10', 'Particles25', 'Particles50', 'Particles100') VALUES ('" +
+                 timestamp + "', " + (String)temperature + ", " + (String)humidity + ", " + (String)data["pm10_standard"] + ", " + (String)data["pm25_standard"] + ", " + (String)data["pm100_standard"] + ", " + (String)data["particles_03um"] + ", " + (String)data["particles_05um"] + ", " + (String)data["particles_10um"] + ", " + (String)data["particles_25um"] + ", " + (String)data["particles_50um"] + ", " + (String)data["particles_100um"] + ")";
 
     debugger->println("Executing: " + sql);
 
