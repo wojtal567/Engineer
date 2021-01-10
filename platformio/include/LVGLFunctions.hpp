@@ -835,7 +835,7 @@ static void turnFanOnTimeIncrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if((lv_spinbox_get_value(turnFanOnTime)+1)<((lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)))
+        if((lv_spinbox_get_value(turnFanOnTime)+1)<((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)))
             lv_spinbox_increment(turnFanOnTime);
     }        
 }
