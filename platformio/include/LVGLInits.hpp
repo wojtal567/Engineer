@@ -56,18 +56,10 @@ void timesettings_screen()
     back_time_settings_btn = my_lv_btn_create(time_settings_scr, NULL, 30, 15, 14, 10, timesettings_back_btn); 
     back_time_settings_label = lv_label_create(back_time_settings_btn, NULL);
     lv_label_set_text(back_time_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_time_settings_btn, 30, 15);
-    lv_obj_set_event_cb(back_time_settings_btn, timesettings_back_btn);
-    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
-    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
-    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &hugeFontStyle);
 
-    timeSettingsLabelAtBar = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(timeSettingsLabelAtBar,195, 10);
-    lv_label_set_text(timeSettingsLabelAtBar, "Time Settings");
-    lv_obj_set_style_local_text_color(timeSettingsLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    timeSettingsLabelAtBar = my_lv_label_create(time_settings_scr, NULL, 195, 10, "Time Settings");
 
-    time_label = my_lv_label_create(time_settings_scr, NULL, 5, 70, "Time [HH:MM]");
+    time_label = my_lv_label_create(time_settings_scr, timeSettingsLabelAtBar, 5, 70, "Time [HH:MM]");
 
     time_hour = lv_spinbox_create(time_settings_scr, NULL);
     lv_textarea_set_cursor_hidden(time_hour, true);
@@ -85,9 +77,7 @@ void timesettings_screen()
     lv_theme_apply(time_hour_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(time_hour_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    time_colon_label = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(time_colon_label, 210, 70);
-    lv_label_set_text(time_colon_label, ":");
+    time_colon_label = my_lv_label_create(time_settings_scr, time_label, 210, 70, ":");
     lv_obj_set_style_local_text_color(time_colon_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     time_minute = lv_spinbox_create(time_settings_scr, NULL);
@@ -106,22 +96,15 @@ void timesettings_screen()
     lv_theme_apply(time_minute_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(time_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    date_label = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(date_label, 5, 129);
-    lv_label_set_text(date_label, "Date ");
-    lv_obj_set_style_local_text_color(date_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    date_label = my_lv_label_create(time_settings_scr, NULL, 5, 129, "Date ");
 
     date_btn = my_lv_btn_create(time_settings_scr, NULL, 95, 43, 165, 119, date_button_func);
-
     date_btn_label = lv_label_create(date_btn, NULL);
     lv_label_set_text(date_btn_label, "99.99.9999");
     lv_obj_set_style_local_border_opa(date_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_obj_set_style_local_text_color(date_btn_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
-    lockScreenLabel = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(lockScreenLabel, 5, 170);
-    lv_label_set_text(lockScreenLabel, "Lock screen after ");
-    lv_obj_set_style_local_text_color(lockScreenLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lockScreenLabel = my_lv_label_create(time_settings_scr, NULL, 5, 170, "Lock screen after ");
     lockScreenDDlist = lv_dropdown_create(time_settings_scr, NULL);
     lv_dropdown_set_options(lockScreenDDlist, "1 min\n"
                                               "5 min\n"
@@ -147,63 +130,40 @@ void settings_screen()
     back_settings_btn = my_lv_btn_create(settings_scr, NULL, 30, 15, 14, 10, btn_settings_back);
     back_settings_label = lv_label_create(back_settings_btn, NULL);
     lv_label_set_text(back_settings_label, LV_SYMBOL_LEFT);
-      lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(back_settings_label, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    settingsLabelAtBar = lv_label_create(settings_scr, NULL);
-    lv_obj_set_pos(settingsLabelAtBar, 239, 10);
-    lv_label_set_text(settingsLabelAtBar, "Settings");
-    lv_obj_set_style_local_text_color(settingsLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    settingsLabelAtBar = my_lv_label_create(settings_scr, NULL, 239, 10, "Settings");
 
     wifiBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 60, 38, WiFi_btn);
-
     wifiBtnLabel = lv_label_create(wifiBtn, NULL);
     lv_label_set_text(wifiBtnLabel, MY_WIFI_SYMBOL);
-    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &containerStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &hugeFontStyle);
 
-    wifiBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(wifiBtnName, "WiFi");
-    lv_obj_set_pos(wifiBtnName, 63, 103);
+    wifiBtnName = my_lv_label_create(settings_scr, NULL, 63, 103, "WiFi");
     lv_obj_add_style(wifiBtnName, LV_OBJ_PART_MAIN, &font20Style);
 
-    infoBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 200, 38, info_btn);
+    infoBtn = my_lv_btn_create(settings_scr, wifiBtn, 60, 60, 200, 38, info_btn);
     infoBtnLabel = lv_label_create(infoBtn, NULL);
     lv_label_set_text(infoBtnLabel, MY_INFO_SYMBOL);
-    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
-    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    infoBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(infoBtnName, "Info");
-    lv_obj_set_pos(infoBtnName, 207, 103);
-    lv_obj_add_style(infoBtnName, LV_OBJ_PART_MAIN, &font20Style);
+    infoBtnName = my_lv_label_create(settings_scr, wifiBtnName, 207, 103, "Info");
 
-    timeBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 60, 140, time_settings_btn);
+    timeBtn = my_lv_btn_create(settings_scr, wifiBtn, 60, 60, 60, 140, time_settings_btn);
     timeBtnLabel = lv_label_create(timeBtn, NULL);
     lv_label_set_text(timeBtnLabel, MY_CLOCK_SYMBOL);
-     lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
-    lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    timeBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(timeBtnName, "Time");
-    lv_obj_set_pos(timeBtnName, 65, 200);
-    lv_obj_add_style(timeBtnName, LV_OBJ_PART_MAIN, &font20Style);
+    timeBtnName = my_lv_label_create(settings_scr, wifiBtnName, 65, 200, "Time");
 
-    tempBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 200, 140, temp_settings_btn);
-
-    tempBtnLabel = lv_label_create(tempBtn, NULL);
+    tempBtn = my_lv_btn_create(settings_scr, wifiBtn, 60, 60, 200, 140, temp_settings_btn);
+    tempBtnLabel = lv_label_create(tempBtn, wifiBtnName);
     lv_label_set_text(tempBtnLabel, MY_COGS_SYMBOL);
-     lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
-    lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
-
-    tempBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(tempBtnName, "Sampling");
-    lv_obj_set_pos(tempBtnName, 180, 200);
-    lv_obj_add_style(tempBtnName, LV_OBJ_PART_MAIN, &font20Style);
+    lv_obj_add_style(tempBtnLabel, LV_OBJ_PART_MAIN, &hugeFontStyle);
+    tempBtnName = my_lv_label_create(settings_scr, wifiBtnName, 180, 200, "Sampling");
 }
 
 void info_screen()
@@ -211,26 +171,17 @@ void info_screen()
     back_info_btn = my_lv_btn_create(info_scr, NULL, 30, 15, 14, 10, setButton_task);
     back_info_label = lv_label_create(back_info_btn, NULL);
     lv_label_set_text(back_info_label, LV_SYMBOL_LEFT);
-      lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
 
-    lcdLabelAtBar = lv_label_create(info_scr, NULL);
-    lv_obj_set_pos(lcdLabelAtBar, 216, 10);
-    lv_obj_set_style_local_text_color(lcdLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_label_set_text(lcdLabelAtBar, "Device info");
+    lcdLabelAtBar = my_lv_label_create(info_scr, NULL, 216, 10, "Device info");
 
-    info_wifi_label = lv_label_create(info_scr, NULL);
-    lv_label_set_text(info_wifi_label, "WiFi address: ");
-    lv_obj_set_style_local_text_color(info_wifi_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    info_wifi_label = my_lv_label_create(info_scr, NULL, 5, 53, "WiFi address: ");
 
-    lv_obj_set_pos(info_wifi_label, 5, 53);
-    info_wifi_address_label = lv_label_create(info_scr, NULL);
-    lv_obj_set_pos(info_wifi_address_label, 115, 53);
-    lv_obj_set_style_local_text_color(info_wifi_address_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    info_wifi_address_label = my_lv_label_create(info_scr, NULL, 115, 53, "");
 
-    config_label = lv_label_create(info_scr, NULL);
-    lv_obj_set_pos(config_label, 5, 70);
-    lv_obj_set_style_local_text_color(config_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    config_label = my_lv_label_create(info_scr, NULL, 5, 70, "");
+
 }
 
 void main_screen()
