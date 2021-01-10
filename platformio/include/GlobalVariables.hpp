@@ -113,8 +113,6 @@ static lv_style_t font22Style;
 //Additional styles with initalization functions
 
 static lv_style_t tinySymbolStyle;
-static lv_style_t transparentButtonStyle;
-static lv_style_t hugeTransparentButtonStyle;
 static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
 static lv_style_t transparentBackgroundStyle;

@@ -25,6 +25,7 @@ void stylesInits(void){
     lv_style_set_outline_width(&borderlessStyle, LV_STATE_DEFAULT, 0);
 
     lv_style_init(&containerStyle);
+    lv_style_set_bg_opa(&containerStyle, LV_STATE_DEFAULT, LV_OPA_0);
     lv_style_set_border_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_radius(&containerStyle, LV_STATE_DEFAULT, 0);
     
@@ -58,11 +59,7 @@ void timesettings_screen()
     lv_label_set_text(timeSettingsLabelAtBar, "Time Settings");
     lv_obj_set_style_local_text_color(timeSettingsLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
-    
-    time_label = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(time_label, 5, 70);
-    lv_label_set_text(time_label, "Time [HH:MM]");
-    lv_obj_set_style_local_text_color(time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    time_label = my_lv_label_create(time_settings_scr, NULL, 5, 70, "Time [HH:MM]");
 
     time_hour = lv_spinbox_create(time_settings_scr, NULL);
     lv_textarea_set_cursor_hidden(time_hour, true);
@@ -106,7 +103,6 @@ void timesettings_screen()
     lv_label_set_text(date_label, "Date ");
     lv_obj_set_style_local_text_color(date_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
-
     date_btn = my_lv_btn_create(time_settings_scr, NULL, 95, 43, 165, 119, date_button_func);
 
     date_btn_label = lv_label_create(date_btn, NULL);
@@ -143,19 +139,20 @@ void settings_screen()
     back_settings_btn = my_lv_btn_create(settings_scr, NULL, 30, 15, 14, 10, btn_settings_back);
     back_settings_label = lv_label_create(back_settings_btn, NULL);
     lv_label_set_text(back_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+      lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
 
     settingsLabelAtBar = lv_label_create(settings_scr, NULL);
     lv_obj_set_pos(settingsLabelAtBar, 239, 10);
     lv_label_set_text(settingsLabelAtBar, "Settings");
     lv_obj_set_style_local_text_color(settingsLabelAtBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
-
     wifiBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 60, 38, WiFi_btn);
 
     wifiBtnLabel = lv_label_create(wifiBtn, NULL);
     lv_label_set_text(wifiBtnLabel, MY_WIFI_SYMBOL);
-    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &containerStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     wifiBtnName = lv_label_create(settings_scr, NULL);
@@ -166,7 +163,8 @@ void settings_screen()
     infoBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 200, 38, info_btn);
     infoBtnLabel = lv_label_create(infoBtn, NULL);
     lv_label_set_text(infoBtnLabel, MY_INFO_SYMBOL);
-    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &containerStyle);
+    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     infoBtnName = lv_label_create(settings_scr, NULL);
@@ -177,7 +175,8 @@ void settings_screen()
     timeBtn = my_lv_btn_create(settings_scr, NULL, 60, 60, 60, 140, time_settings_btn);
     timeBtnLabel = lv_label_create(timeBtn, NULL);
     lv_label_set_text(timeBtnLabel, MY_CLOCK_SYMBOL);
-    lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+     lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &containerStyle);
+    lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     timeBtnName = lv_label_create(settings_scr, NULL);
@@ -189,7 +188,8 @@ void settings_screen()
 
     tempBtnLabel = lv_label_create(tempBtn, NULL);
     lv_label_set_text(tempBtnLabel, MY_COGS_SYMBOL);
-    lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+     lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &containerStyle);
+    lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     tempBtnName = lv_label_create(settings_scr, NULL);
@@ -203,7 +203,8 @@ void info_screen()
     back_info_btn = my_lv_btn_create(info_scr, NULL, 30, 15, 14, 10, setButton_task);
     back_info_label = lv_label_create(back_info_btn, NULL);
     lv_label_set_text(back_info_label, LV_SYMBOL_LEFT);
-    lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+      lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
 
     lcdLabelAtBar = lv_label_create(info_scr, NULL);
     lv_obj_set_pos(lcdLabelAtBar, 216, 10);
@@ -226,6 +227,7 @@ void info_screen()
 
 void main_screen()
 {
+    lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     contBarAtMain = lv_cont_create(main_scr, NULL);
     lv_obj_set_auto_realign(contBarAtMain, true);                  /*Auto realign when the size changes*/
     lv_obj_align(contBarAtMain, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
@@ -235,14 +237,15 @@ void main_screen()
     lv_obj_set_click(contBarAtMain, false);
  
 	lockButton = lv_btn_create(main_scr, NULL); //TODO BRAK POS
-	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
 	labelLockButton = lv_label_create(lockButton, NULL);
     lv_obj_align(lockButton, NULL, LV_ALIGN_IN_TOP_LEFT, 37, -5);
 	lv_label_set_text(labelLockButton, MY_LOCK_SYMBOL);
 	lv_btn_set_fit(lockButton, LV_FIT_TIGHT);
 	lv_obj_set_event_cb(lockButton, lockButton_task);
-    
+    lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &borderlessStyle);
 
     wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
     lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
@@ -258,7 +261,9 @@ void main_screen()
     lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -25, -5);
     lv_btn_set_fit(setButton, LV_FIT_TIGHT);
     lv_obj_set_event_cb(setButton, setButton_task);
-    lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &borderlessStyle);
+
 
 
     wifiStatusAtMainWarning = lv_label_create(wifiStatusAtMain, NULL);
@@ -280,46 +285,49 @@ void main_screen()
 
     contTemp = my_lv_cont_create(main_scr, NULL, 122, 46, 188, 30);
     lv_obj_set_click(contTemp, false);
+    lv_obj_add_style(contTemp, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contTemp, LV_OBJ_PART_MAIN, &containerStyle);
 
     contHumi = my_lv_cont_create(main_scr, NULL, 122, 46, 188, 74);
     lv_obj_set_click(contHumi, false);
+    lv_obj_add_style(contHumi, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contHumi, LV_OBJ_PART_MAIN, &containerStyle);
 
     contPM10 = my_lv_cont_create(main_scr, NULL, 91, 62, 10, 118);
     lv_obj_set_click(contPM10, false);
+    lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &containerStyle);
     lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &font12Style);
 
     contPM25 = my_lv_cont_create(main_scr, NULL, 180, 90, 10, 30);
     lv_obj_set_click(contPM25, false);
+    lv_obj_add_style(contPM25, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contPM25, LV_OBJ_PART_MAIN, &containerStyle);
 
     contPM100 = my_lv_cont_create(main_scr, NULL, 91, 62, 99, 118);
     lv_obj_set_click(contPM100, false);
+    lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &containerStyle);
     lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &font12Style);
 
     contAQI = my_lv_cont_create(main_scr, NULL, 122, 62, 188, 118);
     lv_obj_set_click(contAQI, false);
+    lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &containerStyle);
     lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &font12Style);
 
     contAQIColorBar = my_lv_cont_create(contAQI, NULL, 92, 24, 15, 25);
     lv_obj_set_click(contAQIColorBar, false);
+    lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &containerStyle);
     lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &font12Style);
     lv_obj_set_style_local_bg_opa(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_70);
-    lv_obj_set_style_local_bg_color(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
 
-    labelTemp = lv_label_create(contTemp, NULL);
-    lv_obj_set_pos(labelTemp, 5, 3);
-    lv_label_set_text(labelTemp, "Temp");
 
-    labelTempValue = lv_label_create(contTemp, NULL);
+    labelTemp = my_lv_label_create(contTemp, NULL, 5, 3, "Temp");
+
+    labelTempValue = my_lv_label_create(contTemp, NULL, 16, 22, "         -");
     lv_obj_add_style(labelTempValue, LV_OBJ_PART_MAIN, &font20Style);
-    lv_obj_set_pos(labelTempValue, 16, 22);
-    lv_label_set_text(labelTempValue, "         -");
     lv_label_set_align(labelTempValue, LV_LABEL_ALIGN_LEFT);
 
     labelHumi = my_lv_label_create(contHumi, NULL, 5, 3, "RH");
@@ -384,7 +392,8 @@ void wifi_screen()
     cancel_btn = my_lv_btn_create(wifi_scr, NULL, 14, 14, 14, 10, btn_cancel);
     cancel_label = lv_label_create(cancel_btn, NULL);
     lv_label_set_text(cancel_label, LV_SYMBOL_LEFT);
-    lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+      lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
 
     wifiLabelAtBar = lv_label_create(wifi_scr, NULL);
     lv_obj_set_pos(wifiLabelAtBar, 201, 10);
@@ -422,7 +431,8 @@ void wifi_screen()
     show_hide_btn = my_lv_btn_create(wifi_scr, NULL, 75, 43, 243, 85, show_hide_btn_func);
     show_hide_btn_label = lv_label_create(show_hide_btn, NULL);
     lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
-    lv_obj_add_style(show_hide_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    lv_obj_add_style(show_hide_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(show_hide_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_set_style_local_text_color(show_hide_btn_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     apply_btn = my_lv_btn_create(wifi_scr, NULL, 75, 43, 243, 43, btn_connect);
@@ -436,11 +446,11 @@ void lock_screen()
     contDateTimeAtLock = lv_cont_create(lock_scr, NULL);
     lv_obj_set_auto_realign(contDateTimeAtLock, true);
     lv_obj_align(contDateTimeAtLock, NULL, LV_ALIGN_CENTER, 0, -40);
-    //lv_cont_set_fit4(contDateTimeLock,   LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
     lv_cont_set_fit(contDateTimeAtLock, LV_FIT_TIGHT);
     lv_cont_set_layout(contDateTimeAtLock, LV_LAYOUT_PRETTY_MID);
-    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contDateTimeAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     unlockButton = lv_btn_create(lock_scr, NULL);//TODO BRAK POS
     labelUnlockButton = lv_label_create(unlockButton, NULL);
@@ -448,8 +458,9 @@ void lock_screen()
     lv_label_set_text(labelUnlockButton, MY_UNLOCK_SYMBOL);
     lv_btn_set_fit(unlockButton, LV_FIT_TIGHT);
     lv_obj_set_event_cb(unlockButton, unlockButton_task);
-    lv_obj_add_style(unlockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-    lv_obj_set_style_local_text_font(unlockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     labelTimeLock = lv_label_create(contDateTimeAtLock, NULL);
     lv_label_set_text(labelTimeLock, "Connect to wifi");
@@ -471,13 +482,13 @@ void lock_screen()
     lv_obj_add_style(sdStatusAtLock, LV_OBJ_PART_MAIN, &font16Style);
 
     wifiStatusAtLockWarning = my_lv_label_create(wifiStatusAtLock, NULL, 5, 5, LV_SYMBOL_CLOSE);
-    lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
     lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &font12Style);
+    lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
 
     sdStatusAtLockWarning = my_lv_label_create(sdStatusAtLock, NULL, 2, 5, LV_SYMBOL_CLOSE);
-    lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
-    lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &font12Style);
-
+    lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &font12Style);
+    lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
+    
     ledAtLock = lv_led_create(lock_scr, NULL);
     lv_obj_set_size(ledAtLock, 13, 13);
     lv_obj_set_pos(ledAtLock, 13, 10);
@@ -501,7 +512,8 @@ void samplingSettings_screen()
     back_sampling_settings_btn = my_lv_btn_create(sampling_settings_scr, NULL, 30, 15, 14, 10, sampling_settings_back_btn); 
     back_sampling_settings_label = lv_label_create(back_sampling_settings_btn, NULL);
     lv_label_set_text(back_sampling_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_add_style(back_sampling_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &borderlessStyle);
 
     sampling_save_btn = my_lv_btn_create(sampling_settings_scr, NULL, 75, 25, 231, 10, sampling_settings_save_btn);
     sampling_save_label = lv_label_create(sampling_save_btn, NULL);
@@ -607,11 +619,10 @@ void samplingSettings_screen()
     lv_theme_apply(measure_av_period_decrement, LV_THEME_SPINBOX_BTN);
     lv_obj_set_style_local_value_str(measure_av_period_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    turn_fan_on_time_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(turn_fan_on_time_label, 5, 205);
+    turn_fan_on_time_label = my_lv_label_create(sampling_settings_scr, NULL, 5, 205, "Fan running time \nbefore measure [s]:");
+
     lv_obj_set_style_local_text_font(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(turn_fan_on_time_label, "Fan running time \nbefore measure [s]:");
-    lv_obj_set_style_local_text_color(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
 
     turn_fan_on_time = lv_spinbox_create(sampling_settings_scr, NULL);
     lv_textarea_set_cursor_hidden(turn_fan_on_time, true);
