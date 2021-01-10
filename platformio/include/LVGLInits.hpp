@@ -227,14 +227,10 @@ void info_screen()
 
 void main_screen()
 {
-	lockButton = lv_btn_create(main_scr, NULL); //TODO BRAK POS
-	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lockButton = my_lv_btn_create(main_scr, NULL, 14, 18, 95, 7, lockButton_task);
     lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
 	labelLockButton = lv_label_create(lockButton, NULL);
-    lv_obj_align(lockButton, NULL, LV_ALIGN_IN_TOP_LEFT, 37, -5);
 	lv_label_set_text(labelLockButton, MY_LOCK_SYMBOL);
-	lv_btn_set_fit(lockButton, LV_FIT_TIGHT);
-	lv_obj_set_event_cb(lockButton, lockButton_task);
     lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &borderlessStyle);
 
