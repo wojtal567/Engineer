@@ -258,5 +258,4 @@ void loop()
     lv_task_handler(); /* let the GUI do its work */
     server.handleClient();
     delay(5);
-    Serial.println(lv_obj_get_height_fit(setButton));
 }

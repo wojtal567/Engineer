@@ -36,7 +36,11 @@ void SQLiteDb::createTable(Stream *serial)
         serial->println("No database open");
 
     open();
+<<<<<<< HEAD
         String sql = "CREATE table if not exists " + _tableName + " (timestamp datetime NOT NULL PRIMARY KEY, Temperature float, Humidity FLOAT, Pm10 FLOAT, Pm25 FLOAT, Pm100 float, Particles03 FLOAT, Particles05 FLOAT, Particles10 FLOAT, Particles25 FLOAT, Particles50 FLOAT, Particles100 FLOAT)";
+=======
+    String sql = "CREATE table if not exists " + _tableName + " (timestamp datetime NOT NULL PRIMARY KEY, Temperature float, Humidity FLOAT, Pm10 FLOAT, Pm25 FLOAT, Pm100 float, Particles03 FLOAT, Particles05 FLOAT, Particles10 FLOAT, Particles25 FLOAT, Particles50 FLOAT, Particles100 FLOAT)";
+>>>>>>> b29eba891b2b012fa8e9446eca46e9314fd92309
     int rc = sqlite3_exec(
         object,
         sql.c_str(),
