@@ -40,6 +40,8 @@ void stylesInits(void){
     lv_style_init(&whiteButtonStyle);
     lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
+    lv_style_set_border_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_outline_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
     lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     lv_style_init(&warningStyle);
@@ -53,7 +55,7 @@ void stylesInits(void){
 
 void timesettings_screen()
 {
-    back_time_settings_btn = my_lv_btn_create(time_settings_scr, NULL, 30, 15, 14, 10, timesettings_back_btn); 
+    back_time_settings_btn = my_lv_btn_create(time_settings_scr, back_settings_btn, 30, 15, 14, 10, timesettings_back_btn); 
     back_time_settings_label = lv_label_create(back_time_settings_btn, NULL);
     lv_label_set_text(back_time_settings_label, LV_SYMBOL_LEFT);
 
@@ -71,10 +73,10 @@ void timesettings_screen()
 
     time_hour_increment = my_lv_btn_create(time_settings_scr, NULL, 20, 20, 175, 39, hour_increment);
     lv_theme_apply(time_hour_increment, LV_THEME_SPINBOX_BTN);
+    lv_obj_add_style(time_hour_increment, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_set_style_local_value_str(time_hour_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    time_hour_decrement = my_lv_btn_create(time_settings_scr, NULL, 20, 20, 175, 97, hour_decrement);
-    lv_theme_apply(time_hour_decrement, LV_THEME_SPINBOX_BTN);
+    time_hour_decrement = my_lv_btn_create(time_settings_scr, time_hour_increment, 20, 20, 175, 97, hour_decrement);
     lv_obj_set_style_local_value_str(time_hour_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
     time_colon_label = my_lv_label_create(time_settings_scr, time_label, 210, 70, ":");
@@ -88,12 +90,10 @@ void timesettings_screen()
     lv_obj_set_size(time_minute, 40, 34); 
     lv_obj_set_pos(time_minute, 219, 61);
 
-    time_minute_increment = my_lv_btn_create(time_settings_scr, NULL, 20, 20, 229, 39, minute_increment);
-    lv_theme_apply(time_minute_increment, LV_THEME_SPINBOX_BTN);
+    time_minute_increment = my_lv_btn_create(time_settings_scr, time_hour_increment, 20, 20, 229, 39, minute_increment);
     lv_obj_set_style_local_value_str(time_minute_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    time_minute_decrement = my_lv_btn_create(time_settings_scr, NULL, 20, 20, 229, 97, minute_decrement);
-    lv_theme_apply(time_minute_decrement, LV_THEME_SPINBOX_BTN);
+    time_minute_decrement = my_lv_btn_create(time_settings_scr, time_hour_increment, 20, 20, 229, 97, minute_decrement);
     lv_obj_set_style_local_value_str(time_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
     date_label = my_lv_label_create(time_settings_scr, NULL, 5, 129, "Date ");
@@ -132,7 +132,7 @@ void settings_screen()
     lv_label_set_text(back_settings_label, LV_SYMBOL_LEFT);
     lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
-    lv_obj_add_style(back_settings_label, LV_OBJ_PART_MAIN, &whiteFontStyle);
+    lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     settingsLabelAtBar = my_lv_label_create(settings_scr, NULL, 239, 10, "Settings");
 
@@ -168,11 +168,9 @@ void settings_screen()
 
 void info_screen()
 {
-    back_info_btn = my_lv_btn_create(info_scr, NULL, 30, 15, 14, 10, setButton_task);
+    back_info_btn = my_lv_btn_create(info_scr, back_settings_btn, 30, 15, 14, 10, setButton_task);
     back_info_label = lv_label_create(back_info_btn, NULL);
     lv_label_set_text(back_info_label, LV_SYMBOL_LEFT);
-    lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
-    lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
 
     lcdLabelAtBar = my_lv_label_create(info_scr, NULL, 216, 10, "Device info");
 
@@ -301,11 +299,9 @@ void main_screen()
 
 void samplingSettings_screen()
 {
-    back_sampling_settings_btn = my_lv_btn_create(sampling_settings_scr, NULL, 30, 15, 14, 10, sampling_settings_back_btn); 
+    back_sampling_settings_btn = my_lv_btn_create(sampling_settings_scr, back_settings_btn, 30, 15, 14, 10, sampling_settings_back_btn); 
     back_sampling_settings_label = lv_label_create(back_sampling_settings_btn, NULL);
     lv_label_set_text(back_sampling_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
-    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &borderlessStyle);
 
     sampling_save_btn = my_lv_btn_create(sampling_settings_scr, NULL, 75, 25, 231, 10, sampling_settings_save_btn);
     sampling_save_label = lv_label_create(sampling_save_btn, NULL);
@@ -323,12 +319,12 @@ void samplingSettings_screen()
     lv_obj_set_size(measure_period_hour, 40, 34);
     lv_obj_set_pos(measure_period_hour, 165, 61);
 
-    measure_period_hour_increment = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 175, 39, sampling_hour_increment);
-    lv_theme_apply(measure_period_hour_increment, LV_THEME_SPINBOX_BTN);
+    measure_period_hour_increment  = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 175, 39, sampling_hour_increment);
+    lv_theme_apply(measure_period_hour_increment , LV_THEME_SPINBOX_BTN);
+    lv_obj_add_style(measure_period_hour_increment , LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_set_style_local_value_str(measure_period_hour_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    measure_period_hour_decrement = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 175, 97, sampling_hour_decrement);
-    lv_theme_apply(measure_period_hour_decrement, LV_THEME_SPINBOX_BTN);
+    measure_period_hour_decrement = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 20, 20, 175, 97, sampling_hour_decrement);
     lv_obj_set_style_local_value_str(measure_period_hour_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
     measure_colon_label = my_lv_label_create(sampling_settings_scr, NULL, 210, 70, ":", LV_COLOR_WHITE);
@@ -341,12 +337,10 @@ void samplingSettings_screen()
     lv_obj_set_size(measure_period_minute, 40, 34);
     lv_obj_set_pos(measure_period_minute, 219, 61);
 
-    measure_period_minute_increment = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 229, 39, sampling_minute_increment);
-    lv_theme_apply(measure_period_minute_increment, LV_THEME_SPINBOX_BTN);
+    measure_period_minute_increment = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 20, 20, 229, 39, sampling_minute_increment);
     lv_obj_set_style_local_value_str(measure_period_minute_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    measure_period_minute_decrement = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 229, 97, sampling_minute_decrement);
-    lv_theme_apply(measure_period_minute_decrement, LV_THEME_SPINBOX_BTN);
+    measure_period_minute_decrement = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 20, 20, 229, 97, sampling_minute_decrement);
     lv_obj_set_style_local_value_str(measure_period_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
     measure_colon_label2 = my_lv_label_create(sampling_settings_scr, NULL, 265, 70, ":", LV_COLOR_WHITE);
@@ -359,12 +353,10 @@ void samplingSettings_screen()
     lv_obj_set_size(measure_period_second, 40, 34);
     lv_obj_set_pos(measure_period_second, 274, 61);
 
-    measure_period_second_increment = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 284, 39, sampling_second_increment);
-    lv_theme_apply(measure_period_second_increment, LV_THEME_SPINBOX_BTN);
+    measure_period_second_increment = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 20, 20, 284, 39, sampling_second_increment);
     lv_obj_set_style_local_value_str(measure_period_second_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    measure_period_second_decrement = my_lv_btn_create(sampling_settings_scr, NULL, 20, 20, 284, 97, sampling_second_decrement);
-    lv_theme_apply(measure_period_second_decrement, LV_THEME_SPINBOX_BTN);
+    measure_period_second_decrement = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 20, 20, 284, 97, sampling_second_decrement);
     lv_obj_set_style_local_value_str(measure_period_second_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
     measure_number_label = lv_label_create(sampling_settings_scr, NULL);
@@ -381,12 +373,10 @@ void samplingSettings_screen()
     lv_obj_set_size(measure_number, 50, 34);
     lv_obj_set_pos(measure_number, 206, 119);
 
-    measure_number_increment = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 257, 119, measure_number_increment_func);
-    lv_theme_apply(measure_number_increment, LV_THEME_SPINBOX_BTN);
+    measure_number_increment = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 40, 34, 257, 119, measure_number_increment_func);
     lv_obj_set_style_local_value_str(measure_number_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    measure_number_decrement = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 165, 119, measure_number_decrement_func);
-    lv_theme_apply(measure_number_decrement, LV_THEME_SPINBOX_BTN);
+    measure_number_decrement = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 40, 34, 165, 119, measure_number_decrement_func);
     lv_obj_set_style_local_value_str(measure_number_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
     measure_av_period_label = lv_label_create(sampling_settings_scr, NULL);
@@ -403,12 +393,10 @@ void samplingSettings_screen()
     lv_obj_set_size(measure_av_period, 50, 34);
     lv_obj_set_pos(measure_av_period, 206, 160);
 
-    measure_av_period_increment = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 257, 160, av_period_increment);
-    lv_theme_apply(measure_av_period_increment, LV_THEME_SPINBOX_BTN);
+    measure_av_period_increment = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 40, 34, 257, 160, av_period_increment);
     lv_obj_set_style_local_value_str(measure_av_period_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    measure_av_period_decrement = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 165, 160, av_period_decrement);
-    lv_theme_apply(measure_av_period_decrement, LV_THEME_SPINBOX_BTN);
+    measure_av_period_decrement = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 40, 34, 165, 160, av_period_decrement);
     lv_obj_set_style_local_value_str(measure_av_period_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
     turn_fan_on_time_label = my_lv_label_create(sampling_settings_scr, NULL, 5, 205, "Fan running time \nbefore measure [s]:");
@@ -423,24 +411,22 @@ void samplingSettings_screen()
     lv_obj_set_size(turn_fan_on_time, 50, 34);
     lv_obj_set_pos(turn_fan_on_time, 206, 200);
 
-    turn_fan_on_time_increment = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 257, 200, turn_fan_on_time_increment_func);
-    lv_theme_apply(turn_fan_on_time_increment, LV_THEME_SPINBOX_BTN);
+    turn_fan_on_time_increment = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 40, 34, 257, 200, turn_fan_on_time_increment_func);
     lv_obj_set_style_local_value_str(turn_fan_on_time_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    turn_fan_on_time_decrement = my_lv_btn_create(sampling_settings_scr, NULL, 40, 34, 165, 200, turn_fan_on_time_decrement_func);
-    lv_theme_apply(turn_fan_on_time_decrement, LV_THEME_SPINBOX_BTN);
+    turn_fan_on_time_decrement = my_lv_btn_create(sampling_settings_scr, measure_period_hour_increment , 40, 34, 165, 200, turn_fan_on_time_decrement_func);
     lv_obj_set_style_local_value_str(turn_fan_on_time_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 }
 
 //Zrobione
 void wifi_screen()
 {
-    cancel_btn = my_lv_btn_create(wifi_scr, NULL, 14, 14, 14, 10, btn_cancel);
+    cancel_btn = my_lv_btn_create(wifi_scr, back_settings_btn, 30, 15, 14, 10, btn_cancel);
     cancel_label = lv_label_create(cancel_btn, NULL);
     lv_label_set_text(cancel_label, LV_SYMBOL_LEFT);
     lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &borderlessStyle);
-    lv_obj_add_style(cancel_label, LV_OBJ_PART_MAIN, &whiteFontStyle);
+    lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
     wifiLabelAtBar = my_lv_label_create(wifi_scr, NULL, 201, 10, "WiFi settings");
  
