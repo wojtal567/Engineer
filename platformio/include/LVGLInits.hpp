@@ -494,13 +494,10 @@ void lock_screen()
     lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    unlockButton = lv_btn_create(lock_scr, setButton);//TODO BRAK POS
+    unlockButton = my_lv_btn_create(lock_scr, setButton, 14, 16, 158, 207, unlockButton_task);
     labelUnlockButton = lv_label_create(unlockButton, NULL);
     lv_obj_set_style_local_text_font(unlockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
-    lv_obj_align(unlockButton, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -25);
     lv_label_set_text(labelUnlockButton, MY_UNLOCK_SYMBOL);
-    lv_btn_set_fit(unlockButton, LV_FIT_TIGHT);
-    lv_obj_set_event_cb(unlockButton, unlockButton_task);
 
 
     labelTimeLock = lv_label_create(contDateTimeAtLock, NULL);
@@ -513,18 +510,18 @@ void lock_screen()
     lv_obj_align(labelDateLock, NULL, LV_ALIGN_CENTER, 0, 0);
 
     wifiStatusAtLock = lv_label_create(lock_scr, wifiStatusAtMain);
-    lv_obj_align(wifiStatusAtLock, NULL, LV_ALIGN_CENTER, -36, 10);
+    lv_obj_set_pos(wifiStatusAtLock, 119, 120);
     lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
     wifiStatusAtLockWarning = my_lv_label_create(wifiStatusAtLock,  wifiStatusAtMainWarning, 6, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
 
     sdStatusAtLock = lv_label_create(lock_scr, sdStatusAtMain);
-    lv_obj_align(sdStatusAtLock, NULL, LV_ALIGN_CENTER, 36, 10);
+    lv_obj_set_pos(sdStatusAtLock, 186, 120);
     lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
     sdStatusAtLockWarning = my_lv_label_create(sdStatusAtLock, wifiStatusAtLockWarning, 2, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
 
     ledAtLock = lv_led_create(lock_scr, NULL);
     lv_obj_set_size(ledAtLock, 13, 13);
-    lv_obj_align(ledAtLock, NULL, LV_ALIGN_CENTER, 0, 10);
+    lv_obj_set_pos(ledAtLock, 155, 125);
     lv_led_set_bright(ledAtLock, 200);
     lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
