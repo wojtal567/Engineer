@@ -5,8 +5,8 @@ void inactive_screen(lv_task_t *task)
     {
         if (lv_disp_get_inactive_time(NULL) > config.lcdLockTime)
         {
-            if (lv_scr_act() != lock_scr)
-                lv_disp_load_scr(lock_scr);
+            if (lv_scr_act() != lockScr)
+                lv_disp_load_scr(lockScr);
         }
     }
 }
@@ -76,15 +76,15 @@ void dateTimeFunc(lv_task_t *task)
         lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
         if (inTimeSettings == false)
         {
-            lv_spinbox_set_value(time_hour, getTime(Rtc).substring(0, getTime(Rtc).indexOf(":")).toInt());
-            lv_spinbox_set_value(time_minute, getTime(Rtc).substring(3, 5).toInt());
-            lv_label_set_text(date_btn_label, getDate(Rtc).c_str());
+            lv_spinbox_set_value(timeHour, getTime(Rtc).substring(0, getTime(Rtc).indexOf(":")).toInt());
+            lv_spinbox_set_value(timeMinute, getTime(Rtc).substring(3, 5).toInt());
+            lv_label_set_text(dateBtnLabel, getDate(Rtc).c_str());
         }
     }
     else
     {
         if (inTimeSettings == false)
-            lv_label_set_text(date_btn_label, "01.01.2021");
+            lv_label_set_text(dateBtnLabel, "01.01.2021");
         if(isDefaultTimeOnDisplay)
             lv_label_set_text(dateAndTimeAtBar, "");
         else{

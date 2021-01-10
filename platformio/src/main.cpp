@@ -189,15 +189,15 @@ void setup()
     lv_obj_set_style_local_bg_color(timeSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     wifiScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(wifiScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lock_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    sampling_settingsScr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(sampling_settingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lockScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(lockScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    samplingSettingsScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(samplingSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     //Screens initialization function
     mainScreen();
     wifiScreen();
-    lock_screen();
+    lockScreen();
     settingsScreen();
     infoScreen();
     timesettingsScreen();
@@ -212,16 +212,16 @@ void setup()
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
     status = lv_task_create(statusFunc, 700, LV_TASK_PRIO_LOW, NULL);
-    lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
-    lv_spinbox_set_value(measure_av_period, (config.measurePeriod / 1000));
-    lv_spinbox_set_value(measure_number, config.countOfSamples);
-    lv_spinbox_set_value(measure_period_second, (config.timeBetweenSavingSample / 1000) % 60);
-    lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
-    lv_spinbox_set_value(turn_fan_on_time, (config.turnFanTime / 1000));
+    lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSample / 60000) / 60));
+    lv_spinbox_set_value(measureAvPeriod, (config.measurePeriod / 1000));
+    lv_spinbox_set_value(measureNumber, config.countOfSamples);
+    lv_spinbox_set_value(measurePeriodsecond, (config.timeBetweenSavingSample / 1000) % 60);
+    lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSample / 60000) % 60));
+    lv_spinbox_set_value(turnFanOnTime, (config.turnFanTime / 1000));
 
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
-    inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
+    inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, 300);

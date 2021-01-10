@@ -106,7 +106,6 @@ static lv_style_t font20Style;
 static lv_style_t font22Style;
 
 //Additional styles with initalization functions
-static lv_style_t tinySymbolStyle;
 static lv_style_t warningStyle;
 static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
@@ -223,77 +222,77 @@ lv_obj_t *backTimeSettingsBtn;
 lv_obj_t *backTimeSettingsLabel;
 lv_obj_t *timeSettingsLabelAtBar;
 
-lv_obj_t *time_scroll_page;
-lv_obj_t *time_label;
-lv_obj_t *time_hour;
-lv_obj_t *time_hour_increment;
-lv_obj_t *time_hour_decrement;
+lv_obj_t *timeScrollPage;
+lv_obj_t *timeLabel;
+lv_obj_t *timeHour;
+lv_obj_t *timeHourIncrement;
+lv_obj_t *timeHourDecrement;
 
-lv_obj_t *time_colon_label;
+lv_obj_t *timeColonLabel;
 
-lv_obj_t *time_minute;
-lv_obj_t *time_minute_increment;
-lv_obj_t *time_minute_decrement;
+lv_obj_t *timeMinute;
+lv_obj_t *timeMinuteIncrement;
+lv_obj_t *timeMinuteDecrement;
 
-lv_obj_t *date_label;
-lv_obj_t *date_btn;
-lv_obj_t *date_btn_label;
+lv_obj_t *dateLabel;
+lv_obj_t *dateBtn;
+lv_obj_t *dateBtnLabel;
 
 lv_obj_t *calendar;
 
 lv_obj_t *lockScreenLabel;
 lv_obj_t *lockScreenDDlist;
 
-lv_obj_t *timeSettings_btn;
-lv_obj_t *timeSettings_label;
-lv_obj_t *sync_rtc_btn;
-lv_obj_t *sync_rtc_label;
+lv_obj_t *timeSettingsBtn;
+lv_obj_t *timeSettingsLabel;
+lv_obj_t *syncRtcBtn;
+lv_obj_t *syncRtcLabel;
 lv_obj_t *alertBox;
 // ? -------------------------------------------------- second settings gui
-lv_obj_t *sampling_settingsScr;
-lv_obj_t *back_sampling_settings_btn;
-lv_obj_t *back_sampling_settings_label;
+lv_obj_t *samplingSettingsScr;
+lv_obj_t *backSamplingSettingsBtn;
+lv_obj_t *backSamplingSettingsLabel;
 lv_obj_t *SamplingSettingsLabelAtBar;
 
-lv_obj_t *measure_period_label;
+lv_obj_t *measurePeriodlabel;
 
-lv_obj_t *measure_period_hour;
-lv_obj_t *measure_period_hour_increment;
-lv_obj_t *measure_period_hour_decrement;
+lv_obj_t *measurePeriodHour;
+lv_obj_t *measurePeriodHourIncrement;
+lv_obj_t *measurePeriodHourDecrement;
 
-lv_obj_t *measure_colon_label;
+lv_obj_t *measureColonLabel;
 
-lv_obj_t *measure_period_minute;
-lv_obj_t *measure_period_minute_increment;
-lv_obj_t *measure_period_minute_decrement;
+lv_obj_t *measurePeriodMinute;
+lv_obj_t *measurePeriodMinuteIncrement;
+lv_obj_t *measurePeriodMinuteDecrement;
 
-lv_obj_t *measure_colon_label2;
+lv_obj_t *measureColonLabel2;
 
-lv_obj_t *measure_period_second;
-lv_obj_t *measure_period_second_increment;
-lv_obj_t *measure_period_second_decrement;
+lv_obj_t *measurePeriodsecond;
+lv_obj_t *measurePeriodsecondIncrement;
+lv_obj_t *measurePeriodsecondDecrement;
 
-lv_obj_t *measure_number_label;
-lv_obj_t *measure_number;
-lv_obj_t *measure_number_increment;
-lv_obj_t *measure_number_decrement;
+lv_obj_t *measureNumberLabel;
+lv_obj_t *measureNumber;
+lv_obj_t *measureNumberIncrement;
+lv_obj_t *measureNumberDecrement;
 
-lv_obj_t *measure_av_period_label;
-lv_obj_t *measure_av_period;
-lv_obj_t *measure_av_period_increment;
-lv_obj_t *measure_av_period_decrement;
+lv_obj_t *measureAvPeriodLabel;
+lv_obj_t *measureAvPeriod;
+lv_obj_t *measureAvPeriodIncrement;
+lv_obj_t *measureAvPeriodDecrement;
 
-lv_obj_t *turn_fan_on_time_label;
-lv_obj_t *turn_fan_on_time;
-lv_obj_t *turn_fan_on_time_increment;
-lv_obj_t *turn_fan_on_time_decrement;
+lv_obj_t *turnFanOnTimeLabel;
+lv_obj_t *turnFanOnTime;
+lv_obj_t *turnFanOnTimeIncrement;
+lv_obj_t *turnFanOnTimeDecrement;
 
 
-lv_obj_t *sampling_save_btn;
-lv_obj_t *sampling_save_label;
+lv_obj_t *samplingSaveBtn;
+lv_obj_t *samplingSaveLabel;
 
 // ? --------------------------------------------------lockscreen gui
-lv_obj_t *lock_scr;
+lv_obj_t *lockScr;
 lv_obj_t *contDateTimeAtLock;
 lv_obj_t *labelUnlockButton;
 lv_obj_t *unlockButton;
@@ -308,6 +307,6 @@ lv_obj_t *ledAtLock;
 lv_task_t *turnFanOn;
 lv_task_t *getSample;
 lv_task_t *getAppLastRecordAndSynchronize;
-lv_task_t *inactive_time;
+lv_task_t *inactiveTime;
 lv_task_t *date;
 lv_task_t *status;

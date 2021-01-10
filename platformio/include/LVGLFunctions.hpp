@@ -393,7 +393,7 @@ static void setButton_task(lv_obj_t *obj, lv_event_t event)
 static void lockButton_task(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
-        lv_disp_load_scr(lock_scr);
+        lv_disp_load_scr(lockScr);
 }
 
 //Unlocking button clicked
@@ -505,7 +505,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
         mySDCard.printConfig(configFilePath);
         if (timeChanged == true)
         {
-            String datet = lv_label_get_text(date_btn_label) + (String)lv_textarea_get_text(time_hour) + ":" + (String)lv_textarea_get_text(time_minute);
+            String datet = lv_label_get_text(dateBtnLabel) + (String)lv_textarea_get_text(timeHour) + ":" + (String)lv_textarea_get_text(timeMinute);
             Serial.println(datet);
             RtcDateTime *dt = new RtcDateTime(atoi(datet.substring(6, 10).c_str()), atoi(datet.substring(3, 6).c_str()), atoi(datet.substring(0, 2).c_str()), datet.substring(10, 12).toDouble(), datet.substring(13, 15).toDouble(), 0);
             Rtc.SetDateTime(*dt);
@@ -514,7 +514,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
         if (dateChanged == true)
         {
             RtcDateTime ori = Rtc.GetDateTime();
-            String date = lv_label_get_text(date_btn_label);
+            String date = lv_label_get_text(dateBtnLabel);
             RtcDateTime *dt = new RtcDateTime(atoi(date.substring(6).c_str()), atoi(date.substring(3, 6).c_str()), atoi(date.substring(0, 2).c_str()), ori.Hour(), ori.Minute(), ori.Second());
             Rtc.SetDateTime(*dt);
             Rtc.SetIsRunning(true);
@@ -527,74 +527,74 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
     }
 }
 
-static void hour_increment(lv_obj_t *btn, lv_event_t e)
+static void hourIncrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(time_hour) == 23)
+        if (lv_spinbox_get_value(timeHour) == 23)
         {
-            lv_spinbox_set_value(time_hour, 0);
+            lv_spinbox_set_value(timeHour, 0);
         }
         else
         {
-            lv_spinbox_increment(time_hour);
+            lv_spinbox_increment(timeHour);
         }
         timeChanged = true;
     }
 }
 
-static void hour_decrement(lv_obj_t *btn, lv_event_t e)
+static void hourDecrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(time_hour) == 0)
-            lv_spinbox_set_value(time_hour, 23);
+        if (lv_spinbox_get_value(timeHour) == 0)
+            lv_spinbox_set_value(timeHour, 23);
         else
-            lv_spinbox_decrement(time_hour);
+            lv_spinbox_decrement(timeHour);
         timeChanged = true;
     }
 }
 
-static void minute_increment(lv_obj_t *btn, lv_event_t e)
+static void minuteIncrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(time_minute) == 59)
+        if (lv_spinbox_get_value(timeMinute) == 59)
         {
-            if (lv_spinbox_get_value(time_hour) == 23)
+            if (lv_spinbox_get_value(timeHour) == 23)
             {
-                lv_spinbox_set_value(time_hour, 0);
+                lv_spinbox_set_value(timeHour, 0);
             }
             else
             {
-                lv_spinbox_increment(time_hour);
+                lv_spinbox_increment(timeHour);
             }
-            lv_spinbox_set_value(time_minute, 0);
+            lv_spinbox_set_value(timeMinute, 0);
         }
         else
-            lv_spinbox_increment(time_minute);
+            lv_spinbox_increment(timeMinute);
         timeChanged = true;
     }
 }
 
-static void minute_decrement(lv_obj_t *btn, lv_event_t e)
+static void minuteDecrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(time_minute) == 00)
+        if (lv_spinbox_get_value(timeMinute) == 00)
         {
-            if (lv_spinbox_get_value(time_hour) == 0)
+            if (lv_spinbox_get_value(timeHour) == 0)
             {
-                lv_spinbox_set_value(time_hour, 23);
+                lv_spinbox_set_value(timeHour, 23);
             }
             else
             {
-                lv_spinbox_decrement(time_hour);
+                lv_spinbox_decrement(timeHour);
             }
-            lv_spinbox_set_value(time_minute, 59);
+            lv_spinbox_set_value(timeMinute, 59);
         }
         else
-            lv_spinbox_decrement(time_minute);
+            lv_spinbox_decrement(timeMinute);
         timeChanged = true;
     }
 }
@@ -602,133 +602,133 @@ static void minute_decrement(lv_obj_t *btn, lv_event_t e)
 static void temp_settings_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
-        lv_scr_load(sampling_settingsScr);
+        lv_scr_load(samplingSettingsScr);
 }
 
-static void sampling_hour_increment(lv_obj_t *btn, lv_event_t e)
+static void sampling_hourIncrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        lv_spinbox_increment(measure_period_hour);
+        lv_spinbox_increment(measurePeriodHour);
     }
 }
 
-static void sampling_second_increment(lv_obj_t *btn, lv_event_t e)
+static void sampling_secondIncrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(measure_period_second) == 59)
+        if (lv_spinbox_get_value(measurePeriodsecond) == 59)
         {
-            if (lv_spinbox_get_value(measure_period_minute) == 59)
+            if (lv_spinbox_get_value(measurePeriodMinute) == 59)
             {
-                if (lv_spinbox_get_value(measure_period_hour) != 24)
+                if (lv_spinbox_get_value(measurePeriodHour) != 24)
                 {
-                    lv_spinbox_set_value(measure_period_minute, 0);
-                    lv_spinbox_set_value(measure_period_second, 0);
-                    lv_spinbox_increment(measure_period_hour);
+                    lv_spinbox_set_value(measurePeriodMinute, 0);
+                    lv_spinbox_set_value(measurePeriodsecond, 0);
+                    lv_spinbox_increment(measurePeriodHour);
                 }
             }
             else
             {
-                lv_spinbox_set_value(measure_period_second, 0);
-                lv_spinbox_increment(measure_period_minute);
+                lv_spinbox_set_value(measurePeriodsecond, 0);
+                lv_spinbox_increment(measurePeriodMinute);
             }
         }
         else
         {
-            lv_spinbox_increment(measure_period_second);
+            lv_spinbox_increment(measurePeriodsecond);
         }
     }
 }
 
-static void sampling_second_decrement(lv_obj_t *btn, lv_event_t e)
+static void sampling_secondDecrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(measure_period_second) == 0 && lv_spinbox_get_value(measure_period_minute) != 0)
+        if (lv_spinbox_get_value(measurePeriodsecond) == 0 && lv_spinbox_get_value(measurePeriodMinute) != 0)
         {
-            if(lv_spinbox_get_value(measure_period_second)==0 && lv_spinbox_get_value(measure_period_minute)==1 && lv_spinbox_get_value(measure_period_hour)==0){}
+            if(lv_spinbox_get_value(measurePeriodsecond)==0 && lv_spinbox_get_value(measurePeriodMinute)==1 && lv_spinbox_get_value(measurePeriodHour)==0){}
             else
             {
-                lv_spinbox_decrement(measure_period_minute);
-                lv_spinbox_set_value(measure_period_second, 59);
-                if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                    lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
+                lv_spinbox_decrement(measurePeriodMinute);
+                lv_spinbox_set_value(measurePeriodsecond, 59);
+                if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
+                    lv_spinbox_set_value(turnFanOnTime, ((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1);
             }
             
         }
         else
         {
-            if (lv_spinbox_get_value(measure_period_second) == 0 && lv_spinbox_get_value(measure_period_minute) == 0)
+            if (lv_spinbox_get_value(measurePeriodsecond) == 0 && lv_spinbox_get_value(measurePeriodMinute) == 0)
             {
-                if (lv_spinbox_get_value(measure_period_hour) != 0)
+                if (lv_spinbox_get_value(measurePeriodHour) != 0)
                 {
-                    lv_spinbox_decrement(measure_period_hour);
-                    lv_spinbox_set_value(measure_period_minute, 59);
-                    lv_spinbox_set_value(measure_period_second, 59);
-                    if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                        lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
+                    lv_spinbox_decrement(measurePeriodHour);
+                    lv_spinbox_set_value(measurePeriodMinute, 59);
+                    lv_spinbox_set_value(measurePeriodsecond, 59);
+                    if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
+                        lv_spinbox_set_value(turnFanOnTime, ((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1);
                 }
             }
             else
-                lv_spinbox_decrement(measure_period_second);
-                if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                    lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
+                lv_spinbox_decrement(measurePeriodsecond);
+                if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
+                    lv_spinbox_set_value(turnFanOnTime, ((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1);
         }
     }
 }
 
-static void sampling_hour_decrement(lv_obj_t *btn, lv_event_t e)
+static void sampling_hourDecrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if(((lv_spinbox_get_value(measure_period_hour)-1)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<60)
+        if(((lv_spinbox_get_value(measurePeriodHour)-1)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<60)
             return;
-        if(!((lv_spinbox_get_value(measure_period_second)==0)&&(lv_spinbox_get_value(measure_period_minute)==0)))
+        if(!((lv_spinbox_get_value(measurePeriodsecond)==0)&&(lv_spinbox_get_value(measurePeriodMinute)==0)))
         {
-            lv_spinbox_decrement(measure_period_hour);
-            if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                lv_spinbox_set_value(turn_fan_on_time, ((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1);
+            lv_spinbox_decrement(measurePeriodHour);
+            if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
+                lv_spinbox_set_value(turnFanOnTime, ((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1);
     
         }
     }
 }
 
-static void sampling_minute_increment(lv_obj_t *btn, lv_event_t e)
+static void sampling_minuteIncrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(measure_period_minute) == 59)
+        if (lv_spinbox_get_value(measurePeriodMinute) == 59)
         {
-            if (lv_spinbox_get_value(measure_period_hour) != 24)
+            if (lv_spinbox_get_value(measurePeriodHour) != 24)
             {
-                lv_spinbox_set_value(measure_period_minute, 0);
-                lv_spinbox_increment(measure_period_hour);
+                lv_spinbox_set_value(measurePeriodMinute, 0);
+                lv_spinbox_increment(measurePeriodHour);
             }
         }
         else
         {
-            lv_spinbox_increment(measure_period_minute);
+            lv_spinbox_increment(measurePeriodMinute);
         }
     }
 }
 
-static void sampling_minute_decrement(lv_obj_t *btn, lv_event_t e)
+static void sampling_minuteDecrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if (lv_spinbox_get_value(measure_period_minute) == 0)
+        if (lv_spinbox_get_value(measurePeriodMinute) == 0)
         {
-            lv_spinbox_set_value(measure_period_minute, 59);
-            lv_spinbox_decrement(measure_period_hour);
-            if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                lv_spinbox_set_value(turn_fan_on_time, (((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1)%20*10);    
+            lv_spinbox_set_value(measurePeriodMinute, 59);
+            lv_spinbox_decrement(measurePeriodHour);
+            if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
+                lv_spinbox_set_value(turnFanOnTime, (((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1)%20*10);    
         }
-        if (!(lv_spinbox_get_value(measure_period_minute) == 1 && lv_spinbox_get_value(measure_period_hour) == 0))
+        if (!(lv_spinbox_get_value(measurePeriodMinute) == 1 && lv_spinbox_get_value(measurePeriodHour) == 0))
         {
-            lv_spinbox_decrement(measure_period_minute);
-            if((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)<=lv_spinbox_get_value(turn_fan_on_time))
-                lv_spinbox_set_value(turn_fan_on_time, (((lv_spinbox_get_value(measure_period_hour)*3600)+(lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second))-1)%20*10);
+            lv_spinbox_decrement(measurePeriodMinute);
+            if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
+                lv_spinbox_set_value(turnFanOnTime, (((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1)%20*10);
         }
     }
 }
@@ -767,7 +767,7 @@ static void calendar_event(lv_obj_t *obj, lv_event_t event)
             Serial.println(label);
             itoa(date->year, buffer, 10);
             label += (String)buffer;
-            lv_label_set_text(date_btn_label, label.c_str());
+            lv_label_set_text(dateBtnLabel, label.c_str());
             lv_obj_del(calendar);
             calendar = NULL;
             dateChanged = true;
@@ -784,7 +784,7 @@ static void date_button_func(lv_obj_t *btn, lv_event_t event)
         lv_obj_align(calendar, NULL, LV_ALIGN_CENTER, 0, 0);
         lv_obj_set_event_cb(calendar, calendar_event);
         lv_obj_set_style_local_text_font(calendar, LV_CALENDAR_PART_DATE, LV_STATE_DEFAULT, lv_theme_get_font_small());
-        String now = lv_label_get_text(date_btn_label);
+        String now = lv_label_get_text(dateBtnLabel);
         Serial.println(now);
         Serial.println(now.substring(6).toInt());
         Serial.println(now.substring(4, 5).toInt());
@@ -819,54 +819,54 @@ static void showHideBtn_func(lv_obj_t *btn, lv_event_t event)
     }
 }
 
-static void measure_number_increment_func(lv_obj_t *btn, lv_event_t event)
+static void measureNumberIncrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
-        lv_spinbox_increment(measure_number);
+        lv_spinbox_increment(measureNumber);
 }
 
-static void measure_number_decrement_func(lv_obj_t *btn, lv_event_t event)
+static void measureNumberDecrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
-        lv_spinbox_decrement(measure_number);
+        lv_spinbox_decrement(measureNumber);
 }
 
-static void turn_fan_on_time_increment_func(lv_obj_t *btn, lv_event_t event)
+static void turnFanOnTimeIncrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if((lv_spinbox_get_value(turn_fan_on_time)+1)<((lv_spinbox_get_value(measure_period_minute)*60)+lv_spinbox_get_value(measure_period_second)))
-            lv_spinbox_increment(turn_fan_on_time);
+        if((lv_spinbox_get_value(turnFanOnTime)+1)<((lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)))
+            lv_spinbox_increment(turnFanOnTime);
     }        
 }
 
-static void turn_fan_on_time_decrement_func(lv_obj_t *btn, lv_event_t event)
+static void turnFanOnTimeDecrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
-        lv_spinbox_decrement(turn_fan_on_time);
+        lv_spinbox_decrement(turnFanOnTime);
 }
 
-static void av_period_increment(lv_obj_t *btn, lv_event_t event)
+static void av_periodIncrement(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
-        lv_spinbox_increment(measure_av_period);
+        lv_spinbox_increment(measureAvPeriod);
 }
 
-static void av_period_decrement(lv_obj_t *btn, lv_event_t event)
+static void av_periodDecrement(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
-        lv_spinbox_decrement(measure_av_period);
+        lv_spinbox_decrement(measureAvPeriod);
 }
 
 static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        int get_value = lv_spinbox_get_value(measure_period_hour) * 60 * 60000 + lv_spinbox_get_value(measure_period_minute) * 60000 + lv_spinbox_get_value(measure_period_second) * 1000;
+        int get_value = lv_spinbox_get_value(measurePeriodHour) * 60 * 60000 + lv_spinbox_get_value(measurePeriodMinute) * 60000 + lv_spinbox_get_value(measurePeriodsecond) * 1000;
         config.timeBetweenSavingSample = get_value;
-        config.countOfSamples = lv_spinbox_get_value(measure_number);
-        config.measurePeriod = lv_spinbox_get_value(measure_av_period) * 1000;
-        config.turnFanTime = lv_spinbox_get_value(turn_fan_on_time) * 1000;
+        config.countOfSamples = lv_spinbox_get_value(measureNumber);
+        config.measurePeriod = lv_spinbox_get_value(measureAvPeriod) * 1000;
+        config.turnFanTime = lv_spinbox_get_value(turnFanOnTime) * 1000;
         getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
         turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);
@@ -880,8 +880,8 @@ static void sampling_settings_back_btn(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
-        lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
+        lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSample / 60000) / 60));
+        lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSample / 60000) % 60));
         lv_scr_load(settingsScr);
     }
 }
