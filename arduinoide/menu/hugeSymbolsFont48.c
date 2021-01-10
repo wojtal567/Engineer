@@ -256,4 +256,3 @@ lv_font_t hugeSymbolsFont48 = {
 
 
 #endif /*#if HUGESYMBOLSFONT48*/
-

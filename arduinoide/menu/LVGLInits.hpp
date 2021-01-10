@@ -1,503 +1,289 @@
 #include "LVGLTasks.hpp"
 
-void containerStyleInit(void)
-{
+void stylesInits(void){
+    lv_style_init(&whiteFontStyle);
+    lv_style_set_text_color(&whiteFontStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
+    lv_style_init(&font12Style);
+    lv_style_set_text_font(&font12Style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+
+    lv_style_init(&font16Style);
+    lv_style_set_text_font(&font16Style, LV_STATE_DEFAULT, &lv_font_montserrat_16);
+
+    lv_style_init(&font20Style);
+    lv_style_set_text_font(&font20Style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
+    
+    lv_style_init(&font22Style);
+    lv_style_set_text_font(&font22Style, LV_STATE_DEFAULT, &lv_font_montserrat_22);
+
+    lv_style_init(&transparentBackgroundStyle);
+    lv_style_set_bg_opa(&transparentBackgroundStyle, LV_STATE_DEFAULT, LV_OPA_0);
+
+    lv_style_init(&borderlessStyle);
+    lv_style_set_border_width(&borderlessStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_outline_width(&borderlessStyle, LV_STATE_DEFAULT, 0);
+
     lv_style_init(&containerStyle);
-    lv_style_set_text_font(&containerStyle, LV_STATE_DEFAULT, &lv_font_montserrat_16);
-    lv_style_set_text_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_bg_opa(&containerStyle, LV_STATE_DEFAULT, LV_OPA_0);
     lv_style_set_border_color(&containerStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_radius(&containerStyle, LV_STATE_DEFAULT, 0);
-}
+    
+    lv_style_init(&hugeFontStyle);
+    lv_style_set_text_font(&hugeFontStyle, LV_STATE_DEFAULT, &hugeSymbolsFont48);
 
-//Style initialization functions
-void font20StyleInit(void)
-{
-    lv_style_init(&font20Style);
-    lv_style_set_text_font(&font20Style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
-    lv_style_set_text_color(&font20Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-void font12StyleInit(void)
-{
-    lv_style_init(&font12Style);
-    lv_style_set_text_font(&font12Style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-    lv_style_set_text_color(&font12Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-void font16StyleInit(void)
-{
-    lv_style_init(&font16Style);
-    lv_style_set_text_font(&font16Style, LV_STATE_DEFAULT, &lv_font_montserrat_16);
-    lv_style_set_text_color(&font16Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-void font22StyleInit(void)
-{
-    lv_style_init(&font22Style);
-    lv_style_set_text_font(&font22Style, LV_STATE_DEFAULT, &lv_font_montserrat_22);
-    lv_style_set_text_color(&font22Style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-//Tiny symbols to signalize wifi and sd card status
-void tinySymbolStyleInit(void)
-{
-    lv_style_init(&tinySymbolStyle);
-    lv_style_set_text_font(&tinySymbolStyle, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-    lv_style_set_bg_opa(&tinySymbolStyle, LV_STATE_DEFAULT, LV_OPA_0);
-    lv_style_set_border_opa(&tinySymbolStyle, LV_STATE_DEFAULT, LV_OPA_0);
-    lv_style_set_radius(&tinySymbolStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_text_color(&tinySymbolStyle, LV_STATE_DEFAULT, LV_COLOR_RED);
-}
-
-void transparentButtonStyleInit(void)
-{
-    lv_style_init(&transparentButtonStyle);
-    lv_style_set_bg_opa(&transparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
-    lv_style_set_border_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_outline_width(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_radius(&transparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_text_color(&transparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-}
-
-void whiteButtonStyleInit(void)
-{
-    lv_style_init(&whiteButtonStyle);
-    lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_border_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_outline_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
-    lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-}
-
-void hugeTransparentButtonStyleInit(void)
-{
-    lv_style_init(&hugeTransparentButtonStyle);
-    lv_style_set_bg_opa(&hugeTransparentButtonStyle, LV_BTN_STATE_RELEASED, LV_OPA_0);
-    lv_style_set_border_width(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_outline_width(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_radius(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, 0);
-    lv_style_set_text_color(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_text_font(&hugeTransparentButtonStyle, LV_STATE_DEFAULT, &hugeSymbolsFont48);
-}
-
-void lineStyleInit(void)
-{
     lv_style_init(&lineStyle);
     lv_style_set_line_width(&lineStyle, LV_STATE_DEFAULT, 2);
     lv_style_set_line_color(&lineStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_line_rounded(&lineStyle, LV_STATE_DEFAULT, false);
+
+    lv_style_init(&whiteButtonStyle);
+    lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
+    lv_style_set_border_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_outline_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+
+    lv_style_init(&warningStyle);
+    lv_style_set_text_font(&warningStyle, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+    lv_style_set_bg_opa(&warningStyle, LV_STATE_DEFAULT, LV_OPA_0);
+    lv_style_set_border_opa(&warningStyle, LV_STATE_DEFAULT, LV_OPA_0);
+    lv_style_set_radius(&warningStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_text_color(&warningStyle, LV_STATE_DEFAULT, LV_COLOR_RED);
 }
 
-void toastListStyleInit(void)
+void timesettingsScreen()
 {
-    lv_style_init(&toastListStyle);
-    lv_style_set_bg_color(&toastListStyle, LV_STATE_DEFAULT, LV_COLOR_MAKE(0x32, 0x32, 0x32));
-    lv_style_set_text_color(&toastListStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_radius(&toastListStyle, LV_STATE_DEFAULT, 0);
-}
+    backTimeSettingsBtn = my_lv_btn_create(timeSettingsScr, backSettingsBtn, 30, 15, 14, 10, timesettings_back_btn); 
+    backTimeSettingsLabel = lv_label_create(backTimeSettingsBtn, NULL);
+    lv_label_set_text(backTimeSettingsLabel, LV_SYMBOL_LEFT);
 
-void timesettings_screen()
-{
-    contBarAtTimeSettings = lv_cont_create(time_settings_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtTimeSettings, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtTimeSettings, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtTimeSettings, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtTimeSettings, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtTimeSettings, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtTimeSettings, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtTimeSettings, false);
+    timeSettingsLabelAtBar = my_lv_label_create(timeSettingsScr, NULL, 195, 10, "Time Settings");
 
-    back_time_settings_btn = lv_btn_create(contBarAtTimeSettings, NULL);
-    back_time_settings_label = lv_label_create(back_time_settings_btn, NULL);
-    lv_label_set_text(back_time_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_time_settings_btn, 30, 15);
-    lv_obj_set_event_cb(back_time_settings_btn, timesettings_back_btn);
-    lv_obj_add_style(back_time_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    timeLabel = my_lv_label_create(timeSettingsScr, timeSettingsLabelAtBar, 5, 70, "Time [HH:MM]");
 
-    timeSettingsLabelAtBar = lv_label_create(contBarAtTimeSettings, NULL);
-    lv_label_set_text(timeSettingsLabelAtBar, "Time Settings");
+    timeHour = lv_spinbox_create(timeSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(timeHour, true);
+    lv_textarea_set_text_align(timeHour, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_range(timeHour, 0, 23);
+    lv_spinbox_set_digit_format(timeHour, 2, 0);
+    lv_obj_set_size(timeHour, 40, 34);
+    lv_obj_set_pos(timeHour, 165, 61);
 
-    time_label = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(time_label, 5, 70);
-    lv_label_set_text(time_label, "Time [HH:MM]");
-    lv_obj_set_style_local_text_color(time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    timeHourIncrement = my_lv_btn_create(timeSettingsScr, NULL, 20, 20, 175, 39, hourIncrement);
+    lv_theme_apply(timeHourIncrement, LV_THEME_SPINBOX_BTN);
+    lv_obj_add_style(timeHourIncrement, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_set_style_local_value_str(timeHourIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    time_hour = lv_spinbox_create(time_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(time_hour, true);
-    lv_textarea_set_text_align(time_hour, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_range(time_hour, 0, 23);
-    lv_spinbox_set_digit_format(time_hour, 2, 0);
-    lv_obj_set_width(time_hour, 40);
-    lv_obj_set_pos(time_hour, 165, 61);
+    timeHourDecrement = my_lv_btn_create(timeSettingsScr, timeHourIncrement, 20, 20, 175, 97, hourDecrement);
+    lv_obj_set_style_local_value_str(timeHourDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    time_hour_increment = lv_btn_create(time_settings_scr, NULL);
-    lv_obj_set_size(time_hour_increment, 20, 20);
-    lv_obj_set_pos(time_hour_increment, 175, 39);
-    lv_theme_apply(time_hour_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(time_hour_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(time_hour_increment, hour_increment);
+    timeColonLabel = my_lv_label_create(timeSettingsScr, timeLabel, 210, 70, ":");
+    lv_obj_set_style_local_text_color(timeColonLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
-    time_hour_decrement = lv_btn_create(time_settings_scr, NULL);
-    lv_obj_set_size(time_hour_decrement, 20, 20);
-    lv_obj_set_pos(time_hour_decrement, 175, 97);
-    lv_theme_apply(time_hour_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(time_hour_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(time_hour_decrement, hour_decrement);
+    timeMinute = lv_spinbox_create(timeSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(timeMinute, true);
+    lv_textarea_set_text_align(timeMinute, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_range(timeMinute, 0, 59);
+    lv_spinbox_set_digit_format(timeMinute, 2, 0);
+    lv_obj_set_size(timeMinute, 40, 34); 
+    lv_obj_set_pos(timeMinute, 219, 61);
 
-    time_colon_label = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(time_colon_label, 210, 70);
-    lv_label_set_text(time_colon_label, ":");
-    lv_obj_set_style_local_text_color(time_colon_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    timeMinuteIncrement = my_lv_btn_create(timeSettingsScr, timeHourIncrement, 20, 20, 229, 39, minuteIncrement);
+    lv_obj_set_style_local_value_str(timeMinuteIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    time_minute = lv_spinbox_create(time_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(time_minute, true);
-    lv_textarea_set_text_align(time_minute, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_range(time_minute, 0, 59);
-    lv_spinbox_set_digit_format(time_minute, 2, 0);
-    lv_obj_set_width(time_minute, 40);
-    lv_obj_set_pos(time_minute, 219, 61);
+    timeMinuteDecrement = my_lv_btn_create(timeSettingsScr, timeHourIncrement, 20, 20, 229, 97, minuteDecrement);
+    lv_obj_set_style_local_value_str(timeMinuteDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    time_minute_increment = lv_btn_create(time_settings_scr, NULL);
-    lv_obj_set_size(time_minute_increment, 20, 20);
-    lv_obj_set_pos(time_minute_increment, 229, 39);
-    lv_theme_apply(time_minute_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(time_minute_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(time_minute_increment, minute_increment);
+    dateLabel = my_lv_label_create(timeSettingsScr, NULL, 5, 129, "Date ");
 
-    time_minute_decrement = lv_btn_create(time_settings_scr, NULL);
-    lv_obj_set_size(time_minute_decrement, 20, 20);
-    lv_obj_set_pos(time_minute_decrement, 229, 97);
-    lv_theme_apply(time_minute_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(time_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(time_minute_decrement, minute_decrement);
+    dateBtn = my_lv_btn_create(timeSettingsScr, NULL, 95, 43, 165, 119, date_button_func);
+    dateBtnLabel = lv_label_create(dateBtn, NULL);
+    lv_label_set_text(dateBtnLabel, "99.99.9999");
+    lv_obj_set_style_local_border_opa(dateBtn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+    lv_obj_set_style_local_text_color(dateBtnLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
-    date_label = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(date_label, 5, 129);
-    lv_label_set_text(date_label, "Date ");
-    lv_obj_set_style_local_text_color(date_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    date_btn = lv_btn_create(time_settings_scr, NULL);
-    date_btn_label = lv_label_create(date_btn, NULL);
-    lv_label_set_text(date_btn_label, "99.99.9999");
-    lv_obj_set_style_local_border_opa(date_btn, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    lv_obj_set_style_local_text_color(date_btn_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_obj_set_width(date_btn, 95);
-    lv_obj_set_pos(date_btn, 165, 119);
-    lv_obj_set_event_cb(date_btn, date_button_func);
-
-    lockScreenLabel = lv_label_create(time_settings_scr, NULL);
-    lv_obj_set_pos(lockScreenLabel, 5, 170);
-    lv_label_set_text(lockScreenLabel, "Lock screen after ");
-    lv_obj_set_style_local_text_color(lockScreenLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lockScreenDDlist = lv_dropdown_create(time_settings_scr, NULL);
-    lv_dropdown_set_options(lockScreenDDlist, "30 sec\n"
-                                              "1 min\n"
-                                              "2 min\n"
+    lockScreenLabel = my_lv_label_create(timeSettingsScr, NULL, 5, 170, "Lock screen after ");
+    lockScreenDDlist = lv_dropdown_create(timeSettingsScr, NULL);
+    lv_dropdown_set_options(lockScreenDDlist, "1 min\n"
                                               "5 min\n"
                                               "10 min\n"
-                                              "30 min\n"
                                               "60 min\n"
                                               "Never");
-    lv_obj_set_width(lockScreenDDlist, 120);
+    lv_obj_set_size(lockScreenDDlist, 120, 34); 
     lv_obj_set_pos(lockScreenDDlist, 165, 164);
 
-    timeSettings_btn = lv_btn_create(time_settings_scr, NULL);
-    timeSettings_label = lv_label_create(timeSettings_btn, NULL);
-    lv_label_set_text(timeSettings_label, "Save");
-    lv_obj_set_size(timeSettings_btn, 75, 33);
-    lv_obj_set_pos(timeSettings_btn, 240, 200);
-    lv_obj_set_event_cb(timeSettings_btn, timesettings_save_btn);
-    lv_obj_add_style(timeSettings_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
+    timeSettingsBtn = my_lv_btn_create(timeSettingsScr, NULL, 75, 33, 240, 200, timesettings_save_btn);
+    timeSettingsLabel = lv_label_create(timeSettingsBtn, NULL);
+    lv_label_set_text(timeSettingsLabel, "Save");
+    lv_obj_add_style(timeSettingsBtn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 
-    sync_rtc_btn = lv_btn_create(time_settings_scr, NULL);
-    sync_rtc_label = lv_label_create(sync_rtc_btn, NULL);
-    lv_obj_set_height(sync_rtc_btn, 33);
-    lv_label_set_text(sync_rtc_label, "Sync. Clock");
-    lv_obj_add_style(sync_rtc_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
-    lv_obj_set_pos(sync_rtc_btn, 5, 200);
-    lv_obj_set_event_cb(sync_rtc_btn, sync_rtc_func);
+    syncRtcBtn = my_lv_btn_create(timeSettingsScr, NULL, 130, 33, 5, 200, sync_rtc_func);
+    syncRtcLabel = lv_label_create(syncRtcBtn, NULL);
+    lv_label_set_text(syncRtcLabel, "Sync. Clock");
+    lv_obj_add_style(syncRtcBtn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 }
 
-void settings_screen()
+void settingsScreen()
 {
-    contBarAtMainSettings = lv_cont_create(settings_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMainSettings, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtMainSettings, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtMainSettings, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtMainSettings, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtMainSettings, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMainSettings, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMainSettings, false);
+    backSettingsBtn = my_lv_btn_create(settingsScr, NULL, 30, 15, 14, 10, btn_settings_back);
+    backSettingsLabel = lv_label_create(backSettingsBtn, NULL);
+    lv_label_set_text(backSettingsLabel, LV_SYMBOL_LEFT);
+    lv_obj_add_style(backSettingsBtn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(backSettingsBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(backSettingsBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    back_settings_btn = lv_btn_create(contBarAtMainSettings, NULL);
-    back_settings_label = lv_label_create(back_settings_btn, NULL);
-    lv_label_set_text(back_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_settings_btn, 30, 15);
-    lv_obj_set_event_cb(back_settings_btn, btn_settings_back);
-    lv_obj_add_style(back_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    settingsLabelAtBar = my_lv_label_create(settingsScr, NULL, 239, 10, "Settings");
 
-    settingsLabelAtBar = lv_label_create(contBarAtMainSettings, NULL);
-    lv_label_set_text(settingsLabelAtBar, "Settings");
-
-    wifiBtn = lv_btn_create(settings_scr, NULL);
+    wifiBtn = my_lv_btn_create(settingsScr, NULL, 60, 60, 60, 38, WiFi_btn);
     wifiBtnLabel = lv_label_create(wifiBtn, NULL);
-    lv_obj_set_size(wifiBtn, 60, 60);
-    lv_obj_set_pos(wifiBtn, 60, 38);
     lv_label_set_text(wifiBtnLabel, MY_WIFI_SYMBOL);
-    lv_obj_set_event_cb(wifiBtn, WiFi_btn);
-    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
+    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &hugeFontStyle);
 
-    wifiBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(wifiBtnName, "WiFi");
-    lv_obj_set_pos(wifiBtnName, 63, 103);
+    wifiBtnName = my_lv_label_create(settingsScr, NULL, 63, 103, "WiFi");
     lv_obj_add_style(wifiBtnName, LV_OBJ_PART_MAIN, &font20Style);
 
-    infoBtn = lv_btn_create(settings_scr, NULL);
+    infoBtn = my_lv_btn_create(settingsScr, wifiBtn, 60, 60, 200, 38, info_btn);
     infoBtnLabel = lv_label_create(infoBtn, NULL);
-    lv_obj_set_size(infoBtn, 60, 60);
-    lv_obj_set_pos(infoBtn, 200, 38);
     lv_label_set_text(infoBtnLabel, MY_INFO_SYMBOL);
-    lv_obj_set_event_cb(infoBtn, info_btn);
-    lv_obj_add_style(infoBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
-    
-    infoBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(infoBtnName, "Info");
-    lv_obj_set_pos(infoBtnName, 207, 103);
-    lv_obj_add_style(infoBtnName, LV_OBJ_PART_MAIN, &font20Style);
 
-    timeBtn = lv_btn_create(settings_scr, NULL);
+    infoBtnName = my_lv_label_create(settingsScr, wifiBtnName, 207, 103, "Info");
+
+    timeBtn = my_lv_btn_create(settingsScr, wifiBtn, 60, 60, 60, 140, time_settings_btn);
     timeBtnLabel = lv_label_create(timeBtn, NULL);
-    lv_obj_set_size(timeBtn, 60, 60);
-    lv_obj_set_pos(timeBtn, 60, 140);
     lv_label_set_text(timeBtnLabel, MY_CLOCK_SYMBOL);
-    lv_obj_set_event_cb(timeBtn, time_settings_btn);
-    lv_obj_add_style(timeBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
 
-    timeBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(timeBtnName, "Time");
-    lv_obj_set_pos(timeBtnName, 65, 200);
-    lv_obj_add_style(timeBtnName, LV_OBJ_PART_MAIN, &font20Style);
+    timeBtnName = my_lv_label_create(settingsScr, wifiBtnName, 65, 200, "Time");
 
-    tempBtn = lv_btn_create(settings_scr, NULL);
-    tempBtnLabel = lv_label_create(tempBtn, NULL);
-    lv_obj_set_size(tempBtn, 60, 60);
-    lv_obj_set_pos(tempBtn, 200, 140);
+    tempBtn = my_lv_btn_create(settingsScr, wifiBtn, 60, 60, 200, 140, temp_settings_btn);
+    tempBtnLabel = lv_label_create(tempBtn, wifiBtnName);
     lv_label_set_text(tempBtnLabel, MY_COGS_SYMBOL);
-    lv_obj_set_event_cb(tempBtn, temp_settings_btn);
-    lv_obj_add_style(tempBtn, LV_OBJ_PART_MAIN, &hugeTransparentButtonStyle);
-    
-    tempBtnName = lv_label_create(settings_scr, NULL);
-    lv_label_set_text(tempBtnName, "Sampling");
-    lv_obj_set_pos(tempBtnName, 180, 200);
-    lv_obj_add_style(tempBtnName, LV_OBJ_PART_MAIN, &font20Style);
+    lv_obj_add_style(tempBtnLabel, LV_OBJ_PART_MAIN, &hugeFontStyle);
+    tempBtnName = my_lv_label_create(settingsScr, wifiBtnName, 180, 200, "Sampling");
 }
 
-void info_screen()
+void infoScreen()
 {
-    contBarAtMaininfo = lv_cont_create(info_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMaininfo, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtMaininfo, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtMaininfo, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtMaininfo, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtMaininfo, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMaininfo, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMaininfo, false);
+    backInfoBtn = my_lv_btn_create(infoScr, backSettingsBtn, 30, 15, 14, 10, setButton_task);
+    backInfoLabel = lv_label_create(backInfoBtn, NULL);
+    lv_label_set_text(backInfoLabel, LV_SYMBOL_LEFT);
 
-    back_info_btn = lv_btn_create(contBarAtMaininfo, NULL);
-    back_info_label = lv_label_create(back_info_btn, NULL);
-    lv_label_set_text(back_info_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_info_btn, 30, 15);
-    lv_obj_set_event_cb(back_info_btn, setButton_task);
-    lv_obj_add_style(back_info_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    lcdLabelAtBar = my_lv_label_create(infoScr, NULL, 216, 10, "Device info");
 
-    lcdLabelAtBar = lv_label_create(contBarAtMaininfo, NULL);
-    lv_label_set_text(lcdLabelAtBar, "Device info");
+    infoWifiLabel = my_lv_label_create(infoScr, NULL, 5, 53, "WiFi address: ");
 
-    info_wifi_label = lv_label_create(info_scr, NULL);
-    lv_label_set_text(info_wifi_label, "WiFi address: ");
-    lv_obj_set_style_local_text_color(info_wifi_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    infoWifiAddressLabel = my_lv_label_create(infoScr, NULL, 115, 53, "");
 
-    lv_obj_set_pos(info_wifi_label, 5, 53);
-    info_wifi_address_label = lv_label_create(info_scr, NULL);
-    lv_obj_set_pos(info_wifi_address_label, 115, 53);
-    lv_obj_set_style_local_text_color(info_wifi_address_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    config_label = lv_label_create(info_scr, NULL);
-    lv_obj_set_pos(config_label, 5, 70);
-    lv_obj_set_style_local_text_color(config_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    configLabel = my_lv_label_create(infoScr, NULL, 5, 70, "");
 }
 
-void main_screen()
+void mainScreen()
 {
-    contBarAtMain = lv_cont_create(main_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMain, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtMain, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtMain, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_obj_add_style(contBarAtMain, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMain, false);
- 
-	lockButton = lv_btn_create(main_scr, NULL);
-	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-    lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
-	labelLockButton = lv_label_create(lockButton, NULL);
-    lv_obj_align(lockButton, NULL, LV_ALIGN_IN_TOP_LEFT, 37, -5);
-	lv_label_set_text(labelLockButton, MY_LOCK_SYMBOL);
-	lv_btn_set_fit(lockButton, LV_FIT_TIGHT);
-	lv_obj_set_event_cb(lockButton, lockButton_task);
-    
-
-    wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
-    lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
-    lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 52, 0);
-
-    sdStatusAtMain = lv_label_create(contBarAtMain, NULL);
-    lv_label_set_text(sdStatusAtMain, LV_SYMBOL_SD_CARD);
-    lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 77, 0);
-
-    setButton = lv_btn_create(main_scr, NULL);
+    setButton = my_lv_btn_create(mainScr, NULL, 16, 18, 32, 7, setButton_task);
     labelSetButton = lv_label_create(setButton, NULL);
     lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
-    lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -25, -5);
-    lv_btn_set_fit(setButton, LV_FIT_TIGHT);
-    lv_obj_set_event_cb(setButton, setButton_task);
-    lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
+  lockButton = my_lv_btn_create(mainScr, setButton, 14, 18, 95, 7, lockButton_task);
+  labelLockButton = lv_label_create(lockButton, NULL);
+    lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
+  lv_label_set_text(labelLockButton, MY_LOCK_SYMBOL);
 
-    wifiStatusAtMainWarning = lv_label_create(wifiStatusAtMain, NULL);
-    lv_label_set_text(wifiStatusAtMainWarning, LV_SYMBOL_CLOSE);
-    lv_obj_add_style(wifiStatusAtMainWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
-    lv_obj_set_pos(wifiStatusAtMainWarning, 5, 5);
+    wifiStatusAtMain = my_lv_label_create(mainScr, NULL, 52, 7, LV_SYMBOL_WIFI, LV_COLOR_WHITE);
+    wifiStatusAtMainWarning = my_lv_label_create(wifiStatusAtMain, NULL, 6, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
+    lv_obj_add_style(wifiStatusAtMainWarning, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(wifiStatusAtMainWarning, LV_OBJ_PART_MAIN, &font12Style);
 
-    sdStatusAtMainWarning = lv_label_create(sdStatusAtMain, NULL);
-    lv_label_set_text(sdStatusAtMainWarning, LV_SYMBOL_CLOSE);
-    lv_obj_add_style(sdStatusAtMainWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
-    lv_obj_set_pos(sdStatusAtMainWarning, 2, 5);
+    sdStatusAtMain = my_lv_label_create(mainScr, wifiStatusAtMain, 77, 7, LV_SYMBOL_SD_CARD, LV_COLOR_WHITE);
+    sdStatusAtMainWarning = my_lv_label_create(sdStatusAtMain, wifiStatusAtMainWarning, 2, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
 
-    dateAndTimeAtBar = lv_label_create(contBarAtMain, NULL);
-    lv_label_set_text(dateAndTimeAtBar, "Hello!");
-    lv_obj_align(dateAndTimeAtBar, NULL, LV_ALIGN_IN_RIGHT_MID, -120, 0);
+    dateAndTimeAtBar = my_lv_label_create(mainScr, NULL, 157, 7, "");
 
-    contTemp = lv_cont_create(main_scr, NULL);
+    contPM25 = my_lv_cont_create(mainScr, NULL, 180, 90, 10, 30);
+    lv_obj_set_click(contPM25, false);
+    lv_obj_add_style(contPM25, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(contPM25, LV_OBJ_PART_MAIN, &containerStyle);
+
+    contTemp = my_lv_cont_create(mainScr, contPM25, 122, 46, 188, 30);
     lv_obj_set_click(contTemp, false);
-    lv_obj_add_style(contTemp, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_pos(contTemp, 188, 30);
-    lv_obj_set_size(contTemp, 122, 46);
 
-    contHumi = lv_cont_create(main_scr, NULL);
+    contHumi = my_lv_cont_create(mainScr, contPM25, 122, 46, 188, 74);
     lv_obj_set_click(contHumi, false);
-    lv_obj_add_style(contHumi, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_pos(contHumi, 188, 74);
-    lv_obj_set_size(contHumi, 122, 46);
 
-    contPM10 = lv_cont_create(main_scr, NULL);
+    contPM10 = my_lv_cont_create(mainScr, NULL, 91, 62, 10, 118);
     lv_obj_set_click(contPM10, false);
+    lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &containerStyle);
     lv_obj_add_style(contPM10, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_set_pos(contPM10, 10, 118);
-    lv_obj_set_size(contPM10, 91, 62);
 
-    contPM25 = lv_cont_create(main_scr, NULL);
-    lv_obj_set_click(contPM25, false);
-    lv_obj_add_style(contPM25, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_pos(contPM25, 10, 30);
-    lv_obj_set_size(contPM25, 180, 90);
-
-    contPM100 = lv_cont_create(main_scr, NULL);
+    contPM100 = my_lv_cont_create(mainScr, contPM10, 91, 62, 99, 118);
     lv_obj_set_click(contPM100, false);
-    lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_add_style(contPM100, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_set_pos(contPM100, 99, 118);
-    lv_obj_set_size(contPM100, 91, 62);
 
-    contAQI = lv_cont_create(main_scr, NULL);
+    contAQI = my_lv_cont_create(mainScr, contPM10, 122, 62, 188, 118);
     lv_obj_set_click(contAQI, false);
-    lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_add_style(contAQI, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_set_pos(contAQI, 188, 118);
-    lv_obj_set_size(contAQI, 122, 62);
 
-    contAQIColorBar = lv_cont_create(contAQI, NULL);
+    contAQIColorBar = my_lv_cont_create(contAQI, contAQI, 92, 24, 15, 25);
     lv_obj_set_click(contAQIColorBar, false);
-    lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_add_style(contAQIColorBar, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_set_style_local_bg_opa(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_70);
-    lv_obj_set_style_local_bg_color(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
-    lv_obj_set_pos(contAQIColorBar, 15, 25);
-    lv_obj_set_size(contAQIColorBar, 92, 24);
+    
+    labelTemp = my_lv_label_create(contTemp, NULL, 5, 3, "Temp");
 
-    labelTemp = lv_label_create(contTemp, NULL);
-    lv_obj_set_pos(labelTemp, 5, 3);
-    lv_label_set_text(labelTemp, "Temp");
-
-    labelTempValue = lv_label_create(contTemp, NULL);
+    labelTempValue = my_lv_label_create(contTemp, NULL, 16, 22, "         -");
     lv_obj_add_style(labelTempValue, LV_OBJ_PART_MAIN, &font20Style);
-    lv_obj_set_pos(labelTempValue, 16, 22);
-    lv_label_set_text(labelTempValue, "         -");
     lv_label_set_align(labelTempValue, LV_LABEL_ALIGN_LEFT);
-    labelHumi = lv_label_create(contHumi, NULL);
-    lv_obj_set_pos(labelHumi, 5, 3);
-    lv_label_set_text(labelHumi, "RH");
 
-    labelHumiValue = lv_label_create(contHumi, NULL);
+    labelHumi = my_lv_label_create(contHumi, NULL, 5, 3, "RH");
+
+    labelHumiValue = my_lv_label_create(contHumi, NULL, 16, 22, "         -");
     lv_obj_add_style(labelHumiValue, LV_OBJ_PART_MAIN, &font20Style);
-    lv_obj_set_pos(labelHumiValue, 16, 22);
-    lv_label_set_text(labelHumiValue, "         -");
 
-    labelPM10 = lv_label_create(contPM10, NULL);
-    lv_obj_set_pos(labelPM10, 5, 5);
-    lv_label_set_text(labelPM10, "PM 1.0 ug/m");
+    labelPM10 = my_lv_label_create(contPM10, NULL, 5, 5, "PM 1.0 ug/m");
 
-    labelPM10UpperIndex = lv_label_create(contPM10, NULL);
-    lv_obj_set_pos(labelPM10UpperIndex, 80, 3);
-    lv_label_set_text(labelPM10UpperIndex, "3");
+    labelPM10UpperIndex = my_lv_label_create(contPM10, NULL, 80, 3, "3");
 
-    labelPM25 = lv_label_create(contPM25, NULL);
-    lv_obj_set_pos(labelPM25, 5, 5);
-    lv_label_set_text(labelPM25, "PM 2.5                ug/m");
+    labelPM25 = my_lv_label_create(contPM25, NULL, 5, 5, "PM 2.5                ug/m");
 
-    labelPM25UpperIndex = lv_label_create(contPM25, NULL);
-    //	lv_obj_align(labelPM25, labelPM25UpperIndex, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
-    lv_obj_set_pos(labelPM25UpperIndex, 167, 3);
-    lv_label_set_text(labelPM25UpperIndex, "3");
+    labelPM25UpperIndex = my_lv_label_create(contPM25, NULL, 167, 3 , "3");
     lv_obj_add_style(labelPM25UpperIndex, LV_OBJ_PART_MAIN, &font12Style);
 
-    labelPM100 = lv_label_create(contPM100, NULL);
-    lv_obj_set_pos(labelPM100, 5, 5);
-    lv_label_set_text(labelPM100, "PM 10 ug/m");
+    labelPM100 = my_lv_label_create(contPM100, NULL, 5, 5, "PM 10 ug/m");
 
-    labelPM100UpperIndex = lv_label_create(contPM100, NULL);
-    lv_obj_set_pos(labelPM100UpperIndex, 77, 3);
-    lv_label_set_text(labelPM100UpperIndex, "3");
+    labelPM100UpperIndex = my_lv_label_create(contPM100, NULL, 77, 3, "3");
     lv_obj_add_style(labelPM100UpperIndex, LV_OBJ_PART_MAIN, &font12Style);
 
     labelPM10Data = lv_label_create(contPM10, NULL);
     lv_obj_add_style(labelPM10Data, LV_OBJ_PART_MAIN, &font22Style);
+    lv_obj_add_style(labelPM10Data, LV_OBJ_PART_MAIN, &whiteFontStyle);
     lv_obj_set_auto_realign(labelPM10Data, true);
     lv_obj_align(labelPM10Data, NULL, LV_ALIGN_CENTER, 0, 5);
     lv_label_set_text(labelPM10Data, "-");
 
     labelPM25Data = lv_label_create(contPM25, NULL);
     lv_obj_add_style(labelPM25Data, LV_OBJ_PART_MAIN, &font22Style);
+    lv_obj_add_style(labelPM25Data, LV_OBJ_PART_MAIN, &whiteFontStyle);
     lv_obj_set_auto_realign(labelPM25Data, true);
     lv_obj_align(labelPM25Data, NULL, LV_ALIGN_CENTER, 0, 10);
     lv_label_set_text(labelPM25Data, "-");
 
     labelPM100Data = lv_label_create(contPM100, NULL);
     lv_obj_add_style(labelPM100Data, LV_OBJ_PART_MAIN, &font22Style);
+    lv_obj_add_style(labelPM100Data, LV_OBJ_PART_MAIN, &whiteFontStyle);
     lv_obj_set_auto_realign(labelPM100Data, true);
     lv_obj_align(labelPM100Data, NULL, LV_ALIGN_CENTER, 0, 5);
     lv_label_set_text(labelPM100Data, "-");
 
-    labelAQI = lv_label_create(contAQI, NULL);
-    lv_obj_set_pos(labelAQI, 5, 5);
-    lv_label_set_text(labelAQI, "Air Quality  PM 2.5");
+    labelAQI = my_lv_label_create(contAQI, NULL, 5, 5, "Air Quality  PM 2.5");
 
     labelAQIColorBar = lv_label_create(contAQIColorBar, NULL);
     lv_obj_set_auto_realign(labelAQIColorBar, true);
     lv_obj_align(labelAQIColorBar, NULL, LV_ALIGN_CENTER, 0, 0);
     lv_label_set_text(labelAQIColorBar, "-");
+    lv_obj_add_style(labelAQIColorBar, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    ledAtMain = lv_led_create(main_scr, NULL);
+    ledAtMain = lv_led_create(mainScr, NULL);
     lv_obj_set_size(ledAtMain, 13, 13);
     lv_obj_set_pos(ledAtMain, 13, 10);
     lv_led_set_bright(ledAtMain, 200);
@@ -508,91 +294,195 @@ void main_screen()
     drawParticlesIndicator();
 }
 
-void wifi_screen()
+void samplingsettingsScreen()
 {
-    contBarAtMainWiFi = lv_cont_create(wifi_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMainWiFi, true);
-    lv_obj_align(contBarAtMainWiFi, NULL, LV_ALIGN_IN_TOP_MID, 0, -5);
-    lv_cont_set_fit4(contBarAtMainWiFi, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtMainWiFi, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtMainWiFi, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMainWiFi, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMainWiFi, false);
+    backSamplingSettingsBtn = my_lv_btn_create(samplingSettingsScr, backSettingsBtn, 30, 15, 14, 10, sampling_settings_back_btn); 
+    backSamplingSettingsLabel = lv_label_create(backSamplingSettingsBtn, NULL);
+    lv_label_set_text(backSamplingSettingsLabel, LV_SYMBOL_LEFT);
 
-    cancel_btn = lv_btn_create(contBarAtMainWiFi, NULL);
-    cancel_label = lv_label_create(cancel_btn, NULL);
-    lv_label_set_text(cancel_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(cancel_btn, 30, 15);
-    lv_obj_set_event_cb(cancel_btn, btn_cancel);
-    lv_obj_add_style(cancel_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
+    samplingSaveBtn = my_lv_btn_create(samplingSettingsScr, NULL, 75, 25, 231, 10, sampling_settings_save_btn);
+    samplingSaveLabel = lv_label_create(samplingSaveBtn, NULL);
+    lv_label_set_text(samplingSaveLabel, "Save");
+    lv_obj_add_style(samplingSaveBtn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 
-    wifiLabelAtBar = lv_label_create(contBarAtMainWiFi, NULL);
-    lv_label_set_text(wifiLabelAtBar, "WiFi settings");
+    measurePeriodlabel = my_lv_label_create(samplingSettingsScr, NULL, 5, 52, "Measurements \nsaving time \n[HH:MM:SS]", LV_COLOR_WHITE);
+    lv_obj_set_style_local_text_font(measurePeriodlabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
 
-    ssid_label = lv_label_create(wifi_scr, NULL);
-    lv_label_set_text(ssid_label, "SSID: ");
-    lv_obj_set_pos(ssid_label, 5, 53);
-    lv_obj_set_style_local_text_color(ssid_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    measurePeriodHour = lv_spinbox_create(samplingSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(measurePeriodHour, true);
+    lv_textarea_set_text_align(measurePeriodHour, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_range(measurePeriodHour, 0, 24);
+    lv_spinbox_set_digit_format(measurePeriodHour, 2, 0);
+    lv_obj_set_size(measurePeriodHour, 40, 34);
+    lv_obj_set_pos(measurePeriodHour, 165, 61);
 
-    ssid_ta = lv_textarea_create(wifi_scr, NULL);
-    lv_textarea_set_text(ssid_ta, "");
-    lv_textarea_set_pwd_mode(ssid_ta, false);
-    lv_textarea_set_one_line(ssid_ta, true);    
-    lv_obj_set_event_cb(ssid_ta, ta_event_cb);
-    lv_textarea_set_cursor_hidden(ssid_ta, true);
-    lv_obj_set_width(ssid_ta, LV_HOR_RES / 2 - 20);
-    lv_obj_set_pos(ssid_ta, 100, 45);
+    measurePeriodHourIncrement  = my_lv_btn_create(samplingSettingsScr, NULL, 20, 20, 175, 39, sampling_hourIncrement);
+    lv_theme_apply(measurePeriodHourIncrement , LV_THEME_SPINBOX_BTN);
+    lv_obj_add_style(measurePeriodHourIncrement , LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_set_style_local_value_str(measurePeriodHourIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
 
-    pwd_label = lv_label_create(wifi_scr, NULL);
-    lv_label_set_text(pwd_label, "Password: ");
-    lv_obj_set_pos(pwd_label, 5, 92);
-    lv_obj_set_style_local_text_color(pwd_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    pwd_ta = lv_textarea_create(wifi_scr, NULL);
-    lv_textarea_set_text(pwd_ta, "");
-    lv_textarea_set_pwd_show_time(pwd_ta, 5000);
-    lv_textarea_set_pwd_mode(pwd_ta, true);
-    lv_textarea_set_one_line(pwd_ta, true);
-    lv_obj_set_event_cb(pwd_ta, ta_event_cb);
-    lv_textarea_set_cursor_hidden(pwd_ta, true);
-    lv_obj_set_width(pwd_ta, LV_HOR_RES / 2 - 20);
-    lv_obj_set_pos(pwd_ta, 100, 85);
+    measurePeriodHourDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 20, 20, 175, 97, sampling_hourDecrement);
+    lv_obj_set_style_local_value_str(measurePeriodHourDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    show_hide_btn = lv_btn_create(wifi_scr, NULL);
-    show_hide_btn_label = lv_label_create(show_hide_btn, NULL);
-    lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
-    lv_obj_set_pos(show_hide_btn, 243, 85);
-    lv_obj_set_width(show_hide_btn, 75);
-    lv_obj_add_style(show_hide_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-    lv_obj_set_style_local_text_color(show_hide_btn_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_obj_set_event_cb(show_hide_btn, show_hide_btn_func);
-    apply_btn = lv_btn_create(wifi_scr, NULL);
-    apply_label = lv_label_create(apply_btn, NULL);
-    lv_label_set_text(apply_label, "Connect");
-    lv_obj_add_style(apply_btn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
-    lv_obj_set_event_cb(apply_btn, btn_connect);
-    lv_obj_set_width(apply_btn, 75);
-    lv_obj_set_pos(apply_btn, 243, 43);
+    measureColonLabel = my_lv_label_create(samplingSettingsScr, NULL, 210, 70, ":", LV_COLOR_WHITE);
+
+    measurePeriodMinute = lv_spinbox_create(samplingSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(measurePeriodMinute, true);
+    lv_textarea_set_text_align(measurePeriodMinute, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_range(measurePeriodMinute, 0, 59);
+    lv_spinbox_set_digit_format(measurePeriodMinute, 2, 0);
+    lv_obj_set_size(measurePeriodMinute, 40, 34);
+    lv_obj_set_pos(measurePeriodMinute, 219, 61);
+
+    measurePeriodMinuteIncrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 20, 20, 229, 39, sampling_minuteIncrement);
+    lv_obj_set_style_local_value_str(measurePeriodMinuteIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+
+    measurePeriodMinuteDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 20, 20, 229, 97, sampling_minuteDecrement);
+    lv_obj_set_style_local_value_str(measurePeriodMinuteDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+
+    measureColonLabel2 = my_lv_label_create(samplingSettingsScr, NULL, 265, 70, ":", LV_COLOR_WHITE);
+
+    measurePeriodsecond = lv_spinbox_create(samplingSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(measurePeriodsecond, true);
+    lv_textarea_set_text_align(measurePeriodsecond, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_range(measurePeriodsecond, 0, 59);
+    lv_spinbox_set_digit_format(measurePeriodsecond, 2, 0);
+    lv_obj_set_size(measurePeriodsecond, 40, 34);
+    lv_obj_set_pos(measurePeriodsecond, 274, 61);
+
+    measurePeriodsecondIncrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 20, 20, 284, 39, sampling_secondIncrement);
+    lv_obj_set_style_local_value_str(measurePeriodsecondIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+
+    measurePeriodsecondDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 20, 20, 284, 97, sampling_secondDecrement);
+    lv_obj_set_style_local_value_str(measurePeriodsecondDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+
+    measureNumberLabel = lv_label_create(samplingSettingsScr, NULL);
+    lv_obj_set_pos(measureNumberLabel, 5, 127);
+    lv_obj_set_style_local_text_font(measureNumberLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_label_set_text(measureNumberLabel, "Number of samples");
+    lv_obj_set_style_local_text_color(measureNumberLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
+    measureNumber = lv_spinbox_create(samplingSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(measureNumber, true);
+    lv_textarea_set_text_align(measureNumber, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_digit_format(measureNumber, 2, 0);
+    lv_spinbox_set_range(measureNumber, 1, 20);
+    lv_obj_set_size(measureNumber, 50, 34);
+    lv_obj_set_pos(measureNumber, 206, 119);
+
+    measureNumberIncrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 257, 119, measureNumberIncrement_func);
+    lv_obj_set_style_local_value_str(measureNumberIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+
+    measureNumberDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 165, 119, measureNumberDecrement_func);
+    lv_obj_set_style_local_value_str(measureNumberDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+
+    measureAvPeriodLabel = lv_label_create(samplingSettingsScr, NULL);
+    lv_obj_set_pos(measureAvPeriodLabel, 5, 165);
+    lv_obj_set_style_local_text_font(measureAvPeriodLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_label_set_text(measureAvPeriodLabel, "Time between \nmeasurments [s]:");
+    lv_obj_set_style_local_text_color(measureAvPeriodLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+
+    measureAvPeriod = lv_spinbox_create(samplingSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(measureAvPeriod, true);
+    lv_textarea_set_text_align(measureAvPeriod, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_digit_format(measureAvPeriod, 3, 0);
+    lv_spinbox_set_range(measureAvPeriod, 5, 999);
+    lv_obj_set_size(measureAvPeriod, 50, 34);
+    lv_obj_set_pos(measureAvPeriod, 206, 160);
+
+    measureAvPeriodIncrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 257, 160, av_periodIncrement);
+    lv_obj_set_style_local_value_str(measureAvPeriodIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+
+    measureAvPeriodDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 165, 160, av_periodDecrement);
+    lv_obj_set_style_local_value_str(measureAvPeriodDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
+
+    turnFanOnTimeLabel = my_lv_label_create(samplingSettingsScr, NULL, 5, 205, "Fan running time \nbefore measure [s]:");
+
+    lv_obj_set_style_local_text_font(turnFanOnTimeLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+
+    turnFanOnTime = lv_spinbox_create(samplingSettingsScr, NULL);
+    lv_textarea_set_cursor_hidden(turnFanOnTime, true);
+    lv_textarea_set_text_align(turnFanOnTime, LV_LABEL_ALIGN_CENTER);
+    lv_spinbox_set_digit_format(turnFanOnTime, 3, 0);
+    lv_spinbox_set_range(turnFanOnTime, 1, 999);
+    lv_obj_set_size(turnFanOnTime, 50, 34);
+    lv_obj_set_pos(turnFanOnTime, 206, 200);
+
+    turnFanOnTimeIncrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 257, 200, turnFanOnTimeIncrement_func);
+    lv_obj_set_style_local_value_str(turnFanOnTimeIncrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
+
+    turnFanOnTimeDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 165, 200, turnFanOnTimeDecrement_func);
+    lv_obj_set_style_local_value_str(turnFanOnTimeDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 }
 
-void lock_screen()
+void wifiScreen()
 {
-    contDateTimeAtLock = lv_cont_create(lock_scr, NULL);
+    cancelBtn = my_lv_btn_create(wifiScr, backSettingsBtn, 30, 15, 14, 10, btn_cancel);
+    cancelLabel = lv_label_create(cancelBtn, NULL);
+    lv_label_set_text(cancelLabel, LV_SYMBOL_LEFT);
+    lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
+
+    wifiLabelAtBar = my_lv_label_create(wifiScr, NULL, 201, 10, "WiFi settings");
+ 
+    ssidLabel = my_lv_label_create(wifiScr, NULL, 5, 53, "SSID: ");
+   
+    ssidTA = lv_textarea_create(wifiScr, NULL);
+    lv_textarea_set_text(ssidTA, "");
+    lv_textarea_set_pwd_mode(ssidTA, false);
+    lv_textarea_set_one_line(ssidTA, true);    
+    lv_obj_set_event_cb(ssidTA, ta_event_cb);
+    lv_textarea_set_cursor_hidden(ssidTA, true);
+    lv_obj_set_size(ssidTA, 140, 34);
+    lv_obj_set_pos(ssidTA, 100, 45);
+    lv_obj_add_style(ssidTA, LV_OBJ_PART_MAIN, &borderlessStyle);
+
+    pwdLabel = my_lv_label_create(wifiScr, NULL, 5, 92, "Password: ");
+
+    pwdTA = lv_textarea_create(wifiScr, NULL);
+    lv_textarea_set_text(pwdTA, "");
+    lv_textarea_set_pwd_show_time(pwdTA, 5000);
+    lv_textarea_set_pwd_mode(pwdTA, true);
+    lv_textarea_set_one_line(pwdTA, true);
+    lv_obj_set_event_cb(pwdTA, ta_event_cb);
+    lv_textarea_set_cursor_hidden(pwdTA, true);
+    lv_obj_set_size(pwdTA, 140, 34); 
+    lv_obj_set_pos(pwdTA, 100, 85);
+    lv_obj_add_style(pwdTA, LV_OBJ_PART_MAIN, &borderlessStyle);
+
+    showHideBtn = my_lv_btn_create(wifiScr, NULL, 75, 43, 243, 85, showHideBtn_func);
+    showHideBtnLabel = lv_label_create(showHideBtn, NULL);
+    lv_label_set_text(showHideBtnLabel, LV_SYMBOL_EYE_OPEN);
+    lv_obj_add_style(showHideBtn, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(showHideBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(showHideBtnLabel, LV_OBJ_PART_MAIN, &whiteFontStyle);
+
+    applyBtn = my_lv_btn_create(wifiScr, NULL, 75, 43, 243, 43, btn_connect);
+    applyLabel = lv_label_create(applyBtn, NULL);
+    lv_label_set_text(applyLabel, "Connect");
+    lv_obj_add_style(applyBtn, LV_OBJ_PART_MAIN, &whiteButtonStyle);
+    lv_obj_add_style(applyBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
+}
+
+void lockScreen()
+{
+    contDateTimeAtLock = lv_cont_create(lockScr, NULL);
     lv_obj_set_auto_realign(contDateTimeAtLock, true);
     lv_obj_align(contDateTimeAtLock, NULL, LV_ALIGN_CENTER, 0, -40);
-    //lv_cont_set_fit4(contDateTimeLock,   LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
     lv_cont_set_fit(contDateTimeAtLock, LV_FIT_TIGHT);
     lv_cont_set_layout(contDateTimeAtLock, LV_LAYOUT_PRETTY_MID);
-    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contDateTimeAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &borderlessStyle);
+    lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    unlockButton = lv_btn_create(lock_scr, NULL);
+    unlockButton = lv_btn_create(lockScr, setButton);//TODO BRAK POS
     labelUnlockButton = lv_label_create(unlockButton, NULL);
-    lv_obj_align(unlockButton, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+    lv_obj_set_style_local_text_font(unlockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
+    lv_obj_align(unlockButton, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -25);
     lv_label_set_text(labelUnlockButton, MY_UNLOCK_SYMBOL);
     lv_btn_set_fit(unlockButton, LV_FIT_TIGHT);
     lv_obj_set_event_cb(unlockButton, unlockButton_task);
-    lv_obj_add_style(unlockButton, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-    lv_obj_set_style_local_text_font(unlockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
 
     labelTimeLock = lv_label_create(contDateTimeAtLock, NULL);
     lv_label_set_text(labelTimeLock, "Connect to wifi");
@@ -603,223 +493,21 @@ void lock_screen()
     lv_label_set_text(labelDateLock, "");
     lv_obj_align(labelDateLock, NULL, LV_ALIGN_CENTER, 0, 0);
 
-    wifiStatusAtLock = lv_label_create(lock_scr, NULL);
-    lv_obj_align(wifiStatusAtLock, NULL, LV_ALIGN_CENTER, 42, 10);
+    wifiStatusAtLock = lv_label_create(lockScr, wifiStatusAtMain);
+    lv_obj_align(wifiStatusAtLock, NULL, LV_ALIGN_CENTER, -36, 10);
     lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
-    lv_obj_add_style(wifiStatusAtLock, LV_OBJ_PART_MAIN, &font16Style);
+    wifiStatusAtLockWarning = my_lv_label_create(wifiStatusAtLock,  wifiStatusAtMainWarning, 6, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
 
-    sdStatusAtLock = lv_label_create(lock_scr, NULL);
-    lv_obj_align(sdStatusAtLock, NULL, LV_ALIGN_CENTER, -30, 10);
+    sdStatusAtLock = lv_label_create(lockScr, sdStatusAtMain);
+    lv_obj_align(sdStatusAtLock, NULL, LV_ALIGN_CENTER, 36, 10);
     lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
-    lv_obj_add_style(sdStatusAtLock, LV_OBJ_PART_MAIN, &font16Style);
+    sdStatusAtLockWarning = my_lv_label_create(sdStatusAtLock, wifiStatusAtLockWarning, 2, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
 
-    wifiStatusAtLockWarning = lv_label_create(wifiStatusAtLock, NULL);
-    lv_label_set_text(wifiStatusAtLockWarning, LV_SYMBOL_CLOSE);
-    lv_obj_add_style(wifiStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
-    lv_obj_set_pos(wifiStatusAtLockWarning, 5, 5);
-
-    sdStatusAtLockWarning = lv_label_create(sdStatusAtLock, NULL);
-    lv_label_set_text(sdStatusAtLockWarning, LV_SYMBOL_CLOSE);
-    lv_obj_add_style(sdStatusAtLockWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
-    lv_obj_set_pos(sdStatusAtLockWarning, 2, 5);
-
-    ledAtLock = lv_led_create(lock_scr, NULL);
+    ledAtLock = lv_led_create(lockScr, NULL);
     lv_obj_set_size(ledAtLock, 13, 13);
-    lv_obj_set_pos(ledAtLock, 13, 10);
+    lv_obj_align(ledAtLock, NULL, LV_ALIGN_CENTER, 0, 10);
     lv_led_set_bright(ledAtLock, 200);
     lv_obj_set_style_local_bg_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_obj_set_style_local_shadow_color(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
     lv_obj_set_style_local_border_opa(ledAtLock, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
-}
-
-void samplingSettings_screen()
-{
-    contBarAtSampling = lv_cont_create(sampling_settings_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtSampling, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtSampling, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtSampling, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtSampling, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtSampling, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtSampling, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtSampling, false);
-
-    back_sampling_settings_btn = lv_btn_create(contBarAtSampling, NULL);
-    back_sampling_settings_label = lv_label_create(back_sampling_settings_btn, NULL);
-    lv_label_set_text(back_sampling_settings_label, LV_SYMBOL_LEFT);
-    lv_obj_set_size(back_sampling_settings_btn, 30, 15);
-    lv_obj_set_event_cb(back_sampling_settings_btn, sampling_settings_back_btn);
-    lv_obj_add_style(back_sampling_settings_btn, LV_OBJ_PART_MAIN, &transparentButtonStyle);
-
-    sampling_save_btn = lv_btn_create(contBarAtSampling, NULL);
-    sampling_save_label = lv_label_create(sampling_save_btn, NULL);
-    lv_label_set_text(sampling_save_label, "Save");
-    lv_obj_set_size(sampling_save_btn, 75, 25);
-    lv_obj_set_event_cb(sampling_save_btn, sampling_settings_save_btn);
-    lv_obj_add_style(sampling_save_btn, LV_BTN_PART_MAIN, &whiteButtonStyle);
-
-    measure_period_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_period_label, 5, 52);
-    lv_obj_set_style_local_text_font(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measure_period_label, "Measurements \nsaving time \n[HH:MM:SS]");
-    lv_obj_set_style_local_text_color(measure_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    measure_period_hour = lv_spinbox_create(sampling_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(measure_period_hour, true);
-    lv_textarea_set_text_align(measure_period_hour, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_range(measure_period_hour, 0, 24);
-    lv_spinbox_set_digit_format(measure_period_hour, 2, 0);
-    lv_obj_set_width(measure_period_hour, 40);
-    lv_obj_set_pos(measure_period_hour, 165, 61);
-
-    measure_period_hour_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_period_hour_increment, 20, 20);
-    lv_obj_set_pos(measure_period_hour_increment, 175, 39);
-    lv_theme_apply(measure_period_hour_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_period_hour_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(measure_period_hour_increment, sampling_hour_increment);
-
-    measure_period_hour_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_period_hour_decrement, 20, 20);
-    lv_obj_set_pos(measure_period_hour_decrement, 175, 97);
-    lv_theme_apply(measure_period_hour_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_period_hour_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(measure_period_hour_decrement, sampling_hour_decrement);
-
-    measure_colon_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_colon_label, 210, 70);
-    lv_label_set_text(measure_colon_label, ":");
-    lv_obj_set_style_local_text_color(measure_colon_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    measure_period_minute = lv_spinbox_create(sampling_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(measure_period_minute, true);
-    lv_textarea_set_text_align(measure_period_minute, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_range(measure_period_minute, 0, 59);
-    lv_spinbox_set_digit_format(measure_period_minute, 2, 0);
-    lv_obj_set_width(measure_period_minute, 40);
-    lv_obj_set_pos(measure_period_minute, 219, 61);
-
-    measure_period_minute_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_period_minute_increment, 20, 20);
-    lv_obj_set_pos(measure_period_minute_increment, 229, 39);
-    lv_theme_apply(measure_period_minute_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_period_minute_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(measure_period_minute_increment, sampling_minute_increment);
-
-    measure_period_minute_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_period_minute_decrement, 20, 20);
-    lv_obj_set_pos(measure_period_minute_decrement, 229, 97);
-    lv_theme_apply(measure_period_minute_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_period_minute_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(measure_period_minute_decrement, sampling_minute_decrement);
-
-    measure_colon_label2 = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_colon_label2, 265, 70);
-    lv_label_set_text(measure_colon_label2, ":");
-    lv_obj_set_style_local_text_color(measure_colon_label2, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    measure_period_second = lv_spinbox_create(sampling_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(measure_period_second, true);
-    lv_textarea_set_text_align(measure_period_second, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_range(measure_period_second, 0, 59);
-    lv_spinbox_set_digit_format(measure_period_second, 2, 0);
-    lv_obj_set_width(measure_period_second, 40);
-    lv_obj_set_pos(measure_period_second, 274, 61);
-
-    measure_period_second_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_period_second_increment, 20, 20);
-    lv_obj_set_pos(measure_period_second_increment, 284, 39);
-    lv_theme_apply(measure_period_second_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_period_second_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(measure_period_second_increment, sampling_second_increment);
-
-    measure_period_second_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_period_second_decrement, 20, 20);
-    lv_obj_set_pos(measure_period_second_decrement, 284, 97);
-    lv_theme_apply(measure_period_second_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_period_second_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(measure_period_second_decrement, sampling_second_decrement);
-
-    measure_number_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_number_label, 5, 127);
-    lv_obj_set_style_local_text_font(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measure_number_label, "Number of samples");
-    lv_obj_set_style_local_text_color(measure_number_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    measure_number = lv_spinbox_create(sampling_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(measure_number, true);
-    lv_textarea_set_text_align(measure_number, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_digit_format(measure_number, 2, 0);
-    lv_spinbox_set_range(measure_number, 1, 20);
-    lv_obj_set_width(measure_number, 40);
-    lv_obj_set_pos(measure_number, 206, 119);
-
-    measure_number_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_number_increment, 40, 34);
-    lv_obj_set_pos(measure_number_increment, 247, 119);
-    lv_theme_apply(measure_number_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_number_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(measure_number_increment, measure_number_increment_func);
-
-    measure_number_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_number_decrement, 40, 34);
-    lv_obj_set_pos(measure_number_decrement, 165, 119);
-    lv_theme_apply(measure_number_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_number_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(measure_number_decrement, measure_number_decrement_func);
-
-    measure_av_period_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(measure_av_period_label, 5, 165);
-    lv_obj_set_style_local_text_font(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measure_av_period_label, "Time between \nmeasurments [SS]");
-    lv_obj_set_style_local_text_color(measure_av_period_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    measure_av_period = lv_spinbox_create(sampling_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(measure_av_period, true);
-    lv_textarea_set_text_align(measure_av_period, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_digit_format(measure_av_period, 2, 0);
-    lv_spinbox_set_range(measure_av_period, 5, 30);
-    lv_obj_set_width(measure_av_period, 40);
-    lv_obj_set_pos(measure_av_period, 206, 160);
-
-    measure_av_period_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_av_period_increment, 40, 34);
-    lv_obj_set_pos(measure_av_period_increment, 247, 160);
-    lv_theme_apply(measure_av_period_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_av_period_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(measure_av_period_increment, av_period_increment);
-
-    measure_av_period_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(measure_av_period_decrement, 40, 34);
-    lv_obj_set_pos(measure_av_period_decrement, 165, 160);
-    lv_theme_apply(measure_av_period_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(measure_av_period_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(measure_av_period_decrement, av_period_decrement);
-
-    turn_fan_on_time_label = lv_label_create(sampling_settings_scr, NULL);
-    lv_obj_set_pos(turn_fan_on_time_label, 5, 210);
-    lv_obj_set_style_local_text_font(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(turn_fan_on_time_label, "Turn fan on time [SS]");
-    lv_obj_set_style_local_text_color(turn_fan_on_time_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-
-    turn_fan_on_time = lv_spinbox_create(sampling_settings_scr, NULL);
-    lv_textarea_set_cursor_hidden(turn_fan_on_time, true);
-    lv_textarea_set_text_align(turn_fan_on_time, LV_LABEL_ALIGN_CENTER);
-    lv_spinbox_set_digit_format(turn_fan_on_time, 2, 0);
-    lv_spinbox_set_range(turn_fan_on_time, 1, 59);
-    lv_obj_set_width(turn_fan_on_time, 40);
-    lv_obj_set_pos(turn_fan_on_time, 206, 200);
-
-    turn_fan_on_time_increment = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(turn_fan_on_time_increment, 40, 34);
-    lv_obj_set_pos(turn_fan_on_time_increment, 247, 200);
-    lv_theme_apply(turn_fan_on_time_increment, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(turn_fan_on_time_increment, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_PLUS);
-    lv_obj_set_event_cb(turn_fan_on_time_increment, turn_fan_on_time_increment_func);
-
-    turn_fan_on_time_decrement = lv_btn_create(sampling_settings_scr, NULL);
-    lv_obj_set_size(turn_fan_on_time_decrement, 40, 34);
-    lv_obj_set_pos(turn_fan_on_time_decrement, 165, 200);
-    lv_theme_apply(turn_fan_on_time_decrement, LV_THEME_SPINBOX_BTN);
-    lv_obj_set_style_local_value_str(turn_fan_on_time_decrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
-    lv_obj_set_event_cb(turn_fan_on_time_decrement, turn_fan_on_time_decrement_func);    
 }

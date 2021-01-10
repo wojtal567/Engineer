@@ -722,13 +722,13 @@ static void sampling_minuteDecrement(lv_obj_t *btn, lv_event_t e)
             lv_spinbox_set_value(measurePeriodMinute, 59);
             lv_spinbox_decrement(measurePeriodHour);
             if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
-                lv_spinbox_set_value(turnFanOnTime, (((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1)%20*10);    
+                lv_spinbox_set_value(turnFanOnTime, ((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1);    
         }
         if (!(lv_spinbox_get_value(measurePeriodMinute) == 1 && lv_spinbox_get_value(measurePeriodHour) == 0))
         {
             lv_spinbox_decrement(measurePeriodMinute);
             if((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)<=lv_spinbox_get_value(turnFanOnTime))
-                lv_spinbox_set_value(turnFanOnTime, (((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1)%20*10);
+                lv_spinbox_set_value(turnFanOnTime, ((lv_spinbox_get_value(measurePeriodHour)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond))-1);
         }
     }
 }

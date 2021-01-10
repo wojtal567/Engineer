@@ -1,7 +1,6 @@
 #include <RtcDS1307.h>
 #include <Wire.h>
 #include <lvgl.h>
-
 class MyRTC
 {
     private:

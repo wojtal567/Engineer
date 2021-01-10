@@ -110,4 +110,3 @@ lv_font_t monte16lock = {
 
 
 #endif /*#if MONTE16LOCK*/
-

@@ -5,8 +5,8 @@ void inactive_screen(lv_task_t *task)
     {
         if (lv_disp_get_inactive_time(NULL) > config.lcdLockTime)
         {
-            if (lv_scr_act() != lock_scr)
-                lv_disp_load_scr(lock_scr);
+            if (lv_scr_act() != lockScr)
+                lv_disp_load_scr(lockScr);
         }
     }
 }
@@ -66,22 +66,6 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
     }
 }
 
-void config_time(lv_task_t *task)
-{
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        for (int i = 0; i < 500; i++)
-            dateTimeClient.update();
-        configTime(Rtc, dateTimeClient);
-        wasUpdated = true;
-        Serial.println("Succesfully updated time on RTC.");
-    }
-    else
-    {
-        wasUpdated = false;
-    }
-}
-
 void dateTimeFunc(lv_task_t *task)
 {
 
@@ -90,18 +74,27 @@ void dateTimeFunc(lv_task_t *task)
         lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
         lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
         lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
-        if (in_time_settings == false)
+        if (inTimeSettings == false)
         {
-            lv_spinbox_set_value(time_hour, getTime(Rtc).substring(0, getTime(Rtc).indexOf(":")).toInt());
-            lv_spinbox_set_value(time_minute, getTime(Rtc).substring(3, 5).toInt());
-            lv_label_set_text(date_btn_label, getDate(Rtc).c_str());
+            lv_spinbox_set_value(timeHour, getTime(Rtc).substring(0, getTime(Rtc).indexOf(":")).toInt());
+            lv_spinbox_set_value(timeMinute, getTime(Rtc).substring(3, 5).toInt());
+            lv_label_set_text(dateBtnLabel, getDate(Rtc).c_str());
         }
     }
     else
     {
-        if (in_time_settings == false)
-            lv_label_set_text(date_btn_label, "01.01.2020");
+        if (inTimeSettings == false)
+            lv_label_set_text(dateBtnLabel, "01.01.2021");
+        if(isDefaultTimeOnDisplay)
+            lv_label_set_text(dateAndTimeAtBar, "");
+        else{
+            lv_label_set_text(dateAndTimeAtBar, "00:00:00 01.01.2020");
+        }
+        isDefaultTimeOnDisplay=!isDefaultTimeOnDisplay;
+
+
     }
+
 }
 
 void statusFunc(lv_task_t *task)
@@ -110,13 +103,13 @@ void statusFunc(lv_task_t *task)
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, true);
         lv_obj_set_hidden(wifiStatusAtMainWarning, true);
-        lv_label_set_text(info_wifi_address_label, WiFi.localIP().toString().c_str());
+        lv_label_set_text(infoWifiAddressLabel, WiFi.localIP().toString().c_str());
     }
     else
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, false);
         lv_obj_set_hidden(wifiStatusAtMainWarning, false);
-        lv_label_set_text(info_wifi_address_label, "No WiFi connection.");
+        lv_label_set_text(infoWifiAddressLabel, "No WiFi connection.");
     }
 
     if (mySDCard.start(&sampleDB, &Serial2))
@@ -130,8 +123,8 @@ void statusFunc(lv_task_t *task)
         }
         if (config.ssid != "" && config.password != "")
         {
-            if(!(WiFi.status()==WL_CONNECTED))
-              WiFi.begin(config.ssid.c_str(), config.password.c_str());
+            if(!(WiFi.status() == WL_CONNECTED))
+                WiFi.begin(config.ssid.c_str(), config.password.c_str());
         }
     }
     else

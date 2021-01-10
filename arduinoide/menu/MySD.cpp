@@ -34,7 +34,7 @@ bool MySD::start(SQLiteDb *object, Stream *debugger)
     return result;
 }
 
-void MySD::save(std::map<std::string, int32_t> data, int temperature, int humidity, String timestamp, SQLiteDb *object, Stream *debugger)
+void MySD::save(std::map<std::string, float> data, float temperature, float humidity, String timestamp, SQLiteDb *object, Stream *debugger)
 {
     debugger->println("MySD::save");
     if (begin())

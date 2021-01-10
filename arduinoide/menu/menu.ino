@@ -174,43 +174,34 @@ void setup()
     lv_theme_t *th = lv_theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY, LV_THEME_DEFAULT_FLAG, LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
     lv_theme_set_act(th);
 
-    //Styles initialization functions
-    containerStyleInit();
-    font12StyleInit();
-    font16StyleInit();
-    font20StyleInit();
-    font22StyleInit();
-    transparentButtonStyleInit();
-    whiteButtonStyleInit();
-    tinySymbolStyleInit();
-    lineStyleInit();
-    toastListStyleInit();
-    hugeTransparentButtonStyleInit();
-    main_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    settings_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    info_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(info_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    time_settings_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(time_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    wifi_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(wifi_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lock_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    sampling_settings_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(sampling_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    //Styles initialization function
+    stylesInits();
+
+    mainScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(mainScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    settingsScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(settingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    infoScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(infoScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    timeSettingsScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(timeSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    wifiScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(wifiScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lockScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(lockScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    samplingSettingsScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(samplingSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     //Screens initialization function
-    main_screen();
-    wifi_screen();
-    lock_screen();
-    settings_screen();
-    info_screen();
-    timesettings_screen();
-    samplingSettings_screen();
+    mainScreen();
+    wifiScreen();
+    lockScreen();
+    settingsScreen();
+    infoScreen();
+    timesettingsScreen();
+    samplingsettingsScreen();
 
-    lv_disp_load_scr(main_scr);
+    lv_disp_load_scr(mainScr);
 
     mySDCard.loadConfig(config, configFilePath);
     delay(1000);
@@ -219,19 +210,16 @@ void setup()
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
     status = lv_task_create(statusFunc, 700, LV_TASK_PRIO_LOW, NULL);
-    syn_rtc = lv_task_create_basic();
-    lv_task_set_cb(syn_rtc, config_time);
-    lv_task_set_period(syn_rtc, 3600000);
-    lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
-    lv_spinbox_set_value(measure_av_period, (config.measurePeriod / 1000));
-    lv_spinbox_set_value(measure_number, config.countOfSamples);
-    lv_spinbox_set_value(measure_period_second, (config.timeBetweenSavingSample / 1000) % 60);
-    lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
-    lv_spinbox_set_value(turn_fan_on_time, (config.turnFanTime / 1000));
+    lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSample / 60000) / 60));
+    lv_spinbox_set_value(measureAvPeriod, (config.measurePeriod / 1000));
+    lv_spinbox_set_value(measureNumber, config.countOfSamples);
+    lv_spinbox_set_value(measurePeriodsecond, (config.timeBetweenSavingSample / 1000) % 60);
+    lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSample / 60000) % 60));
+    lv_spinbox_set_value(turnFanOnTime, (config.turnFanTime / 1000));
 
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
-    inactive_time = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
+    inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, 300);
@@ -251,7 +239,7 @@ void setup()
         if (WiFi.status() == WL_CONNECTED)
         {
             Serial.println("setup -> connected to Wi-Fi provided by data from configuration file! IP: " + WiFi.localIP().toString());
-            Rtc.SetIsRunning(true);
+            config_time();
             restServerRouting();
             server.onNotFound(handleNotFound);
             server.begin();
@@ -261,7 +249,6 @@ void setup()
     }
     display_current_config();
     delay(500);
-    lv_task_ready(syn_rtc);
 }
 
 void loop()

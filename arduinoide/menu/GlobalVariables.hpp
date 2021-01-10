@@ -21,10 +21,10 @@ Config config =
         "",
         60000,
         3600000,
-        5000,
+        30000,
         5,
         0,
-        20000};
+        30000};
 
 int ntpTimeOffset = 3600; //poland, winter - 3600, summer (DST) - 7200 
 
@@ -49,7 +49,7 @@ RtcDS1307<TwoWire> Rtc(Wire);
 PMS5003 *pmsSensor;
 SHT3X sht30(0x45);
 
-std::map<std::string, int32_t> data;
+std::map<std::string, float> data;
 const char *labels[15] = {
     "framelen",
     "pm10_standard",
@@ -71,7 +71,6 @@ const char *labels[15] = {
 static const char ntpServerName[] = "europe.pool.ntp.org";
 WiFiUDP ntpUDP;
 NTPClient dateTimeClient(ntpUDP, ntpServerName, ntpTimeOffset);
-bool wasUpdated = false;
 
 //Webserver
 WebServer server(80);
@@ -88,47 +87,39 @@ SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
 String lastSampleTimestamp;
 
-//Is data synchronized variable
-bool date_synchronized = false;
-bool in_time_settings = false;
-bool time_changed = false;
-bool date_changed = false;
-
+bool inTimeSettings = false;
+bool timeChanged = false;
+bool dateChanged = false;
+bool isDefaultTimeOnDisplay=false;
 //Temperature, relative humidity and pm2.5 per ug/m3 variables
 float temp, humi, pm25Aqi;
-
-//declaring photos for settings screen
-LV_IMG_DECLARE(wifi);
-LV_IMG_DECLARE(info);
-LV_IMG_DECLARE(set_time);
 
 // ? --------------------------------------------------styles
 //Basic container with white border and transparent background
 static lv_style_t containerStyle;
 
 //Different font sizes using lvgl styles
+static lv_style_t whiteFontStyle;
 static lv_style_t font12Style;
 static lv_style_t font16Style;
 static lv_style_t font20Style;
 static lv_style_t font22Style;
 
 //Additional styles with initalization functions
-static lv_style_t tinySymbolStyle;
-static lv_style_t transparentButtonStyle;
-static lv_style_t hugeTransparentButtonStyle;
+static lv_style_t warningStyle;
 static lv_style_t whiteButtonStyle;
 static lv_style_t lineStyle;
-static lv_style_t toastListStyle;
-
+static lv_style_t transparentBackgroundStyle;
+static lv_style_t borderlessStyle;
+static lv_style_t hugeFontStyle;
 // ? --------------------------------------------------main gui
 //Main screen objects declaration
-lv_obj_t *main_scr; //LVGL Object that represents main screen
+lv_obj_t *mainScr; //LVGL Object that represents main screen
 lv_obj_t *wifiStatusAtMain;
 lv_obj_t *sdStatusAtMain;
 lv_obj_t *wifiStatusAtMainWarning;
 lv_obj_t *sdStatusAtMainWarning;
 lv_obj_t *dateAndTimeAtBar;
-lv_obj_t *contBarAtMain;
 lv_obj_t *contTemp;
 lv_obj_t *contHumi;
 lv_obj_t *contPM10;
@@ -185,34 +176,31 @@ lv_obj_t *dividingLines[7];
 lv_color_t airQualityColors[6] = {LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
 
 // ? --------------------------------------------------wifi gui
-lv_obj_t *contBarAtMainWiFi;
 lv_obj_t *wifiLabelAtBar;
-lv_obj_t *wifi_scr;
+lv_obj_t *wifiScr;
 lv_obj_t *keyboard;
-lv_obj_t *ssid_ta;
-lv_obj_t *pwd_ta;
-lv_obj_t *ssid_label;
-lv_obj_t *pwd_label;
-lv_obj_t *apply_btn;
-lv_obj_t *apply_label;
-lv_obj_t *cancel_btn;
-lv_obj_t *cancel_label;
-lv_obj_t *show_hide_btn;
-lv_obj_t *show_hide_btn_label;
+lv_obj_t *ssidTA;
+lv_obj_t *pwdTA;
+lv_obj_t *ssidLabel;
+lv_obj_t *pwdLabel;
+lv_obj_t *applyBtn;
+lv_obj_t *applyLabel;
+lv_obj_t *cancelBtn;
+lv_obj_t *cancelLabel;
+lv_obj_t *showHideBtn;
+lv_obj_t *showHideBtnLabel;
 // ? -------------------------------------------------- info gui
-lv_obj_t *info_scr;
-lv_obj_t *contBarAtMaininfo;
-lv_obj_t *back_info_btn;
-lv_obj_t *back_info_label;
+lv_obj_t *infoScr;
+lv_obj_t *backInfoBtn;
+lv_obj_t *backInfoLabel;
 lv_obj_t *lcdLabelAtBar;
-lv_obj_t *info_wifi_label;
-lv_obj_t *info_wifi_address_label;
-lv_obj_t *config_label;
+lv_obj_t *infoWifiLabel;
+lv_obj_t *infoWifiAddressLabel;
+lv_obj_t *configLabel;
 // ? --------------------------------------------------settings gui
-lv_obj_t *settings_scr;
-lv_obj_t *contBarAtMainSettings;
-lv_obj_t *back_settings_btn;
-lv_obj_t *back_settings_label;
+lv_obj_t *settingsScr;
+lv_obj_t *backSettingsBtn;
+lv_obj_t *backSettingsLabel;
 lv_obj_t *settingsLabelAtBar;
 lv_obj_t *wifiBtn;
 lv_obj_t *infoBtn;
@@ -228,84 +216,83 @@ lv_obj_t *timeBtnName;
 lv_obj_t *tempBtnName;
 
 // ? --------------------------------------------------time settings gui
-lv_obj_t *time_settings_scr;
-lv_obj_t *contBarAtTimeSettings;
-lv_obj_t *back_time_settings_btn;
-lv_obj_t *back_time_settings_label;
+lv_obj_t *timeSettingsScr;
+
+lv_obj_t *backTimeSettingsBtn;
+lv_obj_t *backTimeSettingsLabel;
 lv_obj_t *timeSettingsLabelAtBar;
 
-lv_obj_t *time_scroll_page;
-lv_obj_t *time_label;
-lv_obj_t *time_hour;
-lv_obj_t *time_hour_increment;
-lv_obj_t *time_hour_decrement;
+lv_obj_t *timeScrollPage;
+lv_obj_t *timeLabel;
+lv_obj_t *timeHour;
+lv_obj_t *timeHourIncrement;
+lv_obj_t *timeHourDecrement;
 
-lv_obj_t *time_colon_label;
+lv_obj_t *timeColonLabel;
 
-lv_obj_t *time_minute;
-lv_obj_t *time_minute_increment;
-lv_obj_t *time_minute_decrement;
+lv_obj_t *timeMinute;
+lv_obj_t *timeMinuteIncrement;
+lv_obj_t *timeMinuteDecrement;
 
-lv_obj_t *date_label;
-lv_obj_t *date_btn;
-lv_obj_t *date_btn_label;
+lv_obj_t *dateLabel;
+lv_obj_t *dateBtn;
+lv_obj_t *dateBtnLabel;
 
 lv_obj_t *calendar;
 
 lv_obj_t *lockScreenLabel;
 lv_obj_t *lockScreenDDlist;
 
-lv_obj_t *timeSettings_btn;
-lv_obj_t *timeSettings_label;
-lv_obj_t *sync_rtc_btn;
-lv_obj_t *sync_rtc_label;
+lv_obj_t *timeSettingsBtn;
+lv_obj_t *timeSettingsLabel;
+lv_obj_t *syncRtcBtn;
+lv_obj_t *syncRtcLabel;
 lv_obj_t *alertBox;
 // ? -------------------------------------------------- second settings gui
-lv_obj_t *sampling_settings_scr;
-lv_obj_t *contBarAtSampling;
-lv_obj_t *back_sampling_settings_btn;
-lv_obj_t *back_sampling_settings_label;
+lv_obj_t *samplingSettingsScr;
+lv_obj_t *backSamplingSettingsBtn;
+lv_obj_t *backSamplingSettingsLabel;
 lv_obj_t *SamplingSettingsLabelAtBar;
 
-lv_obj_t *measure_period_label;
+lv_obj_t *measurePeriodlabel;
 
-lv_obj_t *measure_period_hour;
-lv_obj_t *measure_period_hour_increment;
-lv_obj_t *measure_period_hour_decrement;
+lv_obj_t *measurePeriodHour;
+lv_obj_t *measurePeriodHourIncrement;
+lv_obj_t *measurePeriodHourDecrement;
 
-lv_obj_t *measure_colon_label;
+lv_obj_t *measureColonLabel;
 
-lv_obj_t *measure_period_minute;
-lv_obj_t *measure_period_minute_increment;
-lv_obj_t *measure_period_minute_decrement;
+lv_obj_t *measurePeriodMinute;
+lv_obj_t *measurePeriodMinuteIncrement;
+lv_obj_t *measurePeriodMinuteDecrement;
 
-lv_obj_t *measure_colon_label2;
+lv_obj_t *measureColonLabel2;
 
-lv_obj_t *measure_period_second;
-lv_obj_t *measure_period_second_increment;
-lv_obj_t *measure_period_second_decrement;
+lv_obj_t *measurePeriodsecond;
+lv_obj_t *measurePeriodsecondIncrement;
+lv_obj_t *measurePeriodsecondDecrement;
 
-lv_obj_t *measure_number_label;
-lv_obj_t *measure_number;
-lv_obj_t *measure_number_increment;
-lv_obj_t *measure_number_decrement;
+lv_obj_t *measureNumberLabel;
+lv_obj_t *measureNumber;
+lv_obj_t *measureNumberIncrement;
+lv_obj_t *measureNumberDecrement;
 
-lv_obj_t *measure_av_period_label;
-lv_obj_t *measure_av_period;
-lv_obj_t *measure_av_period_increment;
-lv_obj_t *measure_av_period_decrement;
+lv_obj_t *measureAvPeriodLabel;
+lv_obj_t *measureAvPeriod;
+lv_obj_t *measureAvPeriodIncrement;
+lv_obj_t *measureAvPeriodDecrement;
 
-lv_obj_t *turn_fan_on_time_label;
-lv_obj_t *turn_fan_on_time;
-lv_obj_t *turn_fan_on_time_increment;
-lv_obj_t *turn_fan_on_time_decrement;
+lv_obj_t *turnFanOnTimeLabel;
+lv_obj_t *turnFanOnTime;
+lv_obj_t *turnFanOnTimeIncrement;
+lv_obj_t *turnFanOnTimeDecrement;
 
 
-lv_obj_t *sampling_save_btn;
-lv_obj_t *sampling_save_label;
+lv_obj_t *samplingSaveBtn;
+lv_obj_t *samplingSaveLabel;
 
 // ? --------------------------------------------------lockscreen gui
-lv_obj_t *lock_scr;
+lv_obj_t *lockScr;
 lv_obj_t *contDateTimeAtLock;
 lv_obj_t *labelUnlockButton;
 lv_obj_t *unlockButton;
@@ -319,8 +306,7 @@ lv_obj_t *ledAtLock;
 // ? --------------------------------------------------tasks
 lv_task_t *turnFanOn;
 lv_task_t *getSample;
-lv_task_t *syn_rtc;
 lv_task_t *getAppLastRecordAndSynchronize;
-lv_task_t *inactive_time;
+lv_task_t *inactiveTime;
 lv_task_t *date;
 lv_task_t *status;
