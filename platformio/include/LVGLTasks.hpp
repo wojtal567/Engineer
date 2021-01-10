@@ -88,7 +88,7 @@ void dateTimeFunc(lv_task_t *task)
         if(is_default_time_on_display)
             lv_label_set_text(dateAndTimeAtBar, "");
         else{
-            lv_label_set_text(dateAndTimeAtBar, "01.01.2020 00:00:00");
+            lv_label_set_text(dateAndTimeAtBar, "00:00:00 01.01.2020");
         }
         is_default_time_on_display=!is_default_time_on_display;
 
