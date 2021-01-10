@@ -234,13 +234,9 @@ void main_screen()
     lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &borderlessStyle);
 
-    wifiStatusAtMain = lv_label_create(main_scr, NULL);
-    lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
-    lv_obj_set_pos(wifiStatusAtMain, 52, 7);
+    wifiStatusAtMain = my_lv_label_create(main_scr, NULL, 52, 7, LV_SYMBOL_WIFI);
 
-    sdStatusAtMain = lv_label_create(main_scr, NULL);
-    lv_label_set_text(sdStatusAtMain, LV_SYMBOL_SD_CARD);
-    lv_obj_set_pos(sdStatusAtMain, 77, 7);
+    sdStatusAtMain = my_lv_label_create(main_scr, NULL, 77, 7, LV_SYMBOL_SD_CARD);
 
     setButton = my_lv_btn_create(main_scr, NULL, 16, 18, 32, 7, setButton_task);
     labelSetButton = lv_label_create(setButton, NULL);
@@ -248,23 +244,15 @@ void main_screen()
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &borderlessStyle);
 
-
-
-    wifiStatusAtMainWarning = lv_label_create(wifiStatusAtMain, NULL);
-    lv_label_set_text(wifiStatusAtMainWarning, LV_SYMBOL_CLOSE);
+    wifiStatusAtMainWarning = my_lv_label_create(wifiStatusAtMain, NULL, 5, 5, LV_SYMBOL_CLOSE);
     lv_obj_add_style(wifiStatusAtMainWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
     lv_obj_add_style(wifiStatusAtMainWarning, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_set_pos(wifiStatusAtMainWarning, 5, 5);
 
-    sdStatusAtMainWarning = lv_label_create(sdStatusAtMain, NULL);
-    lv_label_set_text(sdStatusAtMainWarning, LV_SYMBOL_CLOSE);
+    sdStatusAtMainWarning = my_lv_label_create(sdStatusAtMain, NULL, 2, 5, LV_SYMBOL_CLOSE);
     lv_obj_add_style(sdStatusAtMainWarning, LV_OBJ_PART_MAIN, &tinySymbolStyle);
     lv_obj_add_style(sdStatusAtMainWarning, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_set_pos(sdStatusAtMainWarning, 2, 5);
 
-    dateAndTimeAtBar = lv_label_create(main_scr, NULL);
-    lv_label_set_text(dateAndTimeAtBar, "");
-    lv_obj_set_pos(dateAndTimeAtBar, 157, 7);
+    dateAndTimeAtBar = my_lv_label_create(main_scr, NULL, 157, 7, "");
 
     contTemp = my_lv_cont_create(main_scr, NULL, 122, 46, 188, 30);
     lv_obj_set_click(contTemp, false);
