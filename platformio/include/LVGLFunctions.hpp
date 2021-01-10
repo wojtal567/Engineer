@@ -103,8 +103,8 @@ void display_current_config()
     {
         current_config += (config.timeBetweenSavingSample / 1000) + (String) "s";
     }
-    lv_obj_set_style_local_text_font(config_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(config_label, current_config.c_str());
+    lv_obj_set_style_local_text_font(configLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_label_set_text(configLabel, current_config.c_str());
 
 }
 
@@ -271,21 +271,21 @@ void drawParticlesIndicator()
 {
     for (int i = 0; i < 7; i++)
     {
-        dividingLines[i] = lv_line_create(main_scr, NULL);
+        dividingLines[i] = lv_line_create(mainScr, NULL);
         lv_line_set_points(dividingLines[i], dividingLinesPoints[i], 2);
         lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &lineStyle);
     }
 
     for (int j = 0; j < 6; j++)
     {
-        labelParticleSizeum[j] = lv_label_create(main_scr, NULL);
+        labelParticleSizeum[j] = lv_label_create(mainScr, NULL);
         lv_label_set_text(labelParticleSizeum[j], particlesSize[j].c_str());
         lv_obj_add_style(labelParticleSizeum[j], LV_LABEL_PART_MAIN, &font12Style);
         //lv_obj_set_auto_realign(labelParticleSizeum[i], true);
         lv_obj_add_style(labelParticleSizeum[j], LV_LABEL_PART_MAIN, &whiteFontStyle);
         //lv_obj_align_origo(labelParticleSizeum[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
         lv_obj_set_pos(labelParticleSizeum[j], labelParticleSizePosX[j], 190); //12
-        contParticlesNumber[j] = lv_cont_create(main_scr, NULL);
+        contParticlesNumber[j] = lv_cont_create(mainScr, NULL);
         lv_obj_add_style(contParticlesNumber[j], LV_OBJ_PART_MAIN, &containerStyle);
         lv_obj_set_style_local_border_opa(contParticlesNumber[j], LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
         lv_obj_set_click(contParticlesNumber[j], false);
@@ -299,18 +299,18 @@ void drawParticlesIndicator()
         lv_obj_add_style(labelParticlesNumber[j], LV_LABEL_PART_MAIN, &whiteFontStyle);
     }
 
-    mainLine = lv_line_create(main_scr, NULL);
+    mainLine = lv_line_create(mainScr, NULL);
     lv_line_set_points(mainLine, mainLinePoints, 2);
     lv_line_set_auto_size(mainLine, true);
     lv_obj_add_style(mainLine, LV_LINE_PART_MAIN, &lineStyle);
 
-    labelSizeTitle = lv_label_create(main_scr, NULL);
+    labelSizeTitle = lv_label_create(mainScr, NULL);
     lv_obj_set_pos(labelSizeTitle, 10, 190);
     lv_label_set_text(labelSizeTitle, "S");
     lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &font12Style);
     lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    labelNumberTitle = lv_label_create(main_scr, NULL);
+    labelNumberTitle = lv_label_create(mainScr, NULL);
     lv_obj_set_pos(labelNumberTitle, 10, 215);
     lv_label_set_text(labelNumberTitle, "N");
     lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
@@ -321,15 +321,15 @@ static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        if (ta == ssid_ta)
+        if (ta == ssidTA)
         {
-            lv_textarea_set_cursor_hidden(ssid_ta, false);
-            lv_textarea_set_cursor_hidden(pwd_ta, true);
+            lv_textarea_set_cursor_hidden(ssidTA, false);
+            lv_textarea_set_cursor_hidden(pwdTA, true);
         }
-        if (ta == pwd_ta)
+        if (ta == pwdTA)
         {
-            lv_textarea_set_cursor_hidden(pwd_ta, false);
-            lv_textarea_set_cursor_hidden(ssid_ta, true);
+            lv_textarea_set_cursor_hidden(pwdTA, false);
+            lv_textarea_set_cursor_hidden(ssidTA, true);
         }
 
         if (keyboard == NULL)
@@ -348,13 +348,13 @@ static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 
 static void btn_connect(lv_obj_t *obj, lv_event_t event)
 {
-    if (event == LV_EVENT_CLICKED and ((lv_textarea_get_text(ssid_ta) != NULL and lv_textarea_get_text(ssid_ta) != '\0') or (lv_textarea_get_text(pwd_ta) != NULL and lv_textarea_get_text(pwd_ta) != '\0')))
+    if (event == LV_EVENT_CLICKED and ((lv_textarea_get_text(ssidTA) != NULL and lv_textarea_get_text(ssidTA) != '\0') or (lv_textarea_get_text(pwdTA) != NULL and lv_textarea_get_text(pwdTA) != '\0')))
     {
         uint8_t wifiAttempts = 10;
 
-        config.ssid = lv_textarea_get_text(ssid_ta);
+        config.ssid = lv_textarea_get_text(ssidTA);
         Serial.println(config.ssid.c_str());
-        config.password = lv_textarea_get_text(pwd_ta);
+        config.password = lv_textarea_get_text(pwdTA);
 
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);
@@ -376,9 +376,9 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
         }
         else if (WiFi.status() == WL_DISCONNECTED)
             Serial.println("btn_connect -> can't connect. Probably you have entered wrong credentials.");
-        lv_disp_load_scr(main_scr);
-        lv_textarea_set_text(ssid_ta, "");
-        lv_textarea_set_text(pwd_ta, "");
+        lv_disp_load_scr(mainScr);
+        lv_textarea_set_text(ssidTA, "");
+        lv_textarea_set_text(pwdTA, "");
     }
 }
 
@@ -386,7 +386,7 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
 static void setButton_task(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
-        lv_disp_load_scr(settings_scr);
+        lv_disp_load_scr(settingsScr);
 }
 
 //Locking button clicked
@@ -401,7 +401,7 @@ static void unlockButton_task(lv_obj_t *obj, lv_event_t event)
 {
     Serial.print(lv_btn_get_state(unlockButton));
     if (event == LV_EVENT_CLICKED)
-        lv_disp_load_scr(main_scr);
+        lv_disp_load_scr(mainScr);
 }
 
 //Exit from wifi settings button clicked
@@ -409,38 +409,38 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_disp_load_scr(settings_scr);
-        lv_textarea_set_text(ssid_ta, "");
-        lv_textarea_set_text(pwd_ta, "");
+        lv_disp_load_scr(settingsScr);
+        lv_textarea_set_text(ssidTA, "");
+        lv_textarea_set_text(pwdTA, "");
     }
 }
 
 static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
-        lv_disp_load_scr(main_scr);
+        lv_disp_load_scr(mainScr);
 }
 
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_scr_load(wifi_scr);
+        lv_scr_load(wifiScr);
     }
 }
 
 static void info_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
-        lv_scr_load(info_scr);
+        lv_scr_load(infoScr);
 }
 
 static void time_settings_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        lv_scr_load(time_settings_scr);
-        in_time_settings = true;
+        lv_scr_load(timeSettingsScr);
+        inTimeSettings = true;
     }
 }
 
@@ -469,10 +469,10 @@ void timesettings_back_btn(lv_obj_t *obj, lv_event_t event)
             lv_dropdown_set_selected(lockScreenDDlist, 0);
             break;
         }
-        lv_scr_load(settings_scr);
-        in_time_settings = false;
-        time_changed = false;
-        date_changed = false;
+        lv_scr_load(settingsScr);
+        inTimeSettings = false;
+        timeChanged = false;
+        dateChanged = false;
     }
 }
 
@@ -503,7 +503,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
         }
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);
-        if (time_changed == true)
+        if (timeChanged == true)
         {
             String datet = lv_label_get_text(date_btn_label) + (String)lv_textarea_get_text(time_hour) + ":" + (String)lv_textarea_get_text(time_minute);
             Serial.println(datet);
@@ -511,7 +511,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
             Rtc.SetDateTime(*dt);
             Rtc.SetIsRunning(true);
         }
-        if (date_changed == true)
+        if (dateChanged == true)
         {
             RtcDateTime ori = Rtc.GetDateTime();
             String date = lv_label_get_text(date_btn_label);
@@ -519,10 +519,10 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
             Rtc.SetDateTime(*dt);
             Rtc.SetIsRunning(true);
         }
-        lv_disp_load_scr(main_scr);
-        in_time_settings = false;
-        time_changed = false;
-        date_changed = false;
+        lv_disp_load_scr(mainScr);
+        inTimeSettings = false;
+        timeChanged = false;
+        dateChanged = false;
         display_current_config();
     }
 }
@@ -539,7 +539,7 @@ static void hour_increment(lv_obj_t *btn, lv_event_t e)
         {
             lv_spinbox_increment(time_hour);
         }
-        time_changed = true;
+        timeChanged = true;
     }
 }
 
@@ -551,7 +551,7 @@ static void hour_decrement(lv_obj_t *btn, lv_event_t e)
             lv_spinbox_set_value(time_hour, 23);
         else
             lv_spinbox_decrement(time_hour);
-        time_changed = true;
+        timeChanged = true;
     }
 }
 
@@ -573,7 +573,7 @@ static void minute_increment(lv_obj_t *btn, lv_event_t e)
         }
         else
             lv_spinbox_increment(time_minute);
-        time_changed = true;
+        timeChanged = true;
     }
 }
 
@@ -595,14 +595,14 @@ static void minute_decrement(lv_obj_t *btn, lv_event_t e)
         }
         else
             lv_spinbox_decrement(time_minute);
-        time_changed = true;
+        timeChanged = true;
     }
 }
 
 static void temp_settings_btn(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
-        lv_scr_load(sampling_settings_scr);
+        lv_scr_load(sampling_settingsScr);
 }
 
 static void sampling_hour_increment(lv_obj_t *btn, lv_event_t e)
@@ -770,7 +770,7 @@ static void calendar_event(lv_obj_t *obj, lv_event_t event)
             lv_label_set_text(date_btn_label, label.c_str());
             lv_obj_del(calendar);
             calendar = NULL;
-            date_changed = true;
+            dateChanged = true;
         }
     }
 }
@@ -779,7 +779,7 @@ static void date_button_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        calendar = lv_calendar_create(time_settings_scr, NULL);
+        calendar = lv_calendar_create(timeSettingsScr, NULL);
         lv_obj_set_size(calendar, 235, 235);
         lv_obj_align(calendar, NULL, LV_ALIGN_CENTER, 0, 0);
         lv_obj_set_event_cb(calendar, calendar_event);
@@ -799,22 +799,22 @@ static void date_button_func(lv_obj_t *btn, lv_event_t event)
     }
 }
 
-static void show_hide_btn_func(lv_obj_t *btn, lv_event_t event)
+static void showHideBtn_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
     {
-        if (lv_textarea_get_pwd_mode(pwd_ta))
+        if (lv_textarea_get_pwd_mode(pwdTA))
         {
-            lv_textarea_set_pwd_mode(pwd_ta, false);
-            lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_CLOSE);
+            lv_textarea_set_pwd_mode(pwdTA, false);
+            lv_label_set_text(showHideBtnLabel, LV_SYMBOL_EYE_CLOSE);
         }
         else
         {
-            lv_textarea_set_pwd_mode(pwd_ta, true);
-            lv_textarea_set_pwd_show_time(pwd_ta, 1);
-            lv_textarea_set_text(pwd_ta, lv_textarea_get_text(pwd_ta));
-            lv_textarea_set_pwd_show_time(pwd_ta, 5000);
-            lv_label_set_text(show_hide_btn_label, LV_SYMBOL_EYE_OPEN);
+            lv_textarea_set_pwd_mode(pwdTA, true);
+            lv_textarea_set_pwd_show_time(pwdTA, 1);
+            lv_textarea_set_text(pwdTA, lv_textarea_get_text(pwdTA));
+            lv_textarea_set_pwd_show_time(pwdTA, 5000);
+            lv_label_set_text(showHideBtnLabel, LV_SYMBOL_EYE_OPEN);
         }
     }
 }
@@ -871,7 +871,7 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
         turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);
-        lv_scr_load(main_scr);
+        lv_scr_load(mainScr);
         display_current_config();
     }
 }
@@ -882,6 +882,6 @@ static void sampling_settings_back_btn(lv_obj_t *btn, lv_event_t event)
     {
         lv_spinbox_set_value(measure_period_hour, ((config.timeBetweenSavingSample / 60000) / 60));
         lv_spinbox_set_value(measure_period_minute, ((config.timeBetweenSavingSample / 60000) % 60));
-        lv_scr_load(settings_scr);
+        lv_scr_load(settingsScr);
     }
 }

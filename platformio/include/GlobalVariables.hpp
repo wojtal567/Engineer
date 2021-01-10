@@ -87,17 +87,12 @@ SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
 String lastSampleTimestamp;
 
-bool in_time_settings = false;
-bool time_changed = false;
-bool date_changed = false;
-bool is_default_time_on_display=false;
+bool inTimeSettings = false;
+bool timeChanged = false;
+bool dateChanged = false;
+bool isDefaultTimeOnDisplay=false;
 //Temperature, relative humidity and pm2.5 per ug/m3 variables
 float temp, humi, pm25Aqi;
-
-//declaring photos for settings screen
-LV_IMG_DECLARE(wifi);
-LV_IMG_DECLARE(info);
-LV_IMG_DECLARE(set_time);
 
 // ? --------------------------------------------------styles
 //Basic container with white border and transparent background
@@ -120,7 +115,7 @@ static lv_style_t borderlessStyle;
 static lv_style_t hugeFontStyle;
 // ? --------------------------------------------------main gui
 //Main screen objects declaration
-lv_obj_t *main_scr; //LVGL Object that represents main screen
+lv_obj_t *mainScr; //LVGL Object that represents main screen
 lv_obj_t *wifiStatusAtMain;
 lv_obj_t *sdStatusAtMain;
 lv_obj_t *wifiStatusAtMainWarning;
@@ -183,30 +178,30 @@ lv_color_t airQualityColors[6] = {LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLO
 
 // ? --------------------------------------------------wifi gui
 lv_obj_t *wifiLabelAtBar;
-lv_obj_t *wifi_scr;
+lv_obj_t *wifiScr;
 lv_obj_t *keyboard;
-lv_obj_t *ssid_ta;
-lv_obj_t *pwd_ta;
-lv_obj_t *ssid_label;
-lv_obj_t *pwd_label;
-lv_obj_t *apply_btn;
-lv_obj_t *apply_label;
-lv_obj_t *cancel_btn;
-lv_obj_t *cancel_label;
-lv_obj_t *show_hide_btn;
-lv_obj_t *show_hide_btn_label;
+lv_obj_t *ssidTA;
+lv_obj_t *pwdTA;
+lv_obj_t *ssidLabel;
+lv_obj_t *pwdLabel;
+lv_obj_t *applyBtn;
+lv_obj_t *applyLabel;
+lv_obj_t *cancelBtn;
+lv_obj_t *cancelLabel;
+lv_obj_t *showHideBtn;
+lv_obj_t *showHideBtnLabel;
 // ? -------------------------------------------------- info gui
-lv_obj_t *info_scr;
-lv_obj_t *back_info_btn;
-lv_obj_t *back_info_label;
+lv_obj_t *infoScr;
+lv_obj_t *backInfoBtn;
+lv_obj_t *backInfoLabel;
 lv_obj_t *lcdLabelAtBar;
-lv_obj_t *info_wifi_label;
-lv_obj_t *info_wifi_address_label;
-lv_obj_t *config_label;
+lv_obj_t *infoWifiLabel;
+lv_obj_t *infoWifiAddressLabel;
+lv_obj_t *configLabel;
 // ? --------------------------------------------------settings gui
-lv_obj_t *settings_scr;
-lv_obj_t *back_settings_btn;
-lv_obj_t *back_settings_label;
+lv_obj_t *settingsScr;
+lv_obj_t *backSettingsBtn;
+lv_obj_t *backSettingsLabel;
 lv_obj_t *settingsLabelAtBar;
 lv_obj_t *wifiBtn;
 lv_obj_t *infoBtn;
@@ -222,10 +217,10 @@ lv_obj_t *timeBtnName;
 lv_obj_t *tempBtnName;
 
 // ? --------------------------------------------------time settings gui
-lv_obj_t *time_settings_scr;
+lv_obj_t *timeSettingsScr;
 
-lv_obj_t *back_time_settings_btn;
-lv_obj_t *back_time_settings_label;
+lv_obj_t *backTimeSettingsBtn;
+lv_obj_t *backTimeSettingsLabel;
 lv_obj_t *timeSettingsLabelAtBar;
 
 lv_obj_t *time_scroll_page;
@@ -255,7 +250,7 @@ lv_obj_t *sync_rtc_btn;
 lv_obj_t *sync_rtc_label;
 lv_obj_t *alertBox;
 // ? -------------------------------------------------- second settings gui
-lv_obj_t *sampling_settings_scr;
+lv_obj_t *sampling_settingsScr;
 lv_obj_t *back_sampling_settings_btn;
 lv_obj_t *back_sampling_settings_label;
 lv_obj_t *SamplingSettingsLabelAtBar;

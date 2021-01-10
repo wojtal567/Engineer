@@ -74,7 +74,7 @@ void dateTimeFunc(lv_task_t *task)
         lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
         lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
         lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
-        if (in_time_settings == false)
+        if (inTimeSettings == false)
         {
             lv_spinbox_set_value(time_hour, getTime(Rtc).substring(0, getTime(Rtc).indexOf(":")).toInt());
             lv_spinbox_set_value(time_minute, getTime(Rtc).substring(3, 5).toInt());
@@ -83,14 +83,14 @@ void dateTimeFunc(lv_task_t *task)
     }
     else
     {
-        if (in_time_settings == false)
+        if (inTimeSettings == false)
             lv_label_set_text(date_btn_label, "01.01.2021");
-        if(is_default_time_on_display)
+        if(isDefaultTimeOnDisplay)
             lv_label_set_text(dateAndTimeAtBar, "");
         else{
             lv_label_set_text(dateAndTimeAtBar, "00:00:00 01.01.2020");
         }
-        is_default_time_on_display=!is_default_time_on_display;
+        isDefaultTimeOnDisplay=!isDefaultTimeOnDisplay;
 
 
     }
@@ -103,13 +103,13 @@ void statusFunc(lv_task_t *task)
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, true);
         lv_obj_set_hidden(wifiStatusAtMainWarning, true);
-        lv_label_set_text(info_wifi_address_label, WiFi.localIP().toString().c_str());
+        lv_label_set_text(infoWifiAddressLabel, WiFi.localIP().toString().c_str());
     }
     else
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, false);
         lv_obj_set_hidden(wifiStatusAtMainWarning, false);
-        lv_label_set_text(info_wifi_address_label, "No WiFi connection.");
+        lv_label_set_text(infoWifiAddressLabel, "No WiFi connection.");
     }
 
     if (mySDCard.start(&sampleDB, &Serial2))

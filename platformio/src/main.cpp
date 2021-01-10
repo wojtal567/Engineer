@@ -179,31 +179,31 @@ void setup()
     //Styles initialization function
     stylesInits();
 
-    main_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    settings_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    info_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(info_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    time_settings_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(time_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    wifi_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(wifi_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    mainScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(mainScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    settingsScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(settingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    infoScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(infoScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    timeSettingsScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(timeSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    wifiScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(wifiScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lock_scr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(lock_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    sampling_settings_scr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(sampling_settings_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    sampling_settingsScr = lv_cont_create(NULL, NULL);
+    lv_obj_set_style_local_bg_color(sampling_settingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     //Screens initialization function
-    main_screen();
-    wifi_screen();
+    mainScreen();
+    wifiScreen();
     lock_screen();
-    settings_screen();
-    info_screen();
-    timesettings_screen();
-    samplingSettings_screen();
+    settingsScreen();
+    infoScreen();
+    timesettingsScreen();
+    samplingsettingsScreen();
 
-    lv_disp_load_scr(main_scr);
+    lv_disp_load_scr(mainScr);
 
     mySDCard.loadConfig(config, configFilePath);
     delay(1000);
