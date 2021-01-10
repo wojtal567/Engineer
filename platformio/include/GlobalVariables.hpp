@@ -126,7 +126,6 @@ lv_obj_t *sdStatusAtMain;
 lv_obj_t *wifiStatusAtMainWarning;
 lv_obj_t *sdStatusAtMainWarning;
 lv_obj_t *dateAndTimeAtBar;
-lv_obj_t *contBarAtMain;
 lv_obj_t *contTemp;
 lv_obj_t *contHumi;
 lv_obj_t *contPM10;
@@ -257,7 +256,6 @@ lv_obj_t *sync_rtc_label;
 lv_obj_t *alertBox;
 // ? -------------------------------------------------- second settings gui
 lv_obj_t *sampling_settings_scr;
-lv_obj_t *contBarAtSampling;
 lv_obj_t *back_sampling_settings_btn;
 lv_obj_t *back_sampling_settings_label;
 lv_obj_t *SamplingSettingsLabelAtBar;

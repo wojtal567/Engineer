@@ -227,15 +227,6 @@ void info_screen()
 
 void main_screen()
 {
-    lv_obj_set_style_local_bg_color(main_scr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    contBarAtMain = lv_cont_create(main_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtMain, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtMain, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtMain, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_obj_add_style(contBarAtMain, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtMain, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtMain, false);
- 
 	lockButton = lv_btn_create(main_scr, NULL); //TODO BRAK POS
 	lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
@@ -247,20 +238,17 @@ void main_screen()
     lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(lockButton, LV_OBJ_PART_MAIN, &borderlessStyle);
 
-    wifiStatusAtMain = lv_label_create(contBarAtMain, NULL);
+    wifiStatusAtMain = lv_label_create(main_scr, NULL);
     lv_label_set_text(wifiStatusAtMain, LV_SYMBOL_WIFI);
-    lv_obj_align(wifiStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 52, 0);
+    lv_obj_set_pos(wifiStatusAtMain, 52, 7);
 
-    sdStatusAtMain = lv_label_create(contBarAtMain, NULL);
+    sdStatusAtMain = lv_label_create(main_scr, NULL);
     lv_label_set_text(sdStatusAtMain, LV_SYMBOL_SD_CARD);
-    lv_obj_align(sdStatusAtMain, NULL, LV_ALIGN_IN_LEFT_MID, 77, 0);
+    lv_obj_set_pos(sdStatusAtMain, 77, 7);
 
-    setButton = lv_btn_create(main_scr, NULL); //TODO BRAK POS
+    setButton = my_lv_btn_create(main_scr, NULL, 16, 18, 32, 7, setButton_task);
     labelSetButton = lv_label_create(setButton, NULL);
     lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
-    lv_obj_align(setButton, NULL, LV_ALIGN_IN_TOP_LEFT, -25, -5);
-    lv_btn_set_fit(setButton, LV_FIT_TIGHT);
-    lv_obj_set_event_cb(setButton, setButton_task);
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &transparentBackgroundStyle);
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &borderlessStyle);
 
@@ -278,10 +266,9 @@ void main_screen()
     lv_obj_add_style(sdStatusAtMainWarning, LV_OBJ_PART_MAIN, &font12Style);
     lv_obj_set_pos(sdStatusAtMainWarning, 2, 5);
 
-    dateAndTimeAtBar = lv_label_create(contBarAtMain, NULL);
+    dateAndTimeAtBar = lv_label_create(main_scr, NULL);
     lv_label_set_text(dateAndTimeAtBar, "");
-    lv_obj_set_pos(dateAndTimeAtBar, 157, 13);
-    //lv_obj_align(dateAndTimeAtBar, NULL, LV_ALIGN_IN_RIGHT_MID, -120, 0);
+    lv_obj_set_pos(dateAndTimeAtBar, 157, 7);
 
     contTemp = my_lv_cont_create(main_scr, NULL, 122, 46, 188, 30);
     lv_obj_set_click(contTemp, false);
@@ -500,15 +487,6 @@ void lock_screen()
 
 void samplingSettings_screen()
 {
-    contBarAtSampling = lv_cont_create(sampling_settings_scr, NULL);
-    lv_obj_set_auto_realign(contBarAtSampling, true);                  /*Auto realign when the size changes*/
-    lv_obj_align(contBarAtSampling, NULL, LV_ALIGN_IN_TOP_MID, 0, -5); /*This parametrs will be sued when realigned*/
-    lv_cont_set_fit4(contBarAtSampling, LV_FIT_PARENT, LV_FIT_PARENT, LV_FIT_NONE, LV_FIT_NONE);
-    lv_cont_set_layout(contBarAtSampling, LV_LAYOUT_PRETTY_TOP);
-    lv_obj_add_style(contBarAtSampling, LV_OBJ_PART_MAIN, &containerStyle);
-    lv_obj_set_style_local_border_opa(contBarAtSampling, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, 0);
-    lv_obj_set_click(contBarAtSampling, false);
-
     back_sampling_settings_btn = my_lv_btn_create(sampling_settings_scr, NULL, 30, 15, 14, 10, sampling_settings_back_btn); 
     back_sampling_settings_label = lv_label_create(back_sampling_settings_btn, NULL);
     lv_label_set_text(back_sampling_settings_label, LV_SYMBOL_LEFT);
