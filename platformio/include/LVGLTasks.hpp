@@ -85,16 +85,14 @@ void dateTimeFunc(lv_task_t *task)
     {
         if (inTimeSettings == false)
             lv_label_set_text(dateBtnLabel, "01.01.2021");
-        if(isDefaultTimeOnDisplay)
+        if (isDefaultTimeOnDisplay)
             lv_label_set_text(dateAndTimeAtBar, "");
-        else{
+        else
+        {
             lv_label_set_text(dateAndTimeAtBar, "00:00:00 01.01.2020");
         }
-        isDefaultTimeOnDisplay=!isDefaultTimeOnDisplay;
-
-
+        isDefaultTimeOnDisplay = !isDefaultTimeOnDisplay;
     }
-
 }
 
 void statusFunc(lv_task_t *task)
@@ -123,7 +121,7 @@ void statusFunc(lv_task_t *task)
         }
         if (config.ssid != "" && config.password != "")
         {
-            if(!(WiFi.status() == WL_CONNECTED))
+            if (!(WiFi.status() == WL_CONNECTED))
                 WiFi.begin(config.ssid.c_str(), config.password.c_str());
         }
     }
