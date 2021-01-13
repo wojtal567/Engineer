@@ -174,7 +174,8 @@ void infoScreen()
 
     infoWifiLabel = my_lv_label_create(infoScr, NULL, 5, 53, "WiFi address: ");
     lv_obj_set_style_local_text_font(infoWifiLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    infoWifiAddressLabel = my_lv_label_create(infoScr, NULL, 115, 53, "");
+    
+    infoWifiAddressLabel = my_lv_label_create(infoScr, infoWifiLabel, 115, 53, "");
 
     configLabel = my_lv_label_create(infoScr, NULL, 5, 70, "");
 }
