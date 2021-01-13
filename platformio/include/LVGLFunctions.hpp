@@ -1,5 +1,22 @@
 #include <GlobalVariables.hpp>
 
+void set_spinbox_digit_format(lv_obj_t *spinbox)
+{
+    int _spinbox_value = lv_spinbox_get_value(spinbox);
+    if(_spinbox_value>9){
+        if(_spinbox_value>99){
+        lv_spinbox_set_digit_format(spinbox, 3, 0);
+        }
+        else{
+        lv_spinbox_set_digit_format(spinbox, 2, 0);
+        }
+    }
+    else
+    {
+    lv_spinbox_set_digit_format(spinbox, 1, 0);
+    }
+}
+
 lv_obj_t * my_lv_btn_create(lv_obj_t * par, const lv_obj_t * copy, lv_coord_t width, lv_coord_t height, lv_coord_t x_position, lv_coord_t y_position, lv_event_cb_t event_cb)
 {
     lv_obj_t * btn = lv_btn_create(par, copy);
@@ -813,14 +830,19 @@ static void measureNumberIncrement_func(lv_obj_t *btn, lv_event_t event)
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
         if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)+1)*lv_spinbox_get_value(measureAvPeriod)))
-            lv_spinbox_increment(measureNumber);
+        {   lv_spinbox_increment(measureNumber);
+            set_spinbox_digit_format(measureNumber);
+        }
     }
 }
 
 static void measureNumberDecrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+    {
         lv_spinbox_decrement(measureNumber);
+        set_spinbox_digit_format(measureNumber);
+    }
 }
 
 static void turnFanOnTimeIncrement_func(lv_obj_t *btn, lv_event_t event)
@@ -828,27 +850,38 @@ static void turnFanOnTimeIncrement_func(lv_obj_t *btn, lv_event_t event)
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
         if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+1+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
+        {
             lv_spinbox_increment(turnFanOnTime);
+            set_spinbox_digit_format(turnFanOnTime);
+        }
     }        
 }
 
 static void turnFanOnTimeDecrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+    {    
         lv_spinbox_decrement(turnFanOnTime);
+        set_spinbox_digit_format(turnFanOnTime);
+    }
 }
 
 static void av_periodIncrement(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
         if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*(lv_spinbox_get_value(measureAvPeriod)+1)))
+        {
             lv_spinbox_increment(measureAvPeriod);
+            set_spinbox_digit_format(measureAvPeriod);
+        }
 }
 
 static void av_periodDecrement(lv_obj_t *btn, lv_event_t event)
 {
-    if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
+    if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT){
         lv_spinbox_decrement(measureAvPeriod);
+        set_spinbox_digit_format(measureAvPeriod);
+    }
 }
 
 static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
