@@ -113,7 +113,7 @@ void display_current_config()
     current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + "s\nMeasurements saving time: ";
     if (config.timeBetweenSavingSample >= 3600000)
         current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSample / 1000) % 60 + "s";
-    else if (config.timeBetweenSavingSample >= 1000)
+    else if (config.timeBetweenSavingSample >= 60000)
     {
         current_config += (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s";
     }
@@ -653,15 +653,11 @@ static void sampling_secondDecrement(lv_obj_t *btn, lv_event_t e)
     {
         if (lv_spinbox_get_value(measurePeriodsecond) == 0 && lv_spinbox_get_value(measurePeriodMinute) != 0)
         {
-            if(!(lv_spinbox_get_value(measurePeriodsecond)==0 && lv_spinbox_get_value(measurePeriodMinute)==1 && lv_spinbox_get_value(measurePeriodHour)==0))
+            if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-1)>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod)))
             {
-                if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-1)>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
-                {
-                    lv_spinbox_decrement(measurePeriodMinute);
-                    lv_spinbox_set_value(measurePeriodsecond, 59);
-                }
-            }
-            
+                lv_spinbox_decrement(measurePeriodMinute);
+                lv_spinbox_set_value(measurePeriodsecond, 59);
+            }            
         }
         else
         {
@@ -669,7 +665,7 @@ static void sampling_secondDecrement(lv_obj_t *btn, lv_event_t e)
             {
                 if (lv_spinbox_get_value(measurePeriodHour) != 0)
                 {
-                    if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-1)>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
+                    if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-1)>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod)))
                     {
                         lv_spinbox_decrement(measurePeriodHour);
                         lv_spinbox_set_value(measurePeriodMinute, 59);
@@ -679,7 +675,7 @@ static void sampling_secondDecrement(lv_obj_t *btn, lv_event_t e)
             }
             else
             {
-                if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-1)>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
+                if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-1)>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod)))
                     lv_spinbox_decrement(measurePeriodsecond);
             }
         }
@@ -690,13 +686,10 @@ static void sampling_hourDecrement(lv_obj_t *btn, lv_event_t e)
 {
     if (e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if(((lv_spinbox_get_value(measurePeriodHour)-1)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)>=60)
+        if(((lv_spinbox_get_value(measurePeriodHour)-1)*3600)+(lv_spinbox_get_value(measurePeriodMinute)*60)+lv_spinbox_get_value(measurePeriodsecond)>=1)
         {
-            if(!((lv_spinbox_get_value(measurePeriodsecond)==0)&&(lv_spinbox_get_value(measurePeriodMinute)==0)))
-            {
-                if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-3600)>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
-                    lv_spinbox_decrement(measurePeriodHour);   
-            }
+            if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-3600)>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod)))
+                lv_spinbox_decrement(measurePeriodHour);
         }
     }
 }
@@ -726,17 +719,19 @@ static void sampling_minuteDecrement(lv_obj_t *btn, lv_event_t e)
     {
         if (lv_spinbox_get_value(measurePeriodMinute) == 0)
         {
-            if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-60)>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
-            {
-                lv_spinbox_set_value(measurePeriodMinute, 59);
-                lv_spinbox_decrement(measurePeriodHour);
-            }
+            if(lv_spinbox_get_value(measurePeriodHour)!=0)
+                if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-60)>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod)))
+                {
+                    lv_spinbox_set_value(measurePeriodMinute, 59);
+                    lv_spinbox_decrement(measurePeriodHour);
+                }
         }
-        if (!(lv_spinbox_get_value(measurePeriodMinute) == 1 && lv_spinbox_get_value(measurePeriodHour) == 0))
+        else
         {
-            if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-60)>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
+            if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond)-60)>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod)))
                 lv_spinbox_decrement(measurePeriodMinute);
         }
+        
     }
 }
 
@@ -830,7 +825,7 @@ static void measureNumberIncrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)+1)*lv_spinbox_get_value(measureAvPeriod)))
+        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
         {
             set_spinbox_digit_format(measureNumber, MIN_RANGE, MAX_RANGE, 1);
             lv_spinbox_increment(measureNumber);
@@ -851,7 +846,7 @@ static void turnFanOnTimeIncrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+1+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))        
+        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+1+(lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod)))        
         {  
             set_spinbox_digit_format(turnFanOnTime, MIN_RANGE, MAX_RANGE, 1);
             lv_spinbox_increment(turnFanOnTime);
