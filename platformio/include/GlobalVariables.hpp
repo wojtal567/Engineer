@@ -32,7 +32,7 @@ int ntpTimeOffset = 3600; //poland, winter - 3600, summer (DST) - 7200
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define GMT_OFFSET_SEC 7200
-#define MIN_RANGE 5
+#define MIN_RANGE 1
 #define MAX_RANGE 999
 
 //Include additional font with lock and unlock symbol
