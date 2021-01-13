@@ -89,7 +89,7 @@ void dateTimeFunc(lv_task_t *task)
             lv_label_set_text(dateAndTimeAtBar, "");
         else
         {
-            lv_label_set_text(dateAndTimeAtBar, "00:00:00 01.01.2020");
+            lv_label_set_text(dateAndTimeAtBar, "01.01.2021 00:00:00");
         }
         isDefaultTimeOnDisplay = !isDefaultTimeOnDisplay;
     }
@@ -107,7 +107,7 @@ void statusFunc(lv_task_t *task)
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, false);
         lv_obj_set_hidden(wifiStatusAtMainWarning, false);
-        lv_label_set_text(infoWifiAddressLabel, "No WiFi connection.");
+        lv_label_set_text(infoWifiAddressLabel, "no WiFi connection");
     }
 
     if (mySDCard.start(&sampleDB, &Serial2))

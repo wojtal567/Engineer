@@ -88,11 +88,11 @@ void display_current_config()
     if (config.lcdLockTime == -1)
         current_config += "\nLCD lock time: Never";
     if (config.lcdLockTime == 30000)
-        current_config += "\nLCD lock time: 30 secs";
+        current_config += "\nLCD lock time: 30s";
     if (config.lcdLockTime > 30000)
-        current_config += "\nLCD lock time: " + (String)(config.lcdLockTime / 60000) + " mins";
-    current_config += (String) "\nFan running time before measure: " + config.turnFanTime / 1000 + " sec\n";
-    current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + " sec\nMeasurements saving time: ";
+        current_config += "\nLCD lock time: " + (String)(config.lcdLockTime / 60000) + "m";
+    current_config += (String) "\nFan running time before measure: " + config.turnFanTime / 1000 + "s\n";
+    current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + "s\nMeasurements saving time: ";
     if (config.timeBetweenSavingSample >= 3600000)
         current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSample / 1000) % 60 + "s";
     else if (config.timeBetweenSavingSample >= 1000)
@@ -137,12 +137,12 @@ bool isLastSampleSaved()
     Serial.print(lastRecordToCheck[0]["timestamp"].as<String>());
     if (lastSampleTimestamp == lastRecordToCheck[0]["timestamp"].as<String>())
     {
-        Serial.println("Last sample has been saved correctly. True.");
+        Serial.println("Last sample has been saved correctly - return true.");
         return true;
     }
     else
     {
-        Serial.println("Something went wrong saving last sample. False.");
+        Serial.println("Something went wrong saving last sample - return false");
         return false;
     }
 }
@@ -274,17 +274,17 @@ void drawParticlesIndicator()
         dividingLines[i] = lv_line_create(mainScr, NULL);
         lv_line_set_points(dividingLines[i], dividingLinesPoints[i], 2);
         lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &lineStyle);
+
+        labelParticleSizeum[i] = lv_label_create(mainScr, NULL);
+        lv_label_set_text(labelParticleSizeum[i], particlesSize[i].c_str());
+        lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &font12Style);
+        lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &whiteFontStyle);
+        lv_obj_set_pos(labelParticleSizeum[i], labelParticleSizePosX[i], 190); //12
     }
 
     for (int j = 0; j < 6; j++)
     {
-        labelParticleSizeum[j] = lv_label_create(mainScr, NULL);
-        lv_label_set_text(labelParticleSizeum[j], particlesSize[j].c_str());
-        lv_obj_add_style(labelParticleSizeum[j], LV_LABEL_PART_MAIN, &font12Style);
-        //lv_obj_set_auto_realign(labelParticleSizeum[i], true);
-        lv_obj_add_style(labelParticleSizeum[j], LV_LABEL_PART_MAIN, &whiteFontStyle);
-        //lv_obj_align_origo(labelParticleSizeum[i], dividingLines[i], LV_ALIGN_CENTER, 0, 0);
-        lv_obj_set_pos(labelParticleSizeum[j], labelParticleSizePosX[j], 190); //12
+        
         contParticlesNumber[j] = lv_cont_create(mainScr, NULL);
         lv_obj_add_style(contParticlesNumber[j], LV_OBJ_PART_MAIN, &containerStyle);
         lv_obj_set_style_local_border_opa(contParticlesNumber[j], LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
@@ -303,18 +303,6 @@ void drawParticlesIndicator()
     lv_line_set_points(mainLine, mainLinePoints, 2);
     lv_line_set_auto_size(mainLine, true);
     lv_obj_add_style(mainLine, LV_LINE_PART_MAIN, &lineStyle);
-
-    labelSizeTitle = lv_label_create(mainScr, NULL);
-    lv_obj_set_pos(labelSizeTitle, 10, 190);
-    lv_label_set_text(labelSizeTitle, "S");
-    lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_add_style(labelSizeTitle, LV_OBJ_PART_MAIN, &whiteFontStyle);
-
-    labelNumberTitle = lv_label_create(mainScr, NULL);
-    lv_obj_set_pos(labelNumberTitle, 10, 215);
-    lv_label_set_text(labelNumberTitle, "N");
-    lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &font12Style);
-    lv_obj_add_style(labelNumberTitle, LV_OBJ_PART_MAIN, &whiteFontStyle);
 }
 
 static void ta_event_cb(lv_obj_t *ta, lv_event_t event)

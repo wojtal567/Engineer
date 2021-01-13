@@ -173,7 +173,7 @@ void infoScreen()
     lcdLabelAtBar = my_lv_label_create(infoScr, NULL, 216, 10, "Device info");
 
     infoWifiLabel = my_lv_label_create(infoScr, NULL, 5, 53, "WiFi address: ");
-
+    lv_obj_set_style_local_text_font(infoWifiLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
     infoWifiAddressLabel = my_lv_label_create(infoScr, NULL, 115, 53, "");
 
     configLabel = my_lv_label_create(infoScr, NULL, 5, 70, "");
@@ -227,6 +227,7 @@ void mainScreen()
     lv_obj_set_click(contAQI, false);
 
     contAQIColorBar = my_lv_cont_create(contAQI, contAQI, 92, 24, 15, 25);
+    lv_obj_set_style_local_bg_opa(contAQIColorBar, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_70);
     lv_obj_set_click(contAQIColorBar, false);
     
     labelTemp = my_lv_label_create(contTemp, NULL, 5, 3, "Temp");
@@ -340,7 +341,7 @@ void samplingsettingsScreen()
     measurePeriodMinuteDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 20, 20, 229, 97, sampling_minuteDecrement);
     lv_obj_set_style_local_value_str(measurePeriodMinuteDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    measureColonLabel2 = my_lv_label_create(samplingSettingsScr, NULL, 265, 70, ":", LV_COLOR_WHITE);
+    measureColonLabel2 = my_lv_label_create(samplingSettingsScr, measurePeriodlabel, 265, 70, ":", LV_COLOR_WHITE);
 
     measurePeriodsecond = lv_spinbox_create(samplingSettingsScr, NULL);
     lv_textarea_set_cursor_hidden(measurePeriodsecond, true);
@@ -356,11 +357,8 @@ void samplingsettingsScreen()
     measurePeriodsecondDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 20, 20, 284, 97, sampling_secondDecrement);
     lv_obj_set_style_local_value_str(measurePeriodsecondDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    measureNumberLabel = lv_label_create(samplingSettingsScr, NULL);
-    lv_obj_set_pos(measureNumberLabel, 5, 127);
+    measureNumberLabel = my_lv_label_create(samplingSettingsScr, NULL, 5, 127, "Number of samples", LV_COLOR_WHITE);
     lv_obj_set_style_local_text_font(measureNumberLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measureNumberLabel, "Number of samples");
-    lv_obj_set_style_local_text_color(measureNumberLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
 
     measureNumber = lv_spinbox_create(samplingSettingsScr, NULL);
     lv_textarea_set_cursor_hidden(measureNumber, true);
@@ -376,11 +374,7 @@ void samplingsettingsScreen()
     measureNumberDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 165, 119, measureNumberDecrement_func);
     lv_obj_set_style_local_value_str(measureNumberDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    measureAvPeriodLabel = lv_label_create(samplingSettingsScr, NULL);
-    lv_obj_set_pos(measureAvPeriodLabel, 5, 165);
-    lv_obj_set_style_local_text_font(measureAvPeriodLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(measureAvPeriodLabel, "Time between \nmeasurments [s]:");
-    lv_obj_set_style_local_text_color(measureAvPeriodLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    measureAvPeriodLabel = my_lv_label_create(samplingSettingsScr, measurePeriodlabel, 5, 165, "Time between \nmeasurments [s]:", LV_COLOR_WHITE);
 
     measureAvPeriod = lv_spinbox_create(samplingSettingsScr, NULL);
     lv_textarea_set_cursor_hidden(measureAvPeriod, true);
@@ -396,9 +390,7 @@ void samplingsettingsScreen()
     measureAvPeriodDecrement = my_lv_btn_create(samplingSettingsScr, measurePeriodHourIncrement , 40, 34, 165, 160, av_periodDecrement);
     lv_obj_set_style_local_value_str(measureAvPeriodDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 
-    turnFanOnTimeLabel = my_lv_label_create(samplingSettingsScr, NULL, 5, 205, "Fan running time \nbefore measure [s]:");
-
-    lv_obj_set_style_local_text_font(turnFanOnTimeLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    turnFanOnTimeLabel = my_lv_label_create(samplingSettingsScr, measurePeriodlabel, 5, 205, "Fan running time \nbefore measure [s]:");
 
     turnFanOnTime = lv_spinbox_create(samplingSettingsScr, NULL);
     lv_textarea_set_cursor_hidden(turnFanOnTime, true);
@@ -486,7 +478,7 @@ void lockScreen()
     lv_obj_set_event_cb(unlockButton, unlockButton_task);
 
     labelTimeLock = lv_label_create(contDateTimeAtLock, NULL);
-    lv_label_set_text(labelTimeLock, "Connect to wifi");
+    lv_label_set_text(labelTimeLock,  "No WiFi connection");
     lv_label_set_align(labelTimeLock, LV_LABEL_ALIGN_CENTER);
     lv_obj_align(labelTimeLock, NULL, LV_ALIGN_CENTER, 0, 30);
 
