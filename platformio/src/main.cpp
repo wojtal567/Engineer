@@ -218,9 +218,9 @@ void setup()
     lv_spinbox_set_value(measureAvPeriod, (config.measurePeriod / 1000));
     lv_spinbox_set_value(measureNumber, config.countOfSamples);
     lv_spinbox_set_value(turnFanOnTime, (config.turnFanTime / 1000));
-    set_spinbox_digit_format(measureNumber);
-    set_spinbox_digit_format(measureAvPeriod);
-    set_spinbox_digit_format(turnFanOnTime);
+    set_spinbox_digit_format(measureNumber, MIN_RANGE, MAX_RANGE);
+    set_spinbox_digit_format(measureAvPeriod, MIN_RANGE, MAX_RANGE);
+    set_spinbox_digit_format(turnFanOnTime, MIN_RANGE, MAX_RANGE);
 
     getSample = lv_task_create(getSampleFunc, config.timeBetweenSavingSample, LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
