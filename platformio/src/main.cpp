@@ -211,7 +211,7 @@ void setup()
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
-    status = lv_task_create(statusFunc, 700, LV_TASK_PRIO_LOW, NULL);
+    status = lv_task_create(statusFunc, 5000, LV_TASK_PRIO_LOW, NULL);
     lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSample / 60000) / 60));
     lv_spinbox_set_value(measurePeriodsecond, (config.timeBetweenSavingSample / 1000) % 60);
     lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSample / 60000) % 60));
