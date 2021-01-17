@@ -132,9 +132,9 @@ void MySD::saveConfig(Config config, std::string filePath)
         doc["ssid"] = config.ssid.c_str();
         doc["password"] = config.password.c_str();
         doc["lcdLockTime"] = config.lcdLockTime;
-        doc["timeBetweenSavingSample"] = config.timeBetweenSavingSample;
+        doc["timeBetweenSavingSamples"] = config.timeBetweenSavingSamples;
         doc["measurePeriod"] = config.measurePeriod;
-        doc["countOfSamples"] = config.countOfSamples;
+        doc["numberOfSamples"] = config.numberOfSamples;
         doc["currentSampleNumber"] = config.currentSampleNumber;
         doc["turnFanTime"] = config.turnFanTime;
         if (serializeJson(doc, configurationFile) == 0)
@@ -177,9 +177,9 @@ void MySD::loadConfig(Config &config, std::string filePath)
         strlcpy(tmp, doc["password"], sizeof(tmp));
         config.password = tmp;
         config.lcdLockTime = doc["lcdLockTime"];
-        config.timeBetweenSavingSample = doc["timeBetweenSavingSample"];
+        config.timeBetweenSavingSamples = doc["timeBetweenSavingSamples"];
         config.measurePeriod = doc["measurePeriod"];
-        config.countOfSamples = doc["countOfSamples"];
+        config.numberOfSamples = doc["numberOfSamples"];
         config.currentSampleNumber = doc["currentSampleNumber"];
         config.turnFanTime = doc["turnFanTime"];
         configurationFile.close();

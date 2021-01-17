@@ -6,9 +6,9 @@ struct Config
     std::string ssid;            // * WiFi ssid
     std::string password;        // * WiFi password
     int lcdLockTime;             // * time after
-    int timeBetweenSavingSample; // * time between sampling @measurePeriod
+    int timeBetweenSavingSamples; // * time between sampling @measurePeriod
     int measurePeriod;           // * time of taking samples to calculate average
-    uint countOfSamples;         // * count of samples used to calculate average sample
+    uint numberOfSamples;         // * count of samples used to calculate average sample
     uint currentSampleNumber;    // * number of currently taken sample
     int turnFanTime;             // * time of turning fan on
 };

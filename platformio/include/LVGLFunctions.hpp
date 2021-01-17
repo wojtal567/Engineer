@@ -102,7 +102,7 @@ int getDDListIndexBasedOnLcdLockTime(int lcdLockTime)
 void display_current_config()
 {
     String current_config = (String) "SSID: " + config.ssid.c_str();
-    current_config += (String) "\nNumber of samples: " + (String)config.countOfSamples;
+    current_config += (String) "\nNumber of samples: " + (String)config.numberOfSamples;
     if (config.lcdLockTime == -1)
         current_config += "\nLCD lock time: Never";
     if (config.lcdLockTime == 30000)
@@ -111,15 +111,15 @@ void display_current_config()
         current_config += "\nLCD lock time: " + (String)(config.lcdLockTime / 60000) + "m";
     current_config += (String) "\nFan running time before measure: " + config.turnFanTime / 1000 + "s\n";
     current_config += (String) "Time between measurments: " + config.measurePeriod / 1000 + "s\nMeasurements saving time: ";
-    if (config.timeBetweenSavingSample >= 3600000)
-        current_config += config.timeBetweenSavingSample / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSample / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSample / 1000) % 60 + "s";
-    else if (config.timeBetweenSavingSample >= 60000)
+    if (config.timeBetweenSavingSamples >= 3600000)
+        current_config += config.timeBetweenSavingSamples / 60000 / 60 + (String) "h" + (config.timeBetweenSavingSamples / 60000) % 60 + (String) "m" + (config.timeBetweenSavingSamples / 1000) % 60 + "s";
+    else if (config.timeBetweenSavingSamples >= 60000)
     {
-        current_config += (config.timeBetweenSavingSample / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSample / 1000) % 60 + "s";
+        current_config += (config.timeBetweenSavingSamples / 60000) % 60 + (String) "m " + (config.timeBetweenSavingSamples / 1000) % 60 + "s";
     }
     else
     {
-        current_config += (config.timeBetweenSavingSample / 1000) + (String) "s";
+        current_config += (config.timeBetweenSavingSamples / 1000) + (String) "s";
     }
     lv_obj_set_style_local_text_font(configLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
     lv_label_set_text(configLabel, current_config.c_str());
@@ -182,7 +182,7 @@ void setAqiStateNColor()
 void getSampleFunc(lv_task_t *task)
 {
     sht30.get();
-    if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.countOfSamples)
+    if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.numberOfSamples)
     {
         if(pmsSensor->readData())
         {
@@ -212,15 +212,15 @@ void getSampleFunc(lv_task_t *task)
             humi = sht30.humidity;
         }
     }
-    if (config.currentSampleNumber == config.countOfSamples)
+    if (config.currentSampleNumber == config.numberOfSamples)
     {
         char buffer[7];
         for (uint8_t i = 0; i < 15; i++)
-            data[labels[i]] = data[labels[i]] / config.countOfSamples;
+            data[labels[i]] = data[labels[i]] / config.numberOfSamples;
         config.currentSampleNumber = 0;
-        temp = temp / config.countOfSamples;
-        humi = humi / config.countOfSamples;
-        lv_task_set_period(getSample, (config.timeBetweenSavingSample-config.countOfSamples*config.measurePeriod));
+        temp = temp / config.numberOfSamples;
+        humi = humi / config.numberOfSamples;
+        lv_task_set_period(getSample, (config.timeBetweenSavingSamples-config.numberOfSamples*config.measurePeriod));
 
         itoa(data["pm10_standard"], buffer, 10);
         lv_label_set_text(labelPM10Data, buffer);
@@ -888,12 +888,12 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
         int get_value = lv_spinbox_get_value(measurePeriodHour) * 60 * 60000 + lv_spinbox_get_value(measurePeriodMinute) * 60000 + lv_spinbox_get_value(measurePeriodsecond) * 1000;
-        config.timeBetweenSavingSample = get_value;
-        config.countOfSamples = lv_spinbox_get_value(measureNumber);
+        config.timeBetweenSavingSamples = get_value;
+        config.numberOfSamples = lv_spinbox_get_value(measureNumber);
         config.measurePeriod = lv_spinbox_get_value(measureAvPeriod) * 1000;
         config.turnFanTime = lv_spinbox_get_value(turnFanOnTime) * 1000;
-        getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSample-config.countOfSamples*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
-        turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
+        getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples-config.numberOfSamples*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
+        turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);
         lv_scr_load(mainScr);
@@ -905,8 +905,8 @@ static void sampling_settings_back_btn(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSample / 60000) / 60));
-        lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSample / 60000) % 60));
+        lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSamples / 60000) / 60));
+        lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSamples / 60000) % 60));
         lv_scr_load(settingsScr);
     }
 }

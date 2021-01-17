@@ -212,18 +212,18 @@ void setup()
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
     status = lv_task_create(statusFunc, 5000, LV_TASK_PRIO_LOW, NULL);
-    lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSample / 60000) / 60));
-    lv_spinbox_set_value(measurePeriodsecond, (config.timeBetweenSavingSample / 1000) % 60);
-    lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSample / 60000) % 60));
+    lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSamples / 60000) / 60));
+    lv_spinbox_set_value(measurePeriodsecond, (config.timeBetweenSavingSamples / 1000) % 60);
+    lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSamples / 60000) % 60));
     lv_spinbox_set_value(measureAvPeriod, (config.measurePeriod / 1000));
-    lv_spinbox_set_value(measureNumber, config.countOfSamples);
+    lv_spinbox_set_value(measureNumber, config.numberOfSamples);
     lv_spinbox_set_value(turnFanOnTime, (config.turnFanTime / 1000));
     set_spinbox_digit_format(measureNumber, MIN_RANGE, MAX_RANGE, 0);
     set_spinbox_digit_format(measureAvPeriod, MIN_RANGE, MAX_RANGE, 0);
     set_spinbox_digit_format(turnFanOnTime, MIN_RANGE, MAX_RANGE, 0);
 
-    getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSample-config.countOfSamples*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
-    turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSample - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
+    getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples-config.numberOfSamples*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
+    turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
     inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
