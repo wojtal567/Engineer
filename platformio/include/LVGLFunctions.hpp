@@ -331,6 +331,14 @@ static void btnSync(lv_obj_t *obj, lv_event_t event)
     }
 }
 
+static void kb_cb (lv_obj_t *kb, lv_event_t event)
+{
+    if(event != LV_EVENT_CANCEL)
+    {
+        lv_keyboard_def_event_cb(kb, event);
+    }
+}
+
 static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
@@ -350,7 +358,7 @@ static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
         {
             keyboard = lv_keyboard_create(lv_scr_act(), NULL);
             lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-            lv_obj_set_event_cb(keyboard, lv_keyboard_def_event_cb);
+            lv_obj_set_event_cb(keyboard, kb_cb);
             lv_keyboard_set_textarea(keyboard, ta);
         }
         else
