@@ -388,14 +388,7 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
         }
 
         if (WiFi.status() == WL_CONNECTED)
-        {
             Serial.println("btn_connect -> connected to Wi-Fi! IP: " + WiFi.localIP().toString());
-            Rtc.SetIsRunning(true);
-            dateTimeClient.begin();
-            for (int i = 0; i < 3; i++)
-                dateTimeClient.update();
-            config_time();
-        }
         else if (WiFi.status() == WL_DISCONNECTED)
             Serial.println("btn_connect -> can't connect. Probably you have entered wrong credentials.");
         lv_disp_load_scr(mainScr);
