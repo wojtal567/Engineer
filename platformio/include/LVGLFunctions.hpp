@@ -323,6 +323,14 @@ void drawParticlesIndicator()
     lv_obj_add_style(mainLine, LV_LINE_PART_MAIN, &lineStyle);
 }
 
+static void btnSync(lv_obj_t *obj, lv_event_t event)
+{
+    if(event == LV_EVENT_CLICKED)
+    {
+        lv_task_ready(getAppLastRecordAndSynchronize);
+    }
+}
+
 static void ta_event_cb(lv_obj_t *ta, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)

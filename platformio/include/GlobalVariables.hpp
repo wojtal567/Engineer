@@ -176,7 +176,7 @@ lv_obj_t *dividingLines[7];
 lv_color_t airQualityColors[6] = {LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW, LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
 
 // ? --------------------------------------------------wifi gui
-lv_obj_t *wifiLabelAtBar;
+//lv_obj_t *wifiLabelAtBar;
 lv_obj_t *wifiScr;
 lv_obj_t *keyboard;
 lv_obj_t *ssidTA;
@@ -189,6 +189,8 @@ lv_obj_t *cancelBtn;
 lv_obj_t *cancelLabel;
 lv_obj_t *showHideBtn;
 lv_obj_t *showHideBtnLabel;
+lv_obj_t *syncDbBtn;
+lv_obj_t *syncDbLabel;
 // ? -------------------------------------------------- info gui
 lv_obj_t *infoScr;
 lv_obj_t *backInfoBtn;

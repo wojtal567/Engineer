@@ -408,7 +408,6 @@ void samplingsettingsScreen()
     lv_obj_set_style_local_value_str(turnFanOnTimeDecrement, LV_BTN_PART_MAIN, LV_STATE_DEFAULT, LV_SYMBOL_MINUS);
 }
 
-//Zrobione
 void wifiScreen()
 {
     cancelBtn = my_lv_btn_create(wifiScr, backSettingsBtn, 30, 15, 14, 10, btn_cancel);
@@ -418,8 +417,11 @@ void wifiScreen()
     lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    wifiLabelAtBar = my_lv_label_create(wifiScr, NULL, 201, 10, "WiFi settings");
- 
+    syncDbBtn = my_lv_btn_create(wifiScr, NULL, 105, 25, 215, 10, btnSync);
+    syncDbLabel = lv_label_create(syncDbBtn, NULL);
+    lv_label_set_text(syncDbLabel, "Synchronise");
+    lv_obj_add_style(syncDbBtn, LV_BTN_PART_MAIN, &whiteButtonStyle);
+
     ssidLabel = my_lv_label_create(wifiScr, NULL, 5, 53, "SSID: ");
    
     ssidTA = lv_textarea_create(wifiScr, NULL);
