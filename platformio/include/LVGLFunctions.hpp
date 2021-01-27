@@ -220,7 +220,7 @@ void getSampleFunc(lv_task_t *task)
         config.currentSampleNumber = 0;
         temp = temp / config.numberOfSamples;
         humi = humi / config.numberOfSamples;
-        lv_task_set_period(getSample, (config.timeBetweenSavingSamples-config.numberOfSamples*config.measurePeriod));
+        lv_task_set_period(getSample, (config.timeBetweenSavingSamples-(config.numberOfSamples-1)*config.measurePeriod));
 
         itoa(data["pm10_standard"], buffer, 10);
         lv_label_set_text(labelPM10Data, buffer);
@@ -825,7 +825,7 @@ static void measureNumberIncrement_func(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {
-        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*lv_spinbox_get_value(measureAvPeriod)))
+        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+((lv_spinbox_get_value(measureNumber)-1)*lv_spinbox_get_value(measureAvPeriod))))
         {
             set_spinbox_digit_format(measureNumber, MIN_RANGE, MAX_RANGE, 1);
             lv_spinbox_increment(measureNumber);
@@ -867,7 +867,7 @@ static void av_periodIncrement(lv_obj_t *btn, lv_event_t event)
 {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT)
     {  
-        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+lv_spinbox_get_value(measureNumber)*(lv_spinbox_get_value(measureAvPeriod)+1)))
+        if((lv_spinbox_get_value(measurePeriodHour)*3600+lv_spinbox_get_value(measurePeriodMinute)*60+lv_spinbox_get_value(measurePeriodsecond))>=(lv_spinbox_get_value(turnFanOnTime)+(lv_spinbox_get_value(measureNumber)-1)*(lv_spinbox_get_value(measureAvPeriod)+1)))
         {
             set_spinbox_digit_format(measureAvPeriod, MIN_RANGE, MAX_RANGE, 1);
             lv_spinbox_increment(measureAvPeriod);
@@ -892,7 +892,7 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
         config.numberOfSamples = lv_spinbox_get_value(measureNumber);
         config.measurePeriod = lv_spinbox_get_value(measureAvPeriod) * 1000;
         config.turnFanTime = lv_spinbox_get_value(turnFanOnTime) * 1000;
-        getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples-config.numberOfSamples*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
+        getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples-(config.numberOfSamples-1)*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
         turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);

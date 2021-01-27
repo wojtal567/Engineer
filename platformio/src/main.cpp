@@ -222,12 +222,13 @@ void setup()
     set_spinbox_digit_format(measureAvPeriod, MIN_RANGE, MAX_RANGE, 0);
     set_spinbox_digit_format(turnFanOnTime, MIN_RANGE, MAX_RANGE, 0);
 
-    getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples-config.numberOfSamples*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
+    getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples-(config.numberOfSamples-1)*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
     inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, 300000);
+    lv_task_set_prio(getAppLastRecordAndSynchronize, LV_TASK_PRIO_MID);
     lv_task_handler();
     if (config.ssid != "")
     {
