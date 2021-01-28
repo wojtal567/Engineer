@@ -40,6 +40,7 @@ void setAppIp()
                 doc["status"] = "OK";
                 String buf;
                 serializeJson(doc, buf);
+                lv_task_set_period(getAppLastRecordAndSynchronize, fetchPeriod);
 
                 server.send(201, F("application/json"), buf);
             }

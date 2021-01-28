@@ -99,7 +99,7 @@ void MySD::getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray *array)
         debugger->println("SD Card detected");
         if (SD.exists(object->getRelativePath()))
         {
-            Serial.println("MySD::getLastRecord -> File exists. Trying to sget last saved sample record.");
+            Serial.println("MySD::getLastRecord -> File exists. Trying to get last saved sample record.");
             debugger->println("Database " + object->getLocalPath() + " exists.");
             object->init();
             object->open();

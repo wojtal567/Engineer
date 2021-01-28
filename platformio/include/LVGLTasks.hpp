@@ -25,7 +25,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
             Serial.print(getHttp.getString());
             uint8_t responseCode = getHttp.GET();
 
-            if (responseCode >= 200 and responseCode < 300)
+            if (responseCode == 200)
             {
                 Serial.println("GET /last succesful.");
                 Serial.println("HTTP RESPONSE CODE: " + (String)responseCode);
@@ -56,11 +56,13 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
             else
             {
                 Serial.println("ERROR FETCHING DATA. CODE: " + (String)responseCode);
+                lv_task_set_prio(getAppLastRecordAndSynchronize, LV_TASK_PRIO_OFF);
             }
         }
         else
         {
             Serial.print("Wrong url");
+            lv_task_set_prio(getAppLastRecordAndSynchronize, LV_TASK_PRIO_OFF);
         }
         getHttp.end();
     }
