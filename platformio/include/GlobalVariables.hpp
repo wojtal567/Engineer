@@ -77,6 +77,7 @@ NTPClient dateTimeClient(ntpUDP, ntpServerName, ntpTimeOffset);
 //Webserver
 WebServer server(80);
 String appIpAddress = "";
+int fetchPeriod = 30000;
 
 //TFT display using TFT_eSPI and lvgl library
 TFT_eSPI tft = TFT_eSPI();

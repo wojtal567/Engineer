@@ -227,7 +227,7 @@ void setup()
     inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
-    lv_task_set_period(getAppLastRecordAndSynchronize, 300000);
+    lv_task_set_period(getAppLastRecordAndSynchronize, fetchPeriod);
     lv_task_set_prio(getAppLastRecordAndSynchronize, LV_TASK_PRIO_MID);
     lv_task_handler();
     if (config.ssid != "")
