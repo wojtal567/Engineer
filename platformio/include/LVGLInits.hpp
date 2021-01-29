@@ -417,10 +417,7 @@ void wifiScreen()
     lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &borderlessStyle);
     lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &whiteFontStyle);
 
-    syncDbBtn = my_lv_btn_create(wifiScr, NULL, 105, 25, 215, 10, btnSync);
-    syncDbLabel = lv_label_create(syncDbBtn, NULL);
-    lv_label_set_text(syncDbLabel, "Synchronise");
-    lv_obj_add_style(syncDbBtn, LV_BTN_PART_MAIN, &whiteButtonStyle);
+    wifiLabelAtBar = my_lv_label_create(wifiScr, NULL, 201, 10, "WiFi settings");
 
     ssidLabel = my_lv_label_create(wifiScr, NULL, 5, 53, "SSID: ");
    

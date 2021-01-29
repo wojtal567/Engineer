@@ -104,14 +104,12 @@ void statusFunc(lv_task_t *task)
         lv_obj_set_hidden(wifiStatusAtLockWarning, true);
         lv_obj_set_hidden(wifiStatusAtMainWarning, true);
         lv_label_set_text(infoWifiAddressLabel, WiFi.localIP().toString().c_str());
-        lv_obj_set_hidden(syncDbBtn, false);
     }
     else
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, false);
         lv_obj_set_hidden(wifiStatusAtMainWarning, false);
         lv_label_set_text(infoWifiAddressLabel, "No WiFi connection");
-        lv_obj_set_hidden(syncDbBtn, true);
     }
 
     if (mySDCard.start(&sampleDB, &Serial2))
