@@ -61,10 +61,9 @@ void setAppIp()
 
 void restServerRouting()
 {
-    server.on("/", HTTP_GET, []() {
-        server.send(200, F("text/html"),
-                    F("You have entered the wrong neighbourhood"));
-    });
+    server.on("/", HTTP_GET, []()
+              { server.send(200, F("text/html"),
+                            F("You have entered the wrong neighbourhood")); });
     server.on(F("/setAppIp"), HTTP_POST, setAppIp);
 }
 
@@ -110,11 +109,11 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 
     if (touchX > SCREEN_WIDTH || touchY > SCREEN_HEIGHT)
     {
-        //Serial.println("Y or y outside of expected parameters..");
-        //Serial.print("y:");
-        //Serial.print(touchX);
-        //Serial.print(" x:");
-        //Serial.print(touchY);
+        // Serial.println("Y or y outside of expected parameters..");
+        // Serial.print("y:");
+        // Serial.print(touchX);
+        // Serial.print(" x:");
+        // Serial.print(touchY);
     }
     else
     {
@@ -122,17 +121,17 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
         data->state = touched ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 
         /*Save the state and save the pressed coordinate*/
-        //if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
+        // if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
 
         /*Set the coordinates (if released use the last pressed coordinates)*/
         data->point.x = touchX;
         data->point.y = touchY;
 
-        //Serial.print("Data x");
-        //Serial.println(touchX);
+        // Serial.print("Data x");
+        // Serial.println(touchX);
         //
-        //Serial.print("Data y");
-        //Serial.println(touchY);
+        // Serial.print("Data y");
+        // Serial.println(touchY);
     }
 
     return false; /*Return `false` because we are not buffering and no more data to read*/
@@ -143,10 +142,10 @@ void setup()
     pinMode(FAN_PIN, OUTPUT);
     digitalWrite(FAN_PIN, LOW);
     sqlite3_initialize();
-    //Serial debug
+    // Serial debug
     Serial.begin(115200);
     Serial2.begin(9600, SERIAL_8N1, 16, 17);
-    //PMS sensor initialization
+    // PMS sensor initialization
     pmsSensor = new PMS5003(&Serial2, &Serial);
 
     lv_init();
@@ -157,7 +156,7 @@ void setup()
     tft.setTouch(calData);
 
     lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
-    //Initialize the display
+    // Initialize the display
     lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
     disp_drv.hor_res = SCREEN_WIDTH;
@@ -166,18 +165,18 @@ void setup()
     disp_drv.buffer = &disp_buf;
     lv_disp_drv_register(&disp_drv);
 
-    //Initialize the input device driver
+    // Initialize the input device driver
     lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);          /*Descriptor of a input device driver*/
     indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
     indev_drv.read_cb = my_touchpad_read;   /*Set your driver function*/
     lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
 
-    //Set theme
+    // Set theme
     lv_theme_t *th = lv_theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY, LV_THEME_DEFAULT_FLAG, LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
     lv_theme_set_act(th);
 
-    //Styles initialization function
+    // Styles initialization function
     stylesInits();
 
     mainScr = lv_cont_create(NULL, NULL);
@@ -195,7 +194,7 @@ void setup()
     samplingSettingsScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(samplingSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
-    //Screens initialization function
+    // Screens initialization function
     mainScreen();
     wifiScreen();
     lockScreen();
@@ -223,7 +222,7 @@ void setup()
     set_spinbox_digit_format(measureAvPeriod, MIN_RANGE, MAX_RANGE, 0);
     set_spinbox_digit_format(turnFanOnTime, MIN_RANGE, MAX_RANGE, 0);
 
-    getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples-(config.numberOfSamples-1)*config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
+    getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples - (config.numberOfSamples - 1) * config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
     turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
     inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
