@@ -50,7 +50,7 @@ void fetchLastRecordAndSynchronize(lv_task_t *task)
                     getHttp.POST(json);
                     Serial.print("POST RESPONSE:" + getHttp.getString());
                     getHttp.end();
-                    //lv_task_ready(getAppLastRecordAndSynchronize);
+                    lv_task_ready(getAppLastRecordAndSynchronize);
                 }
             }
             else
@@ -73,7 +73,7 @@ void dateTimeFunc(lv_task_t *task)
 
     if (Rtc.GetIsRunning())
     {
-        lv_label_set_text(dateAndTimeAtBar, getMainTimestamp(Rtc).c_str());
+        Screens::mainScr->updateDateTime(getMainTimestamp(Rtc));
         lv_label_set_text(labelTimeLock, getTime(Rtc).c_str());
         lv_label_set_text(labelDateLock, getDate(Rtc).c_str());
         if (inTimeSettings == false)
@@ -85,13 +85,16 @@ void dateTimeFunc(lv_task_t *task)
     }
     else
     {
+        Serial.println(getMainTimestamp(Rtc));
         if (inTimeSettings == false)
             lv_label_set_text(dateBtnLabel, "01.01.2021");
         if (isDefaultTimeOnDisplay)
-            lv_label_set_text(dateAndTimeAtBar, "");
+        {
+            Screens::mainScr->updateDateTime("");
+        }
         else
         {
-            lv_label_set_text(dateAndTimeAtBar, "01.01.2021 00:00:00");
+            Screens::mainScr->updateDateTime("01.01.2021 00:00:00");
         }
         isDefaultTimeOnDisplay = !isDefaultTimeOnDisplay;
     }
@@ -99,37 +102,43 @@ void dateTimeFunc(lv_task_t *task)
 
 void statusFunc(lv_task_t *task)
 {
-    if (WiFi.status() == WL_CONNECTED)
+    const bool wifiConnected = WiFi.status() == WL_CONNECTED;
+
+    Screens::mainScr->setWifiWarning(!wifiConnected);
+
+    if (wifiConnected)
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, true);
-        lv_obj_set_hidden(wifiStatusAtMainWarning, true);
         lv_label_set_text(infoWifiAddressLabel, WiFi.localIP().toString().c_str());
     }
     else
     {
         lv_obj_set_hidden(wifiStatusAtLockWarning, false);
-        lv_obj_set_hidden(wifiStatusAtMainWarning, false);
         lv_label_set_text(infoWifiAddressLabel, "No WiFi connection");
     }
 
-    if (mySDCard.start(&sampleDB, &Serial2))
+    const bool sdCardError = mySDCard.start(&sampleDB, &Serial2);
+
+    Screens::mainScr->setSdCardWarning(sdCardError);
+    if (!sdCardError)
+    {
+        lv_obj_set_hidden(sdStatusAtLockWarning, false);
+    }
+    else
     {
         lv_obj_set_hidden(sdStatusAtLockWarning, true);
-        lv_obj_set_hidden(sdStatusAtMainWarning, true);
         if (config.ssid == "" && config.password == "")
         {
             mySDCard.loadWiFi(config, configFilePath);
-            mySDCard.saveConfig(config, configFilePath);
+            if (config.ssid != "" && config.password != "")
+            {
+                mySDCard.saveConfig(config, configFilePath);
+            }
         }
         if (config.ssid != "" && config.password != "")
         {
             if (!(WiFi.status() == WL_CONNECTED))
                 WiFi.begin(config.ssid.c_str(), config.password.c_str());
         }
-    }
-    else
-    {
-        lv_obj_set_hidden(sdStatusAtLockWarning, false);
-        lv_obj_set_hidden(sdStatusAtMainWarning, false);
     }
 }

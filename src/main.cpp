@@ -7,7 +7,8 @@
 #include <Adafruit_BusIO_Register.h>
 
 #include <LVGLInits.hpp>
-
+#include "ui/Screens.h"
+#include "ui/Styles.h"
 // ! --------------------------------------------REST WebServer config
 void setAppIp()
 {
@@ -139,15 +140,14 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 
 void setup()
 {
-    pinMode(FAN_PIN, OUTPUT);
-    digitalWrite(FAN_PIN, LOW);
+    pinMode(PinConfig::fanPin, OUTPUT);
+    digitalWrite(PinConfig::fanPin, LOW);
     sqlite3_initialize();
     // Serial debug
     Serial.begin(115200);
     Serial2.begin(9600, SERIAL_8N1, 16, 17);
     // PMS sensor initialization
     pmsSensor = new PMS5003(&Serial2, &Serial);
-
     lv_init();
     tft.begin(); /* TFT init */
     tft.setRotation(3);
@@ -177,10 +177,11 @@ void setup()
     lv_theme_set_act(th);
 
     // Styles initialization function
+    Styles::initStyles();
     stylesInits();
 
-    mainScr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(mainScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    Screens::mainScr = new MainScreen();
+
     settingsScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(settingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     infoScr = lv_cont_create(NULL, NULL);
@@ -195,7 +196,6 @@ void setup()
     lv_obj_set_style_local_bg_color(samplingSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     // Screens initialization function
-    mainScreen();
     wifiScreen();
     lockScreen();
     settingsScreen();
@@ -203,7 +203,7 @@ void setup()
     timesettingsScreen();
     samplingsettingsScreen();
 
-    lv_disp_load_scr(mainScr);
+    lv_disp_load_scr(Screens::mainScr->getScreen());
 
     mySDCard.loadConfig(config, configFilePath);
     delay(1000);
@@ -211,7 +211,7 @@ void setup()
     lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
-    status = lv_task_create(statusFunc, 5000, LV_TASK_PRIO_LOW, NULL);
+    status = lv_task_create(statusFunc, 5000, LV_TASK_PRIO_MID, NULL);
     lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSamples / 60000) / 60));
     lv_spinbox_set_value(measurePeriodsecond, (config.timeBetweenSavingSamples / 1000) % 60);
     lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSamples / 60000) % 60));

@@ -1,5 +1,7 @@
 #include <GlobalVariables.hpp>
-
+#include "ui/widgets/Button.h"
+#include "ui/Screens.h"
+#include <lvgl.h>
 void set_spinbox_digit_format(lv_obj_t *spinbox, int32_t range_min, int32_t range_max, int offset)
 {
     int _spinbox_value = lv_spinbox_get_value(spinbox) + offset;
@@ -19,33 +21,6 @@ void set_spinbox_digit_format(lv_obj_t *spinbox, int32_t range_min, int32_t rang
         lv_spinbox_set_digit_format(spinbox, 1, 0);
     }
     lv_spinbox_set_range(spinbox, range_min, range_max);
-}
-
-lv_obj_t *my_lv_btn_create(lv_obj_t *par, const lv_obj_t *copy, lv_coord_t width, lv_coord_t height, lv_coord_t x_position, lv_coord_t y_position, lv_event_cb_t event_cb)
-{
-    lv_obj_t *btn = lv_btn_create(par, copy);
-    lv_obj_set_size(btn, width, height);
-    lv_obj_set_pos(btn, x_position, y_position);
-    lv_obj_set_event_cb(btn, event_cb);
-    return btn;
-}
-
-lv_obj_t *my_lv_cont_create(lv_obj_t *par, const lv_obj_t *copy, lv_coord_t width, lv_coord_t height, lv_coord_t x_position, lv_coord_t y_position)
-{
-    lv_obj_t *cont = lv_cont_create(par, copy);
-    lv_obj_set_size(cont, width, height);
-    lv_obj_set_pos(cont, x_position, y_position);
-    return cont;
-}
-
-lv_obj_t *my_lv_label_create(lv_obj_t *par, const lv_obj_t *copy, lv_coord_t x_position, lv_coord_t y_position, const char *text = "", lv_color_t color = LV_COLOR_WHITE)
-{
-    lv_obj_t *new_label = lv_label_create(par, copy);
-    lv_obj_set_pos(new_label, x_position, y_position);
-    lv_label_set_text(new_label, text);
-    lv_obj_set_style_local_text_color(new_label, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, color);
-
-    return new_label;
 }
 
 int getDDListIndexBasedOnLcdLockTime(int lcdLockTime)
@@ -129,7 +104,7 @@ void display_current_config()
 // Function that turns fan on
 void turnFanOnFunc(lv_task_t *task)
 {
-    digitalWrite(FAN_PIN, HIGH);
+    digitalWrite(PinConfig::fanPin, HIGH);
     lv_task_set_prio(turnFanOn, LV_TASK_PRIO_OFF);
 }
 
@@ -162,19 +137,6 @@ bool isLastSampleSaved()
     {
         Serial.println("Something went wrong saving last sample - return false");
         return false;
-    }
-}
-
-void setAqiStateNColor()
-{
-    for (int i = 0; i < 6; i++)
-    {
-        if (i == 5 or pm25Aqi < aqiStandards[i])
-        {
-            lv_label_set_text(labelAQIColorBar, airQualityStates[i].c_str());
-            lv_obj_set_style_local_bg_color(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, airQualityColors[i]);
-            return;
-        }
     }
 }
 
@@ -214,7 +176,6 @@ void getSampleFunc(lv_task_t *task)
     }
     if (config.currentSampleNumber == config.numberOfSamples)
     {
-        char buffer[7];
         for (uint8_t i = 0; i < 15; i++)
             data[labels[i]] = data[labels[i]] / config.numberOfSamples;
         config.currentSampleNumber = 0;
@@ -222,40 +183,15 @@ void getSampleFunc(lv_task_t *task)
         humi = humi / config.numberOfSamples;
         lv_task_set_period(getSample, (config.timeBetweenSavingSamples - (config.numberOfSamples - 1) * config.measurePeriod));
 
-        itoa(data["pm10_standard"], buffer, 10);
-        lv_label_set_text(labelPM10Data, buffer);
-
-        itoa(data["pm25_standard"], buffer, 10);
         pm25Aqi = data["pm25_standard"];
-        lv_label_set_text(labelPM25Data, buffer);
-        setAqiStateNColor();
 
-        itoa(data["pm100_standard"], buffer, 10);
-        lv_label_set_text(labelPM100Data, buffer);
-
-        itoa(data["particles_03um"], buffer, 10);
-        lv_label_set_text(labelParticlesNumber[0], buffer);
-
-        itoa(data["particles_05um"], buffer, 10);
-        lv_label_set_text(labelParticlesNumber[1], buffer);
-
-        itoa(data["particles_10um"], buffer, 10);
-        lv_label_set_text(labelParticlesNumber[2], buffer);
-
-        itoa(data["particles_25um"], buffer, 10);
-        lv_label_set_text(labelParticlesNumber[3], buffer);
-
-        itoa(data["particles_50um"], buffer, 10);
-        lv_label_set_text(labelParticlesNumber[4], buffer);
-
-        itoa(data["particles_100um"], buffer, 10);
-        lv_label_set_text(labelParticlesNumber[5], buffer);
-
-        dtostrf(temp, 10, 2, buffer);
-        lv_label_set_text(labelTempValue, strcat(buffer, "°C"));
-
-        dtostrf(humi, 10, 2, buffer);
-        lv_label_set_text(labelHumiValue, strcat(buffer, "%"));
+        Screens::mainScr->setAqiStateNColor(pm25Aqi);
+        Screens::mainScr->updateSampleData(data["pm10_standard"], data["pm25_standard"],
+                                           data["pm100_standard"], data["particles_03um"],
+                                           data["particles_05um"], data["particles_10um"],
+                                           data["particles_25um"], data["particles_50um"],
+                                           data["particles_100um"],
+                                           temp, humi);
         if (Rtc.GetIsRunning())
         {
             lastSampleTimestamp = getMainTimestamp(Rtc);
@@ -263,64 +199,26 @@ void getSampleFunc(lv_task_t *task)
             mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
         }
         else
+        {
             Serial.println("RTC is not running, not saving");
+        }
         lv_task_reset(turnFanOn);
         lv_task_set_prio(turnFanOn, LV_TASK_PRIO_HIGHEST);
-        digitalWrite(FAN_PIN, LOW);
-        if (isLastSampleSaved())
+        digitalWrite(PinConfig::fanPin, LOW);
+        const bool sampleSaveError = !isLastSampleSaved();
+        if (!sampleSaveError)
         {
             lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
-            lv_obj_set_style_local_bg_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
             lv_obj_set_style_local_shadow_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
-            lv_obj_set_style_local_shadow_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_GREEN);
         }
         else
         {
             lv_obj_set_style_local_bg_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
-            lv_obj_set_style_local_bg_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
             lv_obj_set_style_local_shadow_color(ledAtLock, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
-            lv_obj_set_style_local_shadow_color(ledAtMain, LV_LED_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_RED);
         }
+
+        Screens::mainScr->setSampleSaveError(sampleSaveError);
     }
-}
-
-// Draw a line-like thing
-void drawParticlesIndicator()
-{
-    for (int i = 0; i < 7; i++)
-    {
-        dividingLines[i] = lv_line_create(mainScr, NULL);
-        lv_line_set_points(dividingLines[i], dividingLinesPoints[i], 2);
-        lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &lineStyle);
-
-        labelParticleSizeum[i] = lv_label_create(mainScr, NULL);
-        lv_label_set_text(labelParticleSizeum[i], particlesSize[i].c_str());
-        lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &font12Style);
-        lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &whiteFontStyle);
-        lv_obj_set_pos(labelParticleSizeum[i], labelParticleSizePosX[i], 190); // 12
-    }
-
-    for (int j = 0; j < 6; j++)
-    {
-
-        contParticlesNumber[j] = lv_cont_create(mainScr, NULL);
-        lv_obj_add_style(contParticlesNumber[j], LV_OBJ_PART_MAIN, &containerStyle);
-        lv_obj_set_style_local_border_opa(contParticlesNumber[j], LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
-        lv_obj_set_click(contParticlesNumber[j], false);
-        lv_obj_set_size(contParticlesNumber[j], 47, 14);
-        labelParticlesNumber[j] = lv_label_create(contParticlesNumber[j], NULL);
-        lv_obj_set_pos(contParticlesNumber[j], contParticleNumberPosX[j], 215); // 20
-        lv_label_set_align(labelParticlesNumber[j], LV_LABEL_ALIGN_CENTER);
-        lv_obj_set_auto_realign(labelParticlesNumber[j], true);
-        lv_label_set_text(labelParticlesNumber[j], "-");
-        lv_obj_add_style(labelParticlesNumber[j], LV_LABEL_PART_MAIN, &font12Style);
-        lv_obj_add_style(labelParticlesNumber[j], LV_LABEL_PART_MAIN, &whiteFontStyle);
-    }
-
-    mainLine = lv_line_create(mainScr, NULL);
-    lv_line_set_points(mainLine, mainLinePoints, 2);
-    lv_line_set_auto_size(mainLine, true);
-    lv_obj_add_style(mainLine, LV_LINE_PART_MAIN, &lineStyle);
 }
 
 static void kb_cb(lv_obj_t *kb, lv_event_t event)
@@ -386,7 +284,7 @@ static void btn_connect(lv_obj_t *obj, lv_event_t event)
             Serial.println("btn_connect -> connected to Wi-Fi! IP: " + WiFi.localIP().toString());
         else if (WiFi.status() == WL_DISCONNECTED)
             Serial.println("btn_connect -> can't connect. Probably you have entered wrong credentials.");
-        lv_disp_load_scr(mainScr);
+        lv_disp_load_scr(Screens::mainScr->getScreen());
         lv_textarea_set_text(ssidTA, "");
         lv_textarea_set_text(pwdTA, "");
     }
@@ -411,7 +309,7 @@ static void unlockButton_task(lv_obj_t *obj, lv_event_t event)
 {
     Serial.print(lv_btn_get_state(unlockButton));
     if (event == LV_EVENT_CLICKED)
-        lv_disp_load_scr(mainScr);
+        lv_disp_load_scr(Screens::mainScr->getScreen());
 }
 
 // Exit from wifi settings button clicked
@@ -428,7 +326,7 @@ static void btn_cancel(lv_obj_t *obj, lv_event_t event)
 static void btn_settings_back(lv_obj_t *obj, lv_event_t event)
 {
     if (event == LV_EVENT_CLICKED)
-        lv_disp_load_scr(mainScr);
+        lv_disp_load_scr(Screens::mainScr->getScreen());
 }
 
 static void WiFi_btn(lv_obj_t *obj, lv_event_t event)
@@ -529,7 +427,7 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event)
             Rtc.SetDateTime(*dt);
             Rtc.SetIsRunning(true);
         }
-        lv_disp_load_scr(mainScr);
+        lv_disp_load_scr(Screens::mainScr->getScreen());
         inTimeSettings = false;
         timeChanged = false;
         dateChanged = false;
@@ -900,7 +798,7 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event)
         turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
         mySDCard.saveConfig(config, configFilePath);
         mySDCard.printConfig(configFilePath);
-        lv_scr_load(mainScr);
+        lv_scr_load(Screens::mainScr->getScreen());
         display_current_config();
     }
 }
