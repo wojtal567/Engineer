@@ -9,6 +9,7 @@ class MainScreen : public lv_obj_t
 {
 public:
     MainScreen();
+    ~MainScreen();
     lv_obj_t *getScreen() const;
 
     void setAqiStateNColor(float pm25Aqi);
@@ -26,6 +27,8 @@ private:
     void drawParticlesIndicator();
 
     lv_obj_t *mainScr;
+    lv_obj_t *labelSetButton;
+    lv_obj_t *labelLockButton;
     lv_obj_t *labelParticleSizeum[7];
     lv_obj_t *contParticlesNumber[6];
     lv_obj_t *labelParticlesNumber[6];

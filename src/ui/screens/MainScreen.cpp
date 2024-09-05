@@ -30,7 +30,7 @@ MainScreen::MainScreen()
             // lv_disp_load_scr(Screens::settings);
         } });
 
-    lv_obj_t *labelSetButton = lv_label_create(setButton, NULL);
+    labelSetButton = lv_label_create(setButton, NULL);
     lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &Styles::transparentBackgroundStyle);
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &Styles::borderlessStyle);
@@ -42,7 +42,7 @@ MainScreen::MainScreen()
                             // lv_disp_load_scr(Screens::lock);
                                 } });
 
-    lv_obj_t *labelLockButton = lv_label_create(lockButton, NULL);
+    labelLockButton = lv_label_create(lockButton, NULL);
     lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
     lv_label_set_text(labelLockButton, Symbols::LOCK_SYMBOL);
 
@@ -148,6 +148,63 @@ MainScreen::MainScreen()
     drawParticlesIndicator();
 }
 
+MainScreen::~MainScreen()
+{
+    lv_obj_del(mainLine);
+    mainLine = nullptr;
+
+    for (int i = 0; i < 7; i++)
+    {
+        lv_obj_del(dividingLines[i]);
+        dividingLines[i] = nullptr;
+    }
+
+    lv_obj_del(sdStatusWarning);
+    sdStatusWarning = nullptr;
+    lv_obj_del(wifiStatusWarning);
+    wifiStatusWarning = nullptr;
+    lv_obj_del(dateAndTime);
+    dateAndTime = nullptr;
+    lv_obj_del(led);
+    led = nullptr;
+    lv_obj_del(labelHumiValue);
+    labelHumiValue = nullptr;
+    lv_obj_del(labelTempValue);
+    labelTempValue = nullptr;
+    lv_obj_del(labelPM100Data);
+    labelPM100Data = nullptr;
+    lv_obj_del(labelPM25Data);
+    labelPM25Data = nullptr;
+    lv_obj_del(labelPM10Data);
+    labelPM10Data = nullptr;
+    lv_obj_del(contAQIColorBar);
+    contAQIColorBar = nullptr;
+    lv_obj_del(labelAQIColorBar);
+    labelAQIColorBar = nullptr;
+    for (int i = 0; i < 6; i++)
+    {
+        lv_obj_del(labelParticlesNumber[i]);
+        labelParticlesNumber[i] = nullptr;
+    }
+    for (int i = 0; i < 6; i++)
+    {
+        lv_obj_del(contParticlesNumber[i]);
+        contParticlesNumber[i] = nullptr;
+    }
+    for (int i = 0; i < 7; i++)
+    {
+        lv_obj_del(labelParticleSizeum[i]);
+        labelParticleSizeum[i] = nullptr;
+    }
+
+    lv_obj_del(labelSetButton);
+    labelSetButton = nullptr;
+    lv_obj_del(labelLockButton);
+    labelLockButton = nullptr;
+
+    lv_obj_del(mainScr);
+    mainScr = nullptr;
+}
 // Draw a line-like thing
 void MainScreen::drawParticlesIndicator()
 {
