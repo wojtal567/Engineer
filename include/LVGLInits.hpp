@@ -328,7 +328,7 @@ void lockScreen()
     lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &Styles::borderlessStyle);
     lv_obj_add_style(contDateTimeAtLock, LV_OBJ_PART_MAIN, &Styles::whiteFontStyle);
 
-    unlockButton = lv_btn_create(lockScr, nullptr); // TODO parent was from main screen, was setButton
+    unlockButton = lv_btn_create(lockScr, nullptr); // TODO copy was from main screen, was setButton
     labelUnlockButton = lv_label_create(unlockButton, NULL);
     lv_obj_set_style_local_text_font(unlockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
     lv_obj_align(unlockButton, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -25);
@@ -345,12 +345,12 @@ void lockScreen()
     lv_label_set_text(labelDateLock, "");
     lv_obj_align(labelDateLock, NULL, LV_ALIGN_CENTER, 0, 0);
 
-    wifiStatusAtLock = lv_label_create(lockScr, nullptr); // TODO parent was from main screen, was wifiStatusAtMain
+    wifiStatusAtLock = lv_label_create(lockScr, nullptr); // TODO copy was from main screen, was wifiStatusAtMain
     lv_obj_align(wifiStatusAtLock, NULL, LV_ALIGN_CENTER, -36, 10);
     lv_label_set_text(wifiStatusAtLock, LV_SYMBOL_WIFI);
     wifiStatusAtLockWarning = Label(wifiStatusAtLock, nullptr, 6, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
 
-    sdStatusAtLock = lv_label_create(lockScr, nullptr); // TODO parent was from main screen, sdStatusAtMain
+    sdStatusAtLock = lv_label_create(lockScr, nullptr); // TODO copy was from main screen, sdStatusAtMain
     lv_obj_align(sdStatusAtLock, NULL, LV_ALIGN_CENTER, 36, 10);
     lv_label_set_text(sdStatusAtLock, LV_SYMBOL_SD_CARD);
     sdStatusAtLockWarning = Label(sdStatusAtLock, wifiStatusAtLockWarning, 2, 6, LV_SYMBOL_CLOSE, LV_COLOR_RED);
