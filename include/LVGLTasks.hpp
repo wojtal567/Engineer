@@ -68,14 +68,8 @@ void dateTimeFunc(lv_task_t *task) {
             lv_label_set_text(dateBtnLabel, getDate(Rtc).c_str());
         }
     } else {
-        Serial.println(getMainTimestamp(Rtc));
         if (inTimeSettings == false) lv_label_set_text(dateBtnLabel, "01.01.2021");
-        if (isDefaultTimeOnDisplay) {
-            Screens::mainScr->updateDateTime("");
-        } else {
-            Screens::mainScr->updateDateTime("01.01.2021 00:00:00");
-        }
-        isDefaultTimeOnDisplay = !isDefaultTimeOnDisplay;
+        Screens::mainScr->updateDateTime("No date time set");
     }
 }
 

@@ -61,7 +61,6 @@ String lastSampleTimestamp;
 bool inTimeSettings = false;
 bool timeChanged = false;
 bool dateChanged = false;
-bool isDefaultTimeOnDisplay = false;
 // Temperature, relative humidity and pm2.5 per ug/m3 variables
 float temp, humi, pm25Aqi;
 
