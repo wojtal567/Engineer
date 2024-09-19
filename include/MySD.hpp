@@ -1,29 +1,30 @@
+#pragma once
 #include <SD.h>
+
 #include <SQLiteDb.hpp>
 #include <string>
-struct Config
-{
-    std::string ssid;            // * WiFi ssid
-    std::string password;        // * WiFi password
-    int lcdLockTime;             // * time after
-    int timeBetweenSavingSamples; // * time between sampling @measurePeriod
-    int measurePeriod;           // * time of taking samples to calculate average
-    uint numberOfSamples;         // * count of samples used to calculate average sample
-    uint currentSampleNumber;    // * number of currently taken sample
-    int turnFanTime;             // * time of turning fan on
+struct Config {
+    std::string ssid;              // * WiFi ssid
+    std::string password;          // * WiFi password
+    int lcdLockTime;               // * time after
+    int timeBetweenSavingSamples;  // * time between sampling @measurePeriod
+    int measurePeriod;             // * time of taking samples to calculate average
+    uint numberOfSamples;          // * count of samples used to calculate average sample
+    uint currentSampleNumber;      // * number of currently taken sample
+    int turnFanTime;               // * time of turning fan on
 };
 
-class MySD
-{
-private:
+class MySD {
+   private:
     int _port;
 
-public:
+   public:
     MySD(int port);
     bool begin();
     void end();
     bool start(SQLiteDb *object, Stream *debugger);
-    void save(std::map<std::string, float> data, float temperature, float humidity, String timestamp, SQLiteDb *object, Stream *debugger);
+    void save(std::map<std::string, float> data, float temperature, float humidity, String timestamp, SQLiteDb *object,
+              Stream *debugger);
     void select(SQLiteDb *object, Stream *debugger, String datetime, JsonArray *array);
     void getLastRecord(SQLiteDb *object, Stream *debugger, JsonArray *array);
     void saveConfig(Config config, std::string filePath);

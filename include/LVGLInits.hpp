@@ -1,3 +1,5 @@
+#pragma once
+
 #include <LVGLTasks.hpp>
 #include "ui/widgets/Label.h"
 #include "ui/Styles.h"
@@ -7,9 +9,6 @@ void stylesInits()
 {
     lv_style_init(&font16Style);
     lv_style_set_text_font(&font16Style, LV_STATE_DEFAULT, &lv_font_montserrat_16);
-
-    lv_style_init(&hugeFontStyle);
-    lv_style_set_text_font(&hugeFontStyle, LV_STATE_DEFAULT, &hugeSymbolsFont48);
 
     lv_style_init(&whiteButtonStyle);
     lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
@@ -28,7 +27,7 @@ void stylesInits()
 
 void timesettingsScreen()
 {
-    backTimeSettingsBtn = Button(timeSettingsScr, backSettingsBtn, 30, 15, 14, 10, timesettings_back_btn);
+    backTimeSettingsBtn = Button(timeSettingsScr, NULL, 30, 15, 14, 10, timesettings_back_btn); // TODO copy, was backSettingsBtn from settings screen
     backTimeSettingsLabel = lv_label_create(backTimeSettingsBtn, NULL);
     lv_label_set_text(backTimeSettingsLabel, LV_SYMBOL_LEFT);
 
@@ -98,50 +97,13 @@ void timesettingsScreen()
     lv_obj_add_style(syncRtcBtn, LV_BTN_PART_MAIN, &whiteButtonStyle);
 }
 
-void settingsScreen()
-{
-    backSettingsBtn = Button(settingsScr, NULL, 30, 15, 14, 10, btn_settings_back);
-    backSettingsLabel = lv_label_create(backSettingsBtn, NULL);
-    lv_label_set_text(backSettingsLabel, LV_SYMBOL_LEFT);
-    lv_obj_add_style(backSettingsBtn, LV_OBJ_PART_MAIN, &Styles::transparentBackgroundStyle);
-    lv_obj_add_style(backSettingsBtn, LV_OBJ_PART_MAIN, &Styles::borderlessStyle);
-    lv_obj_add_style(backSettingsBtn, LV_OBJ_PART_MAIN, &Styles::whiteFontStyle);
-
-    settingsLabelAtBar = Label(settingsScr, NULL, 239, 10, "Settings");
-
-    wifiBtn = Button(settingsScr, NULL, 60, 60, 60, 38, WiFi_btn);
-    wifiBtnLabel = lv_label_create(wifiBtn, NULL);
-    lv_label_set_text(wifiBtnLabel, Symbols::WIFI_SYMBOL);
-    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &Styles::transparentBackgroundStyle);
-    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &Styles::borderlessStyle);
-    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &Styles::whiteFontStyle);
-    lv_obj_add_style(wifiBtn, LV_OBJ_PART_MAIN, &hugeFontStyle);
-
-    wifiBtnName = Label(settingsScr, NULL, 63, 103, "WiFi");
-    lv_obj_add_style(wifiBtnName, LV_OBJ_PART_MAIN, &Styles::font20Style);
-
-    infoBtn = Button(settingsScr, wifiBtn, 60, 60, 200, 38, info_btn);
-    infoBtnLabel = lv_label_create(infoBtn, NULL);
-    lv_label_set_text(infoBtnLabel, Symbols::INFO_SYMBOL);
-
-    infoBtnName = Label(settingsScr, wifiBtnName, 207, 103, "Info");
-
-    timeBtn = Button(settingsScr, wifiBtn, 60, 60, 60, 140, time_settings_btn);
-    timeBtnLabel = lv_label_create(timeBtn, NULL);
-    lv_label_set_text(timeBtnLabel, Symbols::CLOCK_SYMBOL);
-
-    timeBtnName = Label(settingsScr, wifiBtnName, 65, 200, "Time");
-
-    tempBtn = Button(settingsScr, wifiBtn, 60, 60, 200, 140, temp_settings_btn);
-    tempBtnLabel = lv_label_create(tempBtn, wifiBtnName);
-    lv_label_set_text(tempBtnLabel, Symbols::COGS_SYMBOL);
-    lv_obj_add_style(tempBtnLabel, LV_OBJ_PART_MAIN, &hugeFontStyle);
-    tempBtnName = Label(settingsScr, wifiBtnName, 180, 200, "Sampling");
-}
-
 void infoScreen()
 {
-    backInfoBtn = Button(infoScr, backSettingsBtn, 30, 15, 14, 10, setButton_task);
+    backInfoBtn = Button(infoScr, NULL, 30, 15, 14, 10, [](lv_obj_t *, lv_event_t event)
+                         {
+        if (event == LV_EVENT_CLICKED) {
+            lv_disp_load_scr(Screens::mainScr->getScreen());
+        } }); // TODO copy was: backSettingsBtn
     backInfoLabel = lv_label_create(backInfoBtn, NULL);
     lv_label_set_text(backInfoLabel, LV_SYMBOL_LEFT);
 
@@ -157,7 +119,7 @@ void infoScreen()
 
 void samplingsettingsScreen()
 {
-    backSamplingSettingsBtn = Button(samplingSettingsScr, backSettingsBtn, 30, 15, 14, 10, sampling_settings_back_btn);
+    backSamplingSettingsBtn = Button(samplingSettingsScr, NULL, 30, 15, 14, 10, sampling_settings_back_btn); // TODO copy was: backSettingsBtn
     backSamplingSettingsLabel = lv_label_create(backSamplingSettingsBtn, NULL);
     lv_label_set_text(backSamplingSettingsLabel, LV_SYMBOL_LEFT);
 
@@ -269,7 +231,7 @@ void samplingsettingsScreen()
 
 void wifiScreen()
 {
-    cancelBtn = Button(wifiScr, backSettingsBtn, 30, 15, 14, 10, btn_cancel);
+    cancelBtn = Button(wifiScr, NULL, 30, 15, 14, 10, btn_cancel); // TODO copy was: backSettingsBtn
     cancelLabel = lv_label_create(cancelBtn, NULL);
     lv_label_set_text(cancelLabel, LV_SYMBOL_LEFT);
     lv_obj_add_style(cancelBtn, LV_OBJ_PART_MAIN, &Styles::transparentBackgroundStyle);

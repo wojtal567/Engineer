@@ -18,4 +18,5 @@ public:
     static lv_style_t font20Style;
     static lv_style_t font22Style;
     static lv_style_t whiteFontStyle;
+    static lv_style_t hugeFontStyle;
 };

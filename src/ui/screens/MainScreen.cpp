@@ -1,34 +1,38 @@
 #include "ui/screens/MainScreen.h"
 
+#include <Arduino.h>
+#include <Wire.h>
 #include <lvgl.h>
 
-#include "ui/widgets/Button.h"
-#include "ui/widgets/Label.h"
+#include "ui/Screens.h"
 #include "ui/Styles.h"
-
-#include <Wire.h>
-#include <Arduino.h>
 #include "ui/Symbols.h"
-lv_point_t MainScreen::dividingLinesPoints[][7] = {{{18, 205}, {18, 215}},
-                                                   {{65, 205}, {65, 215}},
-                                                   {{112, 205}, {112, 215}},
-                                                   {{159, 205}, {159, 215}},
-                                                   {{206, 205}, {206, 215}},
-                                                   {{253, 205}, {253, 215}},
-                                                   {{300, 205}, {300, 215}}};
+#include "ui/widgets/Button.h"
+#include "ui/widgets/Container.h"
+#include "ui/widgets/Label.h"
+
+lv_point_t MainScreen::dividingLinesPoints[][7] = {
+    {{18, 205}, {18, 215}},   {{65, 205}, {65, 215}},   {{112, 205}, {112, 215}}, {{159, 205}, {159, 215}},
+    {{206, 205}, {206, 215}}, {{253, 205}, {253, 215}}, {{300, 205}, {300, 215}}};
 
 lv_point_t MainScreen::mainLinePoints[] = {{18, 210}, {300, 210}};
 
-MainScreen::MainScreen()
-{
+static void unlockButton_task(lv_obj_t *obj, lv_event_t event) {
+    if (event == LV_EVENT_CLICKED) {
+        Serial.println("borze dopomusz dla mnie");
+        lv_disp_load_scr(Screens::settingsScr->getScreen());
+    }
+}
+
+MainScreen::MainScreen() {
     mainScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(mainScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
-    Button setButton = Button(mainScr, NULL, 16, 18, 32, 7, [](lv_obj_t *, lv_event_t event)
-                              {
+    Button setButton = Button(mainScr, NULL, 16, 18, 32, 7, [](lv_obj_t *, lv_event_t event) {
         if (event == LV_EVENT_CLICKED) {
-            // lv_disp_load_scr(Screens::settings);
-        } });
+            lv_disp_load_scr(Screens::settingsScr->getScreen());
+        }
+    });
 
     labelSetButton = lv_label_create(setButton, NULL);
     lv_label_set_text(labelSetButton, LV_SYMBOL_SETTINGS);
@@ -36,11 +40,11 @@ MainScreen::MainScreen()
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &Styles::borderlessStyle);
     lv_obj_add_style(setButton, LV_OBJ_PART_MAIN, &Styles::whiteFontStyle);
 
-    Button lockButton = Button(mainScr, setButton, 14, 18, 95, 7, [](lv_obj_t *, lv_event_t event)
-                               {
-                                if (event == LV_EVENT_CLICKED) {
-                            // lv_disp_load_scr(Screens::lock);
-                                } });
+    Button lockButton = Button(mainScr, setButton, 14, 18, 95, 7, [](lv_obj_t *, lv_event_t event) {
+        if (event == LV_EVENT_CLICKED) {
+            // lv_disp_load_scr(Screens::lock);
+        }
+    });
 
     labelLockButton = lv_label_create(lockButton, NULL);
     lv_obj_set_style_local_text_font(lockButton, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &monte16lock);
@@ -148,13 +152,10 @@ MainScreen::MainScreen()
     drawParticlesIndicator();
 }
 
-MainScreen::~MainScreen()
-{
+MainScreen::~MainScreen() {
     lv_obj_del(mainLine);
     mainLine = nullptr;
-
-    for (int i = 0; i < 7; i++)
-    {
+    for (int i = 0; i < 7; i++) {
         lv_obj_del(dividingLines[i]);
         dividingLines[i] = nullptr;
     }
@@ -181,18 +182,15 @@ MainScreen::~MainScreen()
     contAQIColorBar = nullptr;
     lv_obj_del(labelAQIColorBar);
     labelAQIColorBar = nullptr;
-    for (int i = 0; i < 6; i++)
-    {
+    for (int i = 0; i < 6; i++) {
         lv_obj_del(labelParticlesNumber[i]);
         labelParticlesNumber[i] = nullptr;
     }
-    for (int i = 0; i < 6; i++)
-    {
+    for (int i = 0; i < 6; i++) {
         lv_obj_del(contParticlesNumber[i]);
         contParticlesNumber[i] = nullptr;
     }
-    for (int i = 0; i < 7; i++)
-    {
+    for (int i = 0; i < 7; i++) {
         lv_obj_del(labelParticleSizeum[i]);
         labelParticleSizeum[i] = nullptr;
     }
@@ -206,10 +204,8 @@ MainScreen::~MainScreen()
     mainScr = nullptr;
 }
 // Draw a line-like thing
-void MainScreen::drawParticlesIndicator()
-{
-    for (int i = 0; i < 7; i++)
-    {
+void MainScreen::drawParticlesIndicator() {
+    for (int i = 0; i < 7; i++) {
         dividingLines[i] = lv_line_create(mainScr, NULL);
         lv_line_set_points(dividingLines[i], dividingLinesPoints[i], 2);
         lv_obj_add_style(dividingLines[i], LV_LINE_PART_MAIN, &Styles::lineStyle);
@@ -218,18 +214,17 @@ void MainScreen::drawParticlesIndicator()
         lv_label_set_text(labelParticleSizeum[i], particlesSize[i].c_str());
         lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &Styles::font12Style);
         lv_obj_add_style(labelParticleSizeum[i], LV_LABEL_PART_MAIN, &Styles::whiteFontStyle);
-        lv_obj_set_pos(labelParticleSizeum[i], labelParticleSizePosX[i], 190); // 12
+        lv_obj_set_pos(labelParticleSizeum[i], labelParticleSizePosX[i], 190);  // 12
     }
 
-    for (int j = 0; j < 6; j++)
-    {
+    for (int j = 0; j < 6; j++) {
         contParticlesNumber[j] = lv_cont_create(mainScr, NULL);
         lv_obj_add_style(contParticlesNumber[j], LV_OBJ_PART_MAIN, &Styles::containerStyle);
         lv_obj_set_style_local_border_opa(contParticlesNumber[j], LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_0);
         lv_obj_set_click(contParticlesNumber[j], false);
         lv_obj_set_size(contParticlesNumber[j], 47, 14);
         labelParticlesNumber[j] = lv_label_create(contParticlesNumber[j], NULL);
-        lv_obj_set_pos(contParticlesNumber[j], contParticleNumberPosX[j], 215); // 20
+        lv_obj_set_pos(contParticlesNumber[j], contParticleNumberPosX[j], 215);  // 20
         lv_label_set_align(labelParticlesNumber[j], LV_LABEL_ALIGN_CENTER);
         lv_obj_set_auto_realign(labelParticlesNumber[j], true);
         lv_label_set_text(labelParticlesNumber[j], "-");
@@ -243,17 +238,11 @@ void MainScreen::drawParticlesIndicator()
     lv_obj_add_style(mainLine, LV_LINE_PART_MAIN, &Styles::lineStyle);
 }
 
-_lv_obj_t *MainScreen::getScreen() const
-{
-    return mainScr;
-}
+_lv_obj_t *MainScreen::getScreen() const { return mainScr; }
 
-void MainScreen::setAqiStateNColor(float pm25Aqi)
-{
-    for (int i = 0; i < 6; i++)
-    {
-        if (i == 5 or pm25Aqi < aqiStandards[i])
-        {
+void MainScreen::setAqiStateNColor(float pm25Aqi) {
+    for (int i = 0; i < 6; i++) {
+        if (i == 5 or pm25Aqi < aqiStandards[i]) {
             lv_label_set_text(labelAQIColorBar, airQualityStates[i].c_str());
             lv_obj_set_style_local_bg_color(contAQIColorBar, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, airQualityColors[i]);
             return;
@@ -261,13 +250,10 @@ void MainScreen::setAqiStateNColor(float pm25Aqi)
     }
 }
 
-void MainScreen::updateSampleData(const float pm10, const float pm25, const float pm100,
-                                  const float particles03, const float particles05,
-                                  const float particles10, const float particles25,
-                                  const float particles50, const float particles100,
-                                  const float temp, const float humidity)
-{
-
+void MainScreen::updateSampleData(const float pm10, const float pm25, const float pm100, const float particles03,
+                                  const float particles05, const float particles10, const float particles25,
+                                  const float particles50, const float particles100, const float temp,
+                                  const float humidity) {
     char buffer[7];
 
     itoa(pm10, buffer, 10);
@@ -304,25 +290,13 @@ void MainScreen::updateSampleData(const float pm10, const float pm25, const floa
     lv_label_set_text(labelHumiValue, strcat(humidityBuffer, "%"));
 }
 
-void MainScreen::setSampleSaveError(bool error)
-{
-    lv_obj_set_style_local_bg_color(led, LV_LED_PART_MAIN, LV_STATE_DEFAULT,
-                                    error ? LV_COLOR_RED : LV_COLOR_GREEN);
-    lv_obj_set_style_local_shadow_color(led, LV_LED_PART_MAIN, LV_STATE_DEFAULT,
-                                        error ? LV_COLOR_RED : LV_COLOR_GREEN);
+void MainScreen::setSampleSaveError(bool error) {
+    lv_obj_set_style_local_bg_color(led, LV_LED_PART_MAIN, LV_STATE_DEFAULT, error ? LV_COLOR_RED : LV_COLOR_GREEN);
+    lv_obj_set_style_local_shadow_color(led, LV_LED_PART_MAIN, LV_STATE_DEFAULT, error ? LV_COLOR_RED : LV_COLOR_GREEN);
 }
 
-void MainScreen::updateDateTime(const String &dateTime)
-{
-    lv_label_set_text(dateAndTime, dateTime.c_str());
-}
+void MainScreen::updateDateTime(const String &dateTime) { lv_label_set_text(dateAndTime, dateTime.c_str()); }
 
-void MainScreen::setWifiWarning(const bool isWarning)
-{
-    lv_obj_set_hidden(wifiStatusWarning, !isWarning);
-}
+void MainScreen::setWifiWarning(const bool isWarning) { lv_obj_set_hidden(wifiStatusWarning, !isWarning); }
 
-void MainScreen::setSdCardWarning(const bool isWarning)
-{
-    lv_obj_set_hidden(sdStatusWarning, isWarning);
-}
+void MainScreen::setSdCardWarning(const bool isWarning) { lv_obj_set_hidden(sdStatusWarning, isWarning); }

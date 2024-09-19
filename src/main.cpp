@@ -1,40 +1,40 @@
-#include <Arduino.h>
-#include <WiFi.h>
-#include <rtc.hpp>
-#include <HTTPClient.h>
-#include <time.h>
-#include <Adafruit_GFX.h>
 #include <Adafruit_BusIO_Register.h>
+#include <Adafruit_GFX.h>
+#include <Arduino.h>
+#include <HTTPClient.h>
+#include <WiFi.h>
+#include <time.h>
 
 #include <LVGLInits.hpp>
+#include <rtc.hpp>
+
 #include "ui/Screens.h"
 #include "ui/Styles.h"
+
+// declare screens
+namespace Screens {
+MainScreen *mainScr = nullptr;
+SettingsScreen *settingsScr = nullptr;
+}  // namespace Screens
+
 // ! --------------------------------------------REST WebServer config
-void setAppIp()
-{
+void setAppIp() {
     String postBody = server.arg("plain");
     Serial.println(postBody);
     DynamicJsonDocument doc(512);
     DeserializationError error = deserializeJson(doc, postBody);
-    if (error)
-    {
+    if (error) {
         Serial.print(F(error.c_str()));
 
-        server.send(400, F("text/html"),
-                    "Error while parsing json body! <br>" + (String)error.c_str());
-    }
-    else
-    {
+        server.send(400, F("text/html"), "Error while parsing json body! <br>" + (String)error.c_str());
+    } else {
         JsonObject postObj = doc.as<JsonObject>();
 
         Serial.print(F("HTTP Method: "));
         Serial.println(server.method());
 
-        if (server.method() == HTTP_POST)
-        {
-            if (postObj.containsKey("ip"))
-            {
-
+        if (server.method() == HTTP_POST) {
+            if (postObj.containsKey("ip")) {
                 appIpAddress = postObj["ip"].as<String>();
 
                 DynamicJsonDocument doc(512);
@@ -44,9 +44,7 @@ void setAppIp()
                 lv_task_set_prio(getAppLastRecordAndSynchronize, LV_TASK_PRIO_MID);
 
                 server.send(201, F("application/json"), buf);
-            }
-            else
-            {
+            } else {
                 DynamicJsonDocument doc(512);
                 doc["status"] = "OK";
                 doc["message"] = F("No data found or incorrect!");
@@ -60,34 +58,30 @@ void setAppIp()
     }
 }
 
-void restServerRouting()
-{
-    server.on("/", HTTP_GET, []()
-              { server.send(200, F("text/html"),
-                            F("You have entered the wrong neighbourhood")); });
+void restServerRouting() {
+    server.on("/", HTTP_GET, []() { server.send(200, F("text/html"), F("You have entered the wrong neighbourhood")); });
     server.on(F("/setAppIp"), HTTP_POST, setAppIp);
 }
 
-void handleNotFound()
-{
-    String message = "File Not Found \n\n" + (String) "URI: " + server.uri() + "\n Method: " + (server.method() == HTTP_GET) ? "GET" : "POST" + (String) "\n Arguments: " + server.args() + "\n";
+void handleNotFound() {
+    String message =
+        "File Not Found \n\n" + (String) "URI: " + server.uri() + "\n Method: " + (server.method() == HTTP_GET)
+            ? "GET"
+            : "POST" + (String) "\n Arguments: " + server.args() + "\n";
 
-    for (uint8_t i = 0; i < server.args(); i++)
-        message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    for (uint8_t i = 0; i < server.args(); i++) message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
 
     server.send(404, "text/plain", message);
 }
 
-void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
-{
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
     uint16_t c;
 
-    tft.startWrite();                                                                            /* Start new TFT transaction */
-    tft.setAddrWindow(area->x1, area->y1, (area->x2 - area->x1 + 1), (area->y2 - area->y1 + 1)); /* set the working window */
-    for (int y = area->y1; y <= area->y2; y++)
-    {
-        for (int x = area->x1; x <= area->x2; x++)
-        {
+    tft.startWrite(); /* Start new TFT transaction */
+    tft.setAddrWindow(area->x1, area->y1, (area->x2 - area->x1 + 1),
+                      (area->y2 - area->y1 + 1)); /* set the working window */
+    for (int y = area->y1; y <= area->y2; y++) {
+        for (int x = area->x1; x <= area->x2; x++) {
             c = color_p->full;
             tft.writeColor(c, 1);
             color_p++;
@@ -97,28 +91,22 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
     lv_disp_flush_ready(disp); /* tell lvgl that flushing is done */
 }
 
-bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
-{
+bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
     uint16_t touchX, touchY;
 
     bool touched = tft.getTouch(&touchX, &touchY, 600);
 
-    if (!touched)
-    {
+    if (!touched) {
         return false;
     }
 
-    if (touchX > SCREEN_WIDTH || touchY > SCREEN_HEIGHT)
-    {
+    if (touchX > SCREEN_WIDTH || touchY > SCREEN_HEIGHT) {
         // Serial.println("Y or y outside of expected parameters..");
         // Serial.print("y:");
         // Serial.print(touchX);
         // Serial.print(" x:");
         // Serial.print(touchY);
-    }
-    else
-    {
-
+    } else {
         data->state = touched ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 
         /*Save the state and save the pressed coordinate*/
@@ -130,7 +118,7 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 
         // Serial.print("Data x");
         // Serial.println(touchX);
-        //
+
         // Serial.print("Data y");
         // Serial.println(touchY);
     }
@@ -138,8 +126,7 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 
-void setup()
-{
+void setup() {
     pinMode(PinConfig::fanPin, OUTPUT);
     digitalWrite(PinConfig::fanPin, LOW);
     sqlite3_initialize();
@@ -173,7 +160,10 @@ void setup()
     lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
 
     // Set theme
-    lv_theme_t *th = lv_theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY, LV_THEME_DEFAULT_FLAG, LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
+    lv_theme_t *th =
+        lv_theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY, LV_THEME_DEFAULT_FLAG,
+                               LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL,
+                               LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
     lv_theme_set_act(th);
 
     // Styles initialization function
@@ -181,9 +171,8 @@ void setup()
     stylesInits();
 
     Screens::mainScr = new MainScreen();
+    Screens::settingsScr = new SettingsScreen();
 
-    settingsScr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(settingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     infoScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(infoScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     timeSettingsScr = lv_cont_create(NULL, NULL);
@@ -198,7 +187,6 @@ void setup()
     // Screens initialization function
     wifiScreen();
     lockScreen();
-    settingsScreen();
     infoScreen();
     timesettingsScreen();
     samplingsettingsScreen();
@@ -222,43 +210,42 @@ void setup()
     set_spinbox_digit_format(measureAvPeriod, MIN_RANGE, MAX_RANGE, 0);
     set_spinbox_digit_format(turnFanOnTime, MIN_RANGE, MAX_RANGE, 0);
 
-    getSample = lv_task_create(getSampleFunc, (config.timeBetweenSavingSamples - (config.numberOfSamples - 1) * config.measurePeriod), LV_TASK_PRIO_HIGH, NULL);
-    turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_HIGHEST, NULL);
-    inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_HIGH, NULL);
+    getSample = lv_task_create(getSampleFunc,
+                               (config.timeBetweenSavingSamples - (config.numberOfSamples - 1) * config.measurePeriod),
+                               LV_TASK_PRIO_MID, NULL);
+    turnFanOn =
+        lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_MID, NULL);
+    inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_MID, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, fetchPeriod);
     lv_task_set_prio(getAppLastRecordAndSynchronize, LV_TASK_PRIO_MID);
     lv_task_handler();
-    if (config.ssid != "")
-    {
+    if (config.ssid != "") {
         mySDCard.printConfig(configFilePath);
         Serial.print(getMainTimestamp(Rtc).c_str());
         WiFi.begin(config.ssid.c_str(), config.password.c_str());
         volatile int attempts = 0;
-        while (WiFi.status() != WL_CONNECTED and attempts != 20)
-        {
+        while (WiFi.status() != WL_CONNECTED and attempts != 20) {
             delay(500);
             Serial.print(".");
             attempts++;
         }
-        if (WiFi.status() == WL_CONNECTED)
-        {
-            Serial.println("setup -> connected to Wi-Fi provided by data from configuration file! IP: " + WiFi.localIP().toString());
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.println("setup -> connected to Wi-Fi provided by data from configuration file! IP: " +
+                           WiFi.localIP().toString());
             config_time();
             restServerRouting();
             server.onNotFound(handleNotFound);
             server.begin();
-        }
-        else if (WiFi.status() == WL_DISCONNECTED)
+        } else if (WiFi.status() == WL_DISCONNECTED)
             Serial.println("setup -> can't connect to Wi-Fi - probably no data or corrupted or wrong!");
     }
     display_current_config();
     delay(500);
 }
 
-void loop()
-{
+void loop() {
     lv_task_handler(); /* let the GUI do its work */
     server.handleClient();
     delay(5);

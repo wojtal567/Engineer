@@ -1,9 +1,10 @@
+#pragma once
+
+#include <NTPClient.h>
 #include <RtcDS1307.h>
 #include <Wire.h>
-#include <NTPClient.h>
 
-void configTime(RtcDS1307<TwoWire> &Rtc, NTPClient &ntp)
-{
+void configTime(RtcDS1307<TwoWire> &Rtc, NTPClient &ntp) {
     Rtc.Begin();
     time_t rawtime = ntp.getEpochTime();
     struct tm *ti;
@@ -26,15 +27,13 @@ void configTime(RtcDS1307<TwoWire> &Rtc, NTPClient &ntp)
     Rtc.SetIsRunning(true);
 }
 
-void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password)
-{
+void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password) {
     char _ssid[24] = "-----------------------";
     char _password[24] = "-----------------------";
     Rtc.SetMemory(3, (const uint8_t *)_ssid, sizeof(_ssid));
     Rtc.SetMemory(28, (const uint8_t *)_password, sizeof(_password));
 
-    for (int i = 0; i < 24; i++)
-    {
+    for (int i = 0; i < 24; i++) {
         _ssid[i] = ssid[i];
         _password[i] = password[i];
     }
@@ -44,22 +43,19 @@ void saveWiFiToRtcMemory(RtcDS1307<TwoWire> &Rtc, String ssid, String password)
     Rtc.SetMemory(28, (const uint8_t *)_password, sizeof(_password) - 1);
 }
 
-String getCharArrrayFromRTC(RtcDS1307<TwoWire> &Rtc, int address)
-{
+String getCharArrrayFromRTC(RtcDS1307<TwoWire> &Rtc, int address) {
     uint8_t buff[24];
     uint8_t gotten = Rtc.GetMemory(address, buff, sizeof(buff));
     String result = "";
     for (uint8_t ch = 0; ch < gotten; ch++)
-        if ((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && (char)buff[ch] != '\n')
-            result.concat((char)buff[ch]);
+        if ((char)buff[ch] != ' ' && (char)buff[ch] != '\0' && (char)buff[ch] != '\n') result.concat((char)buff[ch]);
 
     result = result.substring(0, result.indexOf("-"));
     Serial.println(result.c_str());
     return result;
 }
 
-String getMainTimestamp(RtcDS1307<TwoWire> &Rtc)
-{
+String getMainTimestamp(RtcDS1307<TwoWire> &Rtc) {
     RtcDateTime timestamp = Rtc.GetDateTime();
     String time = (String)timestamp.Year() + "-";
 
@@ -91,28 +87,16 @@ String getMainTimestamp(RtcDS1307<TwoWire> &Rtc)
     return time;
 }
 
-String getDate(RtcDS1307<TwoWire> &Rtc)
-{
+String getDate(RtcDS1307<TwoWire> &Rtc) {
     RtcDateTime dt = Rtc.GetDateTime();
     char datestring[20];
-    snprintf_P(datestring,
-               20,
-               PSTR("%02u.%02u.%04u"),
-               dt.Day(),
-               dt.Month(),
-               dt.Year());
+    snprintf_P(datestring, 20, PSTR("%02u.%02u.%04u"), dt.Day(), dt.Month(), dt.Year());
     return String(datestring);
 }
 
-String getTime(RtcDS1307<TwoWire> &Rtc)
-{
+String getTime(RtcDS1307<TwoWire> &Rtc) {
     RtcDateTime dt = Rtc.GetDateTime();
     char timestring[20];
-    snprintf_P(timestring,
-               20,
-               PSTR("%02u:%02u:%02u"),
-               dt.Hour(),
-               dt.Minute(),
-               dt.Second());
+    snprintf_P(timestring, 20, PSTR("%02u:%02u:%02u"), dt.Hour(), dt.Minute(), dt.Second());
     return String(timestring);
 }

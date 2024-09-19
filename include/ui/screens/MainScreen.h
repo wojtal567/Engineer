@@ -1,29 +1,24 @@
 #pragma once
 
-#include <lvgl.h>
 #include <Wire.h>
+#include <lvgl.h>
 
-#include "ui/widgets/Container.h"
-
-class MainScreen : public lv_obj_t
-{
-public:
+class MainScreen {
+   public:
     MainScreen();
     ~MainScreen();
     lv_obj_t *getScreen() const;
 
     void setAqiStateNColor(float pm25Aqi);
-    void updateSampleData(const float pm10, const float pm25, const float pm100,
-                          const float particles03, const float particles05,
-                          const float particles10, const float particles25,
-                          const float particles50, const float particles100,
-                          const float temp, const float humidity);
+    void updateSampleData(const float pm10, const float pm25, const float pm100, const float particles03,
+                          const float particles05, const float particles10, const float particles25,
+                          const float particles50, const float particles100, const float temp, const float humidity);
     void setSampleSaveError(const bool error);
     void updateDateTime(const String &dateTime);
     void setWifiWarning(const bool isWarning);
     void setSdCardWarning(const bool isWarning);
 
-private:
+   private:
     void drawParticlesIndicator();
 
     lv_obj_t *mainScr;
@@ -63,6 +58,6 @@ private:
     const float aqiStandards[5] = {21, 61, 101, 141, 201};
     const String airQualityStates[6] = {"Excellent", "Good", "Moderate", "Unhealthy", "Bad", "Hazardous"};
     // An array of colors used depending on actual pm2.5 value
-    const lv_color_t airQualityColors[6] = {LV_COLOR_GREEN, LV_COLOR_GREEN, LV_COLOR_YELLOW,
-                                            LV_COLOR_ORANGE, LV_COLOR_RED, LV_COLOR_RED};
+    const lv_color_t airQualityColors[6] = {LV_COLOR_GREEN,  LV_COLOR_GREEN, LV_COLOR_YELLOW,
+                                            LV_COLOR_ORANGE, LV_COLOR_RED,   LV_COLOR_RED};
 };
