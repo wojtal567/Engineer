@@ -2,16 +2,15 @@
 
 #include <lvgl.h>
 
-class Styles
-{
-public:
+class Styles {
+   public:
     static void initStyles();
 
     static lv_style_t borderlessStyle;
     static lv_style_t containerStyle;
     static lv_style_t transparentBackgroundStyle;
-
     static lv_style_t lineStyle;
+    static lv_style_t whiteButtonStyle;
 
     // Different font sizes using lvgl styles
     static lv_style_t font12Style;

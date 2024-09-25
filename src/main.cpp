@@ -77,24 +77,24 @@ void handleNotFound() {
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
     uint16_t c;
 
-    tft.startWrite(); /* Start new TFT transaction */
-    tft.setAddrWindow(area->x1, area->y1, (area->x2 - area->x1 + 1),
-                      (area->y2 - area->y1 + 1)); /* set the working window */
+    Peripherals::tft.startWrite(); /* Start new TFT transaction */
+    Peripherals::tft.setAddrWindow(area->x1, area->y1, (area->x2 - area->x1 + 1),
+                                   (area->y2 - area->y1 + 1)); /* set the working window */
     for (int y = area->y1; y <= area->y2; y++) {
         for (int x = area->x1; x <= area->x2; x++) {
             c = color_p->full;
-            tft.writeColor(c, 1);
+            Peripherals::tft.writeColor(c, 1);
             color_p++;
         }
     }
-    tft.endWrite();            /* terminate TFT transaction */
-    lv_disp_flush_ready(disp); /* tell lvgl that flushing is done */
+    Peripherals::tft.endWrite(); /* terminate TFT transaction */
+    lv_disp_flush_ready(disp);   /* tell lvgl that flushing is done */
 }
 
 bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
     uint16_t touchX, touchY;
 
-    bool touched = tft.getTouch(&touchX, &touchY, 600);
+    bool touched = Peripherals::tft.getTouch(&touchX, &touchY, 600);
 
     if (!touched) {
         return false;
@@ -133,14 +133,13 @@ void setup() {
     // Serial debug
     Serial.begin(115200);
     Serial2.begin(9600, SERIAL_8N1, 16, 17);
-    // PMS sensor initialization
-    pmsSensor = new PMS5003(&Serial2, &Serial);
+
     lv_init();
-    tft.begin(); /* TFT init */
-    tft.setRotation(3);
+    Peripherals::tft.begin(); /* TFT init */
+    Peripherals::tft.setRotation(3);
 
     uint16_t calData[5] = {275, 3620, 264, 3532, 1};
-    tft.setTouch(calData);
+    Peripherals::tft.setTouch(calData);
 
     lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
     // Initialize the display
@@ -172,20 +171,17 @@ void setup() {
 
     Screens::mainScr = new MainScreen();
     Screens::settingsScr = new SettingsScreen();
-
     infoScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(infoScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     timeSettingsScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(timeSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    wifiScr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(wifiScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+
     lockScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(lockScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     samplingSettingsScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(samplingSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
     // Screens initialization function
-    wifiScreen();
     lockScreen();
     infoScreen();
     timesettingsScreen();
@@ -193,38 +189,39 @@ void setup() {
 
     lv_disp_load_scr(Screens::mainScr->getScreen());
 
-    mySDCard.loadConfig(config, configFilePath);
+    Peripherals::mySDCard.loadConfig(Global::config, Global::configFilePath);
     delay(1000);
 
-    lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(config.lcdLockTime));
+    lv_dropdown_set_selected(lockScreenDDlist, getDDListIndexBasedOnLcdLockTime(Global::config.lcdLockTime));
 
     date = lv_task_create(dateTimeFunc, 800, LV_TASK_PRIO_MID, NULL);
     status = lv_task_create(statusFunc, 5000, LV_TASK_PRIO_MID, NULL);
-    lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSamples / 60000) / 60));
-    lv_spinbox_set_value(measurePeriodsecond, (config.timeBetweenSavingSamples / 1000) % 60);
-    lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSamples / 60000) % 60));
-    lv_spinbox_set_value(measureAvPeriod, (config.measurePeriod / 1000));
-    lv_spinbox_set_value(measureNumber, config.numberOfSamples);
-    lv_spinbox_set_value(turnFanOnTime, (config.turnFanTime / 1000));
+    lv_spinbox_set_value(measurePeriodHour, ((Global::config.timeBetweenSavingSamples / 60000) / 60));
+    lv_spinbox_set_value(measurePeriodsecond, (Global::config.timeBetweenSavingSamples / 1000) % 60);
+    lv_spinbox_set_value(measurePeriodMinute, ((Global::config.timeBetweenSavingSamples / 60000) % 60));
+    lv_spinbox_set_value(measureAvPeriod, (Global::config.measurePeriod / 1000));
+    lv_spinbox_set_value(measureNumber, Global::config.numberOfSamples);
+    lv_spinbox_set_value(turnFanOnTime, (Global::config.turnFanTime / 1000));
     set_spinbox_digit_format(measureNumber, MIN_RANGE, MAX_RANGE, 0);
     set_spinbox_digit_format(measureAvPeriod, MIN_RANGE, MAX_RANGE, 0);
     set_spinbox_digit_format(turnFanOnTime, MIN_RANGE, MAX_RANGE, 0);
 
-    getSample = lv_task_create(getSampleFunc,
-                               (config.timeBetweenSavingSamples - (config.numberOfSamples - 1) * config.measurePeriod),
+    getSample = lv_task_create(
+        getSampleFunc,
+        (Global::config.timeBetweenSavingSamples - (Global::config.numberOfSamples - 1) * Global::config.measurePeriod),
+        LV_TASK_PRIO_MID, NULL);
+    turnFanOn = lv_task_create(turnFanOnFunc, Global::config.timeBetweenSavingSamples - Global::config.turnFanTime,
                                LV_TASK_PRIO_MID, NULL);
-    turnFanOn =
-        lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime, LV_TASK_PRIO_MID, NULL);
     inactiveTime = lv_task_create(inactive_screen, 1, LV_TASK_PRIO_MID, NULL);
     getAppLastRecordAndSynchronize = lv_task_create_basic();
     lv_task_set_cb(getAppLastRecordAndSynchronize, fetchLastRecordAndSynchronize);
     lv_task_set_period(getAppLastRecordAndSynchronize, fetchPeriod);
     lv_task_set_prio(getAppLastRecordAndSynchronize, LV_TASK_PRIO_MID);
     lv_task_handler();
-    if (config.ssid != "") {
-        mySDCard.printConfig(configFilePath);
-        Serial.print(getMainTimestamp(Rtc).c_str());
-        WiFi.begin(config.ssid.c_str(), config.password.c_str());
+    if (Global::config.ssid != "") {
+        Peripherals::mySDCard.printConfig(Global::configFilePath);
+        Serial.print(getMainTimestamp(Peripherals::Rtc).c_str());
+        WiFi.begin(Global::config.ssid.c_str(), Global::config.password.c_str());
         volatile int attempts = 0;
         while (WiFi.status() != WL_CONNECTED and attempts != 20) {
             delay(500);

@@ -1,24 +1,18 @@
 #pragma once
 
-#include <../configs./pin_conf.h>
 #include <NTPClient.h>
 #include <RtcDS1307.h>
 #include <TFT_eSPI.h>
-#include <WEMOS_SHT3X.h>
 #include <WebServer.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
 #include <lvgl.h>
 
-#include <MySD.hpp>
 #include <PMS5003.hpp>
 
+#include "globals/Global.h"
+// TODO separate this file for something namespace or smth like that
 // ! CONFIG ============================================|
-std::string configFilePath = "/settings.json";
-
-Config config = {"", "", 60000, 3600000, 30000, 5, 0, 30000};
-
-int ntpTimeOffset = 3600;  // poland, winter - 3600, summer (DST) - 7200
 
 #define LVGL_TICK_PERIOD 60
 #define SCREEN_WIDTH 320
@@ -28,19 +22,10 @@ int ntpTimeOffset = 3600;  // poland, winter - 3600, summer (DST) - 7200
 #define MAX_RANGE 999
 
 // RTC, PMS5003 and SHT30 objects declaration
-RtcDS1307<TwoWire> Rtc(Wire);
-PMS5003 *pmsSensor;
-SHT3X sht30(0x44);  // TODO move address for some config file
-
-std::map<std::string, float> data;
-const char *labels[15] = {"framelen",       "pm10_standard",  "pm25_standard",   "pm100_standard", "pm10_env",
-                          "pm25_env",       "pm100_env",      "particles_03um",  "particles_05um", "particles_10um",
-                          "particles_25um", "particles_50um", "particles_100um", "unused",         "checksum"};
-
+// WiFi wifi;
 // NTPClient declarations
-static const char ntpServerName[] = "europe.pool.ntp.org";
 WiFiUDP ntpUDP;
-NTPClient dateTimeClient(ntpUDP, ntpServerName, ntpTimeOffset);
+NTPClient dateTimeClient(ntpUDP, Global::ntpServerName, Global::ntpTimeOffset);
 
 // Webserver
 WebServer server(80);
@@ -48,13 +33,10 @@ String appIpAddress = "";
 int fetchPeriod = 30000;
 
 // TFT display using TFT_eSPI and lvgl library
-TFT_eSPI tft = TFT_eSPI();
 static lv_disp_buf_t disp_buf;
 static lv_color_t buf[LV_HOR_RES_MAX * 10];
 
 // SD Card and sqlite database objects declaration
-MySD mySDCard(PinConfig::sdCardPin);
-SQLiteDb sampleDB("/sd/database.db", "/database.db", "samples");
 
 String lastSampleTimestamp;
 
@@ -69,22 +51,7 @@ float temp, humi, pm25Aqi;
 static lv_style_t font16Style;
 
 static lv_style_t warningStyle;
-static lv_style_t whiteButtonStyle;
 
-// ? --------------------------------------------------wifi gui
-lv_obj_t *wifiLabelAtBar;
-lv_obj_t *wifiScr;
-lv_obj_t *keyboard;
-lv_obj_t *ssidTA;
-lv_obj_t *pwdTA;
-lv_obj_t *ssidLabel;
-lv_obj_t *pwdLabel;
-lv_obj_t *applyBtn;
-lv_obj_t *applyLabel;
-lv_obj_t *cancelBtn;
-lv_obj_t *cancelLabel;
-lv_obj_t *showHideBtn;
-lv_obj_t *showHideBtnLabel;
 // ? -------------------------------------------------- info gui
 lv_obj_t *infoScr;
 lv_obj_t *backInfoBtn;

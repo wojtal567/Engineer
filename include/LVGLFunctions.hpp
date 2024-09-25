@@ -3,6 +3,7 @@
 
 #include <GlobalVariables.hpp>
 
+#include "globals/Peripherals.h"
 #include "rtc.hpp"
 #include "ui/Screens.h"
 #include "ui/widgets/Button.h"
@@ -63,23 +64,24 @@ int getDDListIndexBasedOnLcdLockTime(int lcdLockTime) {
 }
 
 void display_current_config() {
-    String current_config = (String) "SSID: " + config.ssid.c_str();
-    current_config += (String) "\nNumber of samples: " + (String)config.numberOfSamples;
-    if (config.lcdLockTime == -1) current_config += "\nLCD lock time: Never";
-    if (config.lcdLockTime == 30000) current_config += "\nLCD lock time: 30s";
-    if (config.lcdLockTime > 30000) current_config += "\nLCD lock time: " + (String)(config.lcdLockTime / 60000) + "m";
-    current_config += (String) "\nFan running time before measure: " + config.turnFanTime / 1000 + "s\n";
+    String current_config = (String) "SSID: " + Global::config.ssid.c_str();
+    current_config += (String) "\nNumber of samples: " + (String)Global::config.numberOfSamples;
+    if (Global::config.lcdLockTime == -1) current_config += "\nLCD lock time: Never";
+    if (Global::config.lcdLockTime == 30000) current_config += "\nLCD lock time: 30s";
+    if (Global::config.lcdLockTime > 30000)
+        current_config += "\nLCD lock time: " + (String)(Global::config.lcdLockTime / 60000) + "m";
+    current_config += (String) "\nFan running time before measure: " + Global::config.turnFanTime / 1000 + "s\n";
     current_config +=
-        (String) "Time between measurments: " + config.measurePeriod / 1000 + "s\nMeasurements saving time: ";
-    if (config.timeBetweenSavingSamples >= 3600000)
-        current_config += config.timeBetweenSavingSamples / 60000 / 60 + (String) "h" +
-                          (config.timeBetweenSavingSamples / 60000) % 60 + (String) "m" +
-                          (config.timeBetweenSavingSamples / 1000) % 60 + "s";
-    else if (config.timeBetweenSavingSamples >= 60000) {
-        current_config += (config.timeBetweenSavingSamples / 60000) % 60 + (String) "m " +
-                          (config.timeBetweenSavingSamples / 1000) % 60 + "s";
+        (String) "Time between measurments: " + Global::config.measurePeriod / 1000 + "s\nMeasurements saving time: ";
+    if (Global::config.timeBetweenSavingSamples >= 3600000)
+        current_config += Global::config.timeBetweenSavingSamples / 60000 / 60 + (String) "h" +
+                          (Global::config.timeBetweenSavingSamples / 60000) % 60 + (String) "m" +
+                          (Global::config.timeBetweenSavingSamples / 1000) % 60 + "s";
+    else if (Global::config.timeBetweenSavingSamples >= 60000) {
+        current_config += (Global::config.timeBetweenSavingSamples / 60000) % 60 + (String) "m " +
+                          (Global::config.timeBetweenSavingSamples / 1000) % 60 + "s";
     } else {
-        current_config += (config.timeBetweenSavingSamples / 1000) + (String) "s";
+        current_config += (Global::config.timeBetweenSavingSamples / 1000) + (String) "s";
     }
     lv_obj_set_style_local_text_font(configLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
     lv_label_set_text(configLabel, current_config.c_str());
@@ -94,7 +96,7 @@ void turnFanOnFunc(lv_task_t *task) {
 void config_time() {
     if (WiFi.status() == WL_CONNECTED) {
         for (int i = 0; i < 500; i++) dateTimeClient.update();
-        configTime(Rtc, dateTimeClient);
+        configTime(Peripherals::Rtc, dateTimeClient);
         Serial.println("Succesfully updated time on RTC.");
     }
 }
@@ -102,7 +104,7 @@ void config_time() {
 bool isLastSampleSaved() {
     StaticJsonDocument<600> docA;
     JsonArray lastRecordToCheck = docA.to<JsonArray>();
-    mySDCard.getLastRecord(&sampleDB, &Serial, &lastRecordToCheck);
+    Peripherals::mySDCard.getLastRecord(&Peripherals::sampleDB, &Serial, &lastRecordToCheck);
     Serial.print("Global: ");
     Serial.print(lastSampleTimestamp);
     Serial.print(" Baza: ");
@@ -118,51 +120,54 @@ bool isLastSampleSaved() {
 
 // Get single sample and set text
 void getSampleFunc(lv_task_t *task) {
-    sht30.get();
-    if (config.currentSampleNumber != 0 && config.currentSampleNumber < config.numberOfSamples) {
-        if (pmsSensor->readData()) {
+    Peripherals::sht30.get();
+    if (Global::config.currentSampleNumber != 0 &&
+        Global::config.currentSampleNumber < Global::config.numberOfSamples) {
+        if (Peripherals::pmsSensor->readData()) {
             Serial.println("Succesfully read data from dust sensor.");
-            std::map<std::string, float> tmpData = pmsSensor->returnData();
-            pmsSensor->dumpSamples();
+            std::map<std::string, float> tmpData = Peripherals::pmsSensor->returnData();
+            Peripherals::pmsSensor->dumpSamples();
             for (uint8_t i = 0; i < 15; i++) {
-                data[labels[i]] += tmpData[labels[i]];
+                Global::data[Global::labels[i]] += tmpData[Global::labels[i]];
             }
-            config.currentSampleNumber++;
-            temp += sht30.cTemp;
-            humi += sht30.humidity;
+            Global::config.currentSampleNumber++;
+            temp += Peripherals::sht30.cTemp;
+            humi += Peripherals::sht30.humidity;
         }
     }
-    if (config.currentSampleNumber == 0) {
-        lv_task_set_period(getSample, config.measurePeriod);
-        if (pmsSensor->readData()) {
+    if (Global::config.currentSampleNumber == 0) {
+        lv_task_set_period(getSample, Global::config.measurePeriod);
+        if (Peripherals::pmsSensor->readData()) {
             Serial.println("Succesfully read data from dust sensor.");
-            std::map<std::string, float> tmpData = pmsSensor->returnData();
-            pmsSensor->dumpSamples();
-            data = tmpData;
-            config.currentSampleNumber++;
-            temp = sht30.cTemp;
-            humi = sht30.humidity;
+            std::map<std::string, float> tmpData = Peripherals::pmsSensor->returnData();
+            Peripherals::pmsSensor->dumpSamples();
+            Global::data = tmpData;
+            Global::config.currentSampleNumber++;
+            temp = Peripherals::sht30.cTemp;
+            humi = Peripherals::sht30.humidity;
         }
     }
-    if (config.currentSampleNumber == config.numberOfSamples) {
-        for (uint8_t i = 0; i < 15; i++) data[labels[i]] = data[labels[i]] / config.numberOfSamples;
-        config.currentSampleNumber = 0;
-        temp = temp / config.numberOfSamples;
-        humi = humi / config.numberOfSamples;
-        lv_task_set_period(getSample,
-                           (config.timeBetweenSavingSamples - (config.numberOfSamples - 1) * config.measurePeriod));
+    if (Global::config.currentSampleNumber == Global::config.numberOfSamples) {
+        for (uint8_t i = 0; i < 15; i++)
+            Global::data[Global::labels[i]] = Global::data[Global::labels[i]] / Global::config.numberOfSamples;
+        Global::config.currentSampleNumber = 0;
+        temp = temp / Global::config.numberOfSamples;
+        humi = humi / Global::config.numberOfSamples;
+        lv_task_set_period(getSample, (Global::config.timeBetweenSavingSamples -
+                                       (Global::config.numberOfSamples - 1) * Global::config.measurePeriod));
 
-        pm25Aqi = data["pm25_standard"];
+        pm25Aqi = Global::data["pm25_standard"];
 
         Screens::mainScr->setAqiStateNColor(pm25Aqi);
-        Screens::mainScr->updateSampleData(data["pm10_standard"], data["pm25_standard"], data["pm100_standard"],
-                                           data["particles_03um"], data["particles_05um"], data["particles_10um"],
-                                           data["particles_25um"], data["particles_50um"], data["particles_100um"],
-                                           temp, humi);
-        if (Rtc.GetIsRunning()) {
-            lastSampleTimestamp = getMainTimestamp(Rtc);
+        Screens::mainScr->updateSampleData(Global::data["pm10_standard"], Global::data["pm25_standard"],
+                                           Global::data["pm100_standard"], Global::data["particles_03um"],
+                                           Global::data["particles_05um"], Global::data["particles_10um"],
+                                           Global::data["particles_25um"], Global::data["particles_50um"],
+                                           Global::data["particles_100um"], temp, humi);
+        if (Peripherals::Rtc.GetIsRunning()) {
+            lastSampleTimestamp = getMainTimestamp(Peripherals::Rtc);
             Serial.print("lastSampleTimestamp przed wrzuceniem do bazy: " + lastSampleTimestamp);
-            mySDCard.save(data, temp, humi, lastSampleTimestamp, &sampleDB, &Serial);
+            Peripherals::mySDCard.save(Global::data, temp, humi, lastSampleTimestamp, &Peripherals::sampleDB, &Serial);
         } else {
             Serial.println("RTC is not running, not saving");
         }
@@ -182,75 +187,10 @@ void getSampleFunc(lv_task_t *task) {
     }
 }
 
-static void kb_cb(lv_obj_t *kb, lv_event_t event) {
-    if (event != LV_EVENT_CANCEL) {
-        lv_keyboard_def_event_cb(kb, event);
-    }
-}
-
-static void ta_event_cb(lv_obj_t *ta, lv_event_t event) {
-    if (event == LV_EVENT_CLICKED) {
-        if (ta == ssidTA) {
-            lv_textarea_set_cursor_hidden(ssidTA, false);
-            lv_textarea_set_cursor_hidden(pwdTA, true);
-        }
-        if (ta == pwdTA) {
-            lv_textarea_set_cursor_hidden(pwdTA, false);
-            lv_textarea_set_cursor_hidden(ssidTA, true);
-        }
-
-        if (keyboard == NULL) {
-            keyboard = lv_keyboard_create(lv_scr_act(), NULL);
-            lv_obj_set_size(keyboard, LV_HOR_RES, LV_VER_RES / 2);
-            lv_obj_set_event_cb(keyboard, kb_cb);
-            lv_keyboard_set_textarea(keyboard, ta);
-        } else {
-            lv_keyboard_set_textarea(keyboard, ta);
-        }
-    }
-}
-
-static void btn_connect(lv_obj_t *obj, lv_event_t event) {
-    if (event == LV_EVENT_CLICKED and
-        ((lv_textarea_get_text(ssidTA) != NULL and lv_textarea_get_text(ssidTA)[0] != '\0') or
-         (lv_textarea_get_text(pwdTA) != NULL and lv_textarea_get_text(pwdTA)[0] != '\0'))) {
-        uint8_t wifiAttempts = 10;
-
-        config.ssid = lv_textarea_get_text(ssidTA);
-        Serial.println(config.ssid.c_str());
-        config.password = lv_textarea_get_text(pwdTA);
-
-        mySDCard.saveConfig(config, configFilePath);
-        mySDCard.printConfig(configFilePath);
-        WiFi.begin(config.ssid.c_str(), config.password.c_str());
-        while (WiFi.status() != WL_CONNECTED and wifiAttempts > 0) {
-            delay(500);
-            wifiAttempts--;
-        }
-
-        if (WiFi.status() == WL_CONNECTED)
-            Serial.println("btn_connect -> connected to Wi-Fi! IP: " + WiFi.localIP().toString());
-        else if (WiFi.status() == WL_DISCONNECTED)
-            Serial.println("btn_connect -> can't connect. Probably you have entered wrong credentials.");
-        lv_disp_load_scr(Screens::mainScr->getScreen());
-        lv_textarea_set_text(ssidTA, "");
-        lv_textarea_set_text(pwdTA, "");
-    }
-}
-
 // Unlocking button clicked
 static void unlockButton_task(lv_obj_t *obj, lv_event_t event) {
     Serial.print(lv_btn_get_state(unlockButton));
     if (event == LV_EVENT_CLICKED) lv_disp_load_scr(Screens::mainScr->getScreen());
-}
-
-// Exit from wifi settings button clicked
-static void btn_cancel(lv_obj_t *obj, lv_event_t event) {
-    if (event == LV_EVENT_CLICKED) {
-        lv_disp_load_scr(Screens::settingsScr->getScreen());
-        lv_textarea_set_text(ssidTA, "");
-        lv_textarea_set_text(pwdTA, "");
-    }
 }
 
 static void btn_settings_back(lv_obj_t *obj, lv_event_t event) {
@@ -259,7 +199,7 @@ static void btn_settings_back(lv_obj_t *obj, lv_event_t event) {
 
 void timesettings_back_btn(lv_obj_t *obj, lv_event_t event) {
     if (event == LV_EVENT_CLICKED) {
-        switch (config.lcdLockTime) {
+        switch (Global::config.lcdLockTime) {
             case -1:
                 lv_dropdown_set_selected(lockScreenDDlist, 4);
                 break;
@@ -290,26 +230,26 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event) {
     if (event == LV_EVENT_CLICKED) {
         switch (lv_dropdown_get_selected(lockScreenDDlist)) {
             case 0:
-                config.lcdLockTime = 60000;
+                Global::config.lcdLockTime = 60000;
                 break;
             case 1:
-                config.lcdLockTime = 300000;
+                Global::config.lcdLockTime = 300000;
                 break;
             case 2:
-                config.lcdLockTime = 600000;
+                Global::config.lcdLockTime = 600000;
                 break;
             case 3:
-                config.lcdLockTime = 3600000;
+                Global::config.lcdLockTime = 3600000;
                 break;
             case 4:
-                config.lcdLockTime = -1;
+                Global::config.lcdLockTime = -1;
                 break;
             default:
-                config.lcdLockTime = 60000;
+                Global::config.lcdLockTime = 60000;
                 break;
         }
-        mySDCard.saveConfig(config, configFilePath);
-        mySDCard.printConfig(configFilePath);
+        Peripherals::mySDCard.saveConfig(Global::config, Global::configFilePath);
+        Peripherals::mySDCard.printConfig(Global::configFilePath);
         if (timeChanged == true) {
             String datet = lv_label_get_text(dateBtnLabel) + (String)lv_textarea_get_text(timeHour) + ":" +
                            (String)lv_textarea_get_text(timeMinute);
@@ -317,17 +257,17 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event) {
             RtcDateTime *dt = new RtcDateTime(atoi(datet.substring(6, 10).c_str()), atoi(datet.substring(3, 6).c_str()),
                                               atoi(datet.substring(0, 2).c_str()), datet.substring(10, 12).toDouble(),
                                               datet.substring(13, 15).toDouble(), 0);
-            Rtc.SetDateTime(*dt);
-            Rtc.SetIsRunning(true);
+            Peripherals::Rtc.SetDateTime(*dt);
+            Peripherals::Rtc.SetIsRunning(true);
         }
         if (dateChanged == true) {
-            RtcDateTime ori = Rtc.GetDateTime();
+            RtcDateTime ori = Peripherals::Rtc.GetDateTime();
             String date = lv_label_get_text(dateBtnLabel);
             RtcDateTime *dt =
                 new RtcDateTime(atoi(date.substring(6).c_str()), atoi(date.substring(3, 6).c_str()),
                                 atoi(date.substring(0, 2).c_str()), ori.Hour(), ori.Minute(), ori.Second());
-            Rtc.SetDateTime(*dt);
-            Rtc.SetIsRunning(true);
+            Peripherals::Rtc.SetDateTime(*dt);
+            Peripherals::Rtc.SetIsRunning(true);
         }
         lv_disp_load_scr(Screens::mainScr->getScreen());
         inTimeSettings = false;
@@ -556,21 +496,6 @@ static void date_button_func(lv_obj_t *btn, lv_event_t event) {
     }
 }
 
-static void showHideBtn_func(lv_obj_t *btn, lv_event_t event) {
-    if (event == LV_EVENT_CLICKED) {
-        if (lv_textarea_get_pwd_mode(pwdTA)) {
-            lv_textarea_set_pwd_mode(pwdTA, false);
-            lv_label_set_text(showHideBtnLabel, LV_SYMBOL_EYE_CLOSE);
-        } else {
-            lv_textarea_set_pwd_mode(pwdTA, true);
-            lv_textarea_set_pwd_show_time(pwdTA, 1);
-            lv_textarea_set_text(pwdTA, lv_textarea_get_text(pwdTA));
-            lv_textarea_set_pwd_show_time(pwdTA, 5000);
-            lv_label_set_text(showHideBtnLabel, LV_SYMBOL_EYE_OPEN);
-        }
-    }
-}
-
 static void measureNumberIncrement_func(lv_obj_t *btn, lv_event_t event) {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT) {
         if ((lv_spinbox_get_value(measurePeriodHour) * 3600 + lv_spinbox_get_value(measurePeriodMinute) * 60 +
@@ -633,17 +558,17 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event) {
         int get_value = lv_spinbox_get_value(measurePeriodHour) * 60 * 60000 +
                         lv_spinbox_get_value(measurePeriodMinute) * 60000 +
                         lv_spinbox_get_value(measurePeriodsecond) * 1000;
-        config.timeBetweenSavingSamples = get_value;
-        config.numberOfSamples = lv_spinbox_get_value(measureNumber);
-        config.measurePeriod = lv_spinbox_get_value(measureAvPeriod) * 1000;
-        config.turnFanTime = lv_spinbox_get_value(turnFanOnTime) * 1000;
+        Global::config.timeBetweenSavingSamples = get_value;
+        Global::config.numberOfSamples = lv_spinbox_get_value(measureNumber);
+        Global::config.measurePeriod = lv_spinbox_get_value(measureAvPeriod) * 1000;
+        Global::config.turnFanTime = lv_spinbox_get_value(turnFanOnTime) * 1000;
         getSample = lv_task_create(
-            getSampleFunc, (config.timeBetweenSavingSamples - (config.numberOfSamples - 1) * config.measurePeriod),
+            getSampleFunc, (Global::config.timeBetweenSavingSamples - (Global::config.numberOfSamples - 1) * Global::config.measurePeriod),
             LV_TASK_PRIO_MID, NULL);
-        turnFanOn = lv_task_create(turnFanOnFunc, config.timeBetweenSavingSamples - config.turnFanTime,
-                                   LV_TASK_PRIO_MID, NULL);
-        mySDCard.saveConfig(config, configFilePath);
-        mySDCard.printConfig(configFilePath);
+        turnFanOn =
+            lv_task_create(turnFanOnFunc, Global::config.timeBetweenSavingSamples - Global::config.turnFanTime, LV_TASK_PRIO_MID, NULL);
+        Peripherals::mySDCard.saveConfig(Global::config, Global::configFilePath);
+        Peripherals::mySDCard.printConfig(Global::configFilePath);
         lv_scr_load(Screens::mainScr->getScreen());
         display_current_config();
     }
@@ -651,8 +576,8 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event) {
 
 static void sampling_settings_back_btn(lv_obj_t *btn, lv_event_t event) {
     if (event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_set_value(measurePeriodHour, ((config.timeBetweenSavingSamples / 60000) / 60));
-        lv_spinbox_set_value(measurePeriodMinute, ((config.timeBetweenSavingSamples / 60000) % 60));
+        lv_spinbox_set_value(measurePeriodHour, ((Global::config.timeBetweenSavingSamples / 60000) / 60));
+        lv_spinbox_set_value(measurePeriodMinute, ((Global::config.timeBetweenSavingSamples / 60000) % 60));
         lv_scr_load(Screens::settingsScr->getScreen());
     }
 }

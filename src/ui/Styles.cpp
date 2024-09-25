@@ -1,10 +1,12 @@
 #include "ui/Styles.h"
+
 #include "ui/Symbols.h"
 
 lv_style_t Styles::borderlessStyle;
 lv_style_t Styles::containerStyle;
 lv_style_t Styles::transparentBackgroundStyle;
 lv_style_t Styles::lineStyle;
+lv_style_t Styles::whiteButtonStyle;
 
 lv_style_t Styles::font12Style;
 lv_style_t Styles::font20Style;
@@ -12,8 +14,7 @@ lv_style_t Styles::font22Style;
 lv_style_t Styles::whiteFontStyle;
 lv_style_t Styles::hugeFontStyle;
 
-void Styles::initStyles()
-{
+void Styles::initStyles() {
     lv_style_init(&transparentBackgroundStyle);
     lv_style_set_bg_opa(&transparentBackgroundStyle, LV_STATE_DEFAULT, LV_OPA_0);
 
@@ -45,4 +46,11 @@ void Styles::initStyles()
 
     lv_style_init(&hugeFontStyle);
     lv_style_set_text_font(&hugeFontStyle, LV_STATE_DEFAULT, &hugeSymbolsFont48);
+
+    lv_style_init(&whiteButtonStyle);
+    lv_style_set_bg_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_radius(&whiteButtonStyle, LV_STATE_DEFAULT, 10);
+    lv_style_set_border_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_outline_width(&whiteButtonStyle, LV_STATE_DEFAULT, 0);
+    lv_style_set_text_color(&whiteButtonStyle, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 }

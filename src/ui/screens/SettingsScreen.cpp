@@ -26,7 +26,7 @@ SettingsScreen::SettingsScreen() {
 
     Button wifiBtn = Button(settingsScr, NULL, 60, 60, 60, 38, [](lv_obj_t *, lv_event_t event) {
         if (event == LV_EVENT_CLICKED) {
-            // lv_scr_load(wifiScr);
+            lv_scr_load(WifiSettingsScreen::getInstance().getScreen());
         }
     });
     wifiBtnLabel = lv_label_create(wifiBtn, NULL);
