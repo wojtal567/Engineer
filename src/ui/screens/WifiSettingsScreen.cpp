@@ -80,6 +80,7 @@ WifiSettingsScreen::WifiSettingsScreen() {
     lv_obj_add_style(showHideBtn, LV_OBJ_PART_MAIN, &Styles::borderlessStyle);
     lv_obj_add_style(showHideBtnLabel, LV_OBJ_PART_MAIN, &Styles::whiteFontStyle);
 
+    // TODO add some optimization to this handler
     Button applyBtn = Button(wifiScr, NULL, 75, 43, 243, 43, [](lv_obj_t *, lv_event_t event) {
         if (event == LV_EVENT_CLICKED and
             ((lv_textarea_get_text(instance->ssidTA) != NULL and lv_textarea_get_text(instance->ssidTA)[0] != '\0') or

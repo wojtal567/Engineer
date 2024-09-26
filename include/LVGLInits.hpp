@@ -91,24 +91,7 @@ void timesettingsScreen() {
     lv_obj_add_style(syncRtcBtn, LV_BTN_PART_MAIN, &Styles::whiteButtonStyle);
 }
 
-void infoScreen() {
-    backInfoBtn = Button(infoScr, NULL, 30, 15, 14, 10, [](lv_obj_t *, lv_event_t event) {
-        if (event == LV_EVENT_CLICKED) {
-            lv_disp_load_scr(Screens::mainScr->getScreen());
-        }
-    });  // TODO copy was: backSettingsBtn
-    backInfoLabel = lv_label_create(backInfoBtn, NULL);
-    lv_label_set_text(backInfoLabel, LV_SYMBOL_LEFT);
 
-    lcdLabelAtBar = Label(infoScr, NULL, 216, 10, "Device info");
-
-    infoWifiLabel = Label(infoScr, NULL, 5, 53, "WiFi address: ");
-    lv_obj_set_style_local_text_font(infoWifiLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-
-    infoWifiAddressLabel = Label(infoScr, infoWifiLabel, 115, 53, "");
-
-    configLabel = Label(infoScr, NULL, 5, 70, "");
-}
 
 void samplingsettingsScreen() {
     backSamplingSettingsBtn = Button(samplingSettingsScr, NULL, 30, 15, 14, 10,

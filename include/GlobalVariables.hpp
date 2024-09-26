@@ -52,14 +52,6 @@ static lv_style_t font16Style;
 
 static lv_style_t warningStyle;
 
-// ? -------------------------------------------------- info gui
-lv_obj_t *infoScr;
-lv_obj_t *backInfoBtn;
-lv_obj_t *backInfoLabel;
-lv_obj_t *lcdLabelAtBar;
-lv_obj_t *infoWifiLabel;
-lv_obj_t *infoWifiAddressLabel;
-lv_obj_t *configLabel;
 // ? --------------------------------------------------time settings gui
 lv_obj_t *timeSettingsScr;
 

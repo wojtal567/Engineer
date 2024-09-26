@@ -15,6 +15,7 @@
 namespace Screens {
 MainScreen *mainScr = nullptr;
 SettingsScreen *settingsScr = nullptr;
+InfoScreen *infoScr = nullptr;
 }  // namespace Screens
 
 // ! --------------------------------------------REST WebServer config
@@ -171,8 +172,7 @@ void setup() {
 
     Screens::mainScr = new MainScreen();
     Screens::settingsScr = new SettingsScreen();
-    infoScr = lv_cont_create(NULL, NULL);
-    lv_obj_set_style_local_bg_color(infoScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    Screens::infoScr = new InfoScreen();
     timeSettingsScr = lv_cont_create(NULL, NULL);
     lv_obj_set_style_local_bg_color(timeSettingsScr, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
 
@@ -183,7 +183,6 @@ void setup() {
 
     // Screens initialization function
     lockScreen();
-    infoScreen();
     timesettingsScreen();
     samplingsettingsScreen();
 
@@ -238,7 +237,6 @@ void setup() {
         } else if (WiFi.status() == WL_DISCONNECTED)
             Serial.println("setup -> can't connect to Wi-Fi - probably no data or corrupted or wrong!");
     }
-    display_current_config();
     delay(500);
 }
 

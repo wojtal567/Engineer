@@ -63,30 +63,6 @@ int getDDListIndexBasedOnLcdLockTime(int lcdLockTime) {
     }
 }
 
-void display_current_config() {
-    String current_config = (String) "SSID: " + Global::config.ssid.c_str();
-    current_config += (String) "\nNumber of samples: " + (String)Global::config.numberOfSamples;
-    if (Global::config.lcdLockTime == -1) current_config += "\nLCD lock time: Never";
-    if (Global::config.lcdLockTime == 30000) current_config += "\nLCD lock time: 30s";
-    if (Global::config.lcdLockTime > 30000)
-        current_config += "\nLCD lock time: " + (String)(Global::config.lcdLockTime / 60000) + "m";
-    current_config += (String) "\nFan running time before measure: " + Global::config.turnFanTime / 1000 + "s\n";
-    current_config +=
-        (String) "Time between measurments: " + Global::config.measurePeriod / 1000 + "s\nMeasurements saving time: ";
-    if (Global::config.timeBetweenSavingSamples >= 3600000)
-        current_config += Global::config.timeBetweenSavingSamples / 60000 / 60 + (String) "h" +
-                          (Global::config.timeBetweenSavingSamples / 60000) % 60 + (String) "m" +
-                          (Global::config.timeBetweenSavingSamples / 1000) % 60 + "s";
-    else if (Global::config.timeBetweenSavingSamples >= 60000) {
-        current_config += (Global::config.timeBetweenSavingSamples / 60000) % 60 + (String) "m " +
-                          (Global::config.timeBetweenSavingSamples / 1000) % 60 + "s";
-    } else {
-        current_config += (Global::config.timeBetweenSavingSamples / 1000) + (String) "s";
-    }
-    lv_obj_set_style_local_text_font(configLabel, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_label_set_text(configLabel, current_config.c_str());
-}
-
 // Function that turns fan on
 void turnFanOnFunc(lv_task_t *task) {
     digitalWrite(PinConfig::fanPin, HIGH);
@@ -273,7 +249,6 @@ void timesettings_save_btn(lv_obj_t *obj, lv_event_t event) {
         inTimeSettings = false;
         timeChanged = false;
         dateChanged = false;
-        display_current_config();
     }
 }
 
@@ -562,15 +537,15 @@ static void sampling_settings_save_btn(lv_obj_t *btn, lv_event_t event) {
         Global::config.numberOfSamples = lv_spinbox_get_value(measureNumber);
         Global::config.measurePeriod = lv_spinbox_get_value(measureAvPeriod) * 1000;
         Global::config.turnFanTime = lv_spinbox_get_value(turnFanOnTime) * 1000;
-        getSample = lv_task_create(
-            getSampleFunc, (Global::config.timeBetweenSavingSamples - (Global::config.numberOfSamples - 1) * Global::config.measurePeriod),
-            LV_TASK_PRIO_MID, NULL);
-        turnFanOn =
-            lv_task_create(turnFanOnFunc, Global::config.timeBetweenSavingSamples - Global::config.turnFanTime, LV_TASK_PRIO_MID, NULL);
+        getSample = lv_task_create(getSampleFunc,
+                                   (Global::config.timeBetweenSavingSamples -
+                                    (Global::config.numberOfSamples - 1) * Global::config.measurePeriod),
+                                   LV_TASK_PRIO_MID, NULL);
+        turnFanOn = lv_task_create(turnFanOnFunc, Global::config.timeBetweenSavingSamples - Global::config.turnFanTime,
+                                   LV_TASK_PRIO_MID, NULL);
         Peripherals::mySDCard.saveConfig(Global::config, Global::configFilePath);
         Peripherals::mySDCard.printConfig(Global::configFilePath);
         lv_scr_load(Screens::mainScr->getScreen());
-        display_current_config();
     }
 }
 

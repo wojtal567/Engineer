@@ -41,7 +41,8 @@ SettingsScreen::SettingsScreen() {
 
     Button infoBtn = Button(settingsScr, wifiBtn, 60, 60, 200, 38, [](lv_obj_t *, lv_event_t event) {
         if (event == LV_EVENT_CLICKED) {
-            // lv_scr_load(infoScr);
+            Screens::infoScr->display_current_config();
+            lv_scr_load(Screens::infoScr->getScreen());
         }
     });
     infoBtnLabel = lv_label_create(infoBtn, NULL);

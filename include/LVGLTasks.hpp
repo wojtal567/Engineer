@@ -82,10 +82,11 @@ void statusFunc(lv_task_t *task) {
 
     if (wifiConnected) {
         lv_obj_set_hidden(wifiStatusAtLockWarning, true);
-        lv_label_set_text(infoWifiAddressLabel, WiFi.localIP().toString().c_str());
+        Screens::infoScr->setWifiAddress(WiFi.localIP().toString().c_str());
+
     } else {
         lv_obj_set_hidden(wifiStatusAtLockWarning, false);
-        lv_label_set_text(infoWifiAddressLabel, "No WiFi connection");
+        Screens::infoScr->setWifiAddress("No WiFi connection");
     }
 
     const bool sdCardError = Peripherals::mySDCard.start(&Peripherals::sampleDB, &Serial2);
